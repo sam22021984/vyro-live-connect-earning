@@ -3,6 +3,8 @@ import { LogOut, ChevronDown, Sparkles } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 
+
+
 const services = [
   { name: "Finance", icon: "💰", gradient: "from-green-400 to-emerald-500", highlight: false },
   { name: "Tasks & Rewards", icon: "🎁", gradient: "from-pink-400 to-rose-500", highlight: false },
@@ -23,23 +25,17 @@ const services = [
 ];
 
 function ServiceCard({ service, onClick }) {
-  const [tapped, setTapped] = useState(false);
   return (
     <button
+      type="button"
       onClick={onClick}
-      onPointerDown={() => setTapped(true)}
-      onPointerUp={() => setTapped(false)}
-      onPointerLeave={() => setTapped(false)}
-      className={`relative flex flex-col items-center justify-center gap-2 p-3 rounded-[20px] transition-all duration-300
-        ${tapped ? "scale-95" : "hover:scale-[1.05]"}
+      className={`relative flex flex-col items-center justify-center gap-2 p-3 rounded-[20px] transition-all duration-200 active:scale-95 hover:scale-[1.05]
         ${service.highlight
           ? "bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200/60"
           : "bg-white/80 backdrop-blur-xl border border-white"
         }`}
       style={{
-        boxShadow: tapped
-          ? "0 1px 2px rgba(0,0,0,0.08)"
-          : service.highlight
+        boxShadow: service.highlight
           ? "0 4px 12px rgba(245,158,11,0.15), 0 1px 3px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)"
           : "0 4px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.9)",
       }}
@@ -48,11 +44,9 @@ function ServiceCard({ service, onClick }) {
         <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-sm shadow-amber-300" />
       )}
       <div
-        className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center transition-transform duration-300`}
+        className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center`}
         style={{
-          boxShadow: tapped
-            ? "0 1px 2px rgba(0,0,0,0.15)"
-            : "0 3px 8px rgba(0,0,0,0.18), inset 0 1px 1px rgba(255,255,255,0.35), inset 0 -2px 4px rgba(0,0,0,0.12)",
+          boxShadow: "0 3px 8px rgba(0,0,0,0.18), inset 0 1px 1px rgba(255,255,255,0.35), inset 0 -2px 4px rgba(0,0,0,0.12)",
         }}
       >
         <span className="text-xl" style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.2))" }}>{service.icon}</span>
