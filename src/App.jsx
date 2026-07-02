@@ -22,6 +22,7 @@ import ApplicationDetail from '@/pages/ApplicationDetail';
 import Recharge from '@/pages/Recharge';
 import LevelSystem from '@/pages/LevelSystem';
 import VyroMall from '@/pages/VyroMall';
+import TasksRewards from '@/pages/TasksRewards';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -63,6 +64,7 @@ const AuthenticatedApp = () => {
         <Route path="/recharge" element={<Recharge />} />
         <Route path="/level-system" element={<LevelSystem />} />
         <Route path="/vyro-mall" element={<VyroMall />} />
+        <Route path="/tasks-rewards" element={<TasksRewards />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

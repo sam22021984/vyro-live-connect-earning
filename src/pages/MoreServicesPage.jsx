@@ -37,6 +37,8 @@ export default function MoreServicesPage() {
       navigate("/level-system");
     } else if (s.name === "VYRO Mall") {
       navigate("/vyro-mall");
+    } else if (s.name === "Tasks & Rewards") {
+      navigate("/tasks-rewards");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
