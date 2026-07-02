@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield } from "lucide-react";
 
 const dashboards = [
   {
@@ -13,6 +13,17 @@ const dashboards = [
     color: "#2F80ED",
     badge: "HIGHEST AUTHORITY",
     modules: ["Dashboard Home", "Global Search", "Country Control", "Role Management", "Applications", "Revenue Center", "Gift Center", "Coin Economy", "Rankings", "Live Monitoring", "AI Monitoring", "Security Command", "Finance Center", "Audit Center", "Broadcast", "Automation", "Business Intelligence", "Settings", "Owner Powers"],
+  },
+  {
+    id: "sam",
+    title: "SAM Dashboard",
+    description: "Super Admin Manager controls users, coins, sellers, recharges, withdrawals, wallets, revenue, security, and system health",
+    icon: Shield,
+    path: "/sam-dashboard",
+    gradient: "linear-gradient(135deg, #D4AF37, #B8941E)",
+    color: "#D4AF37",
+    badge: "SUPER ADMIN",
+    modules: ["Dashboard Overview", "User Management", "Coin Management", "Coin Seller Management", "Offline Recharge", "Wallet Control Center", "Withdrawal Management", "Agency & Agent Management", "Host & Streaming", "Gift & Revenue", "Reports & Analytics", "Security Center", "Admin Control", "System Health", "SAM Profile"],
   },
 ];
 
