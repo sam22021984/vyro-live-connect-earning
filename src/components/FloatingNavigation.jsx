@@ -46,7 +46,7 @@ export default function FloatingNavigation() {
   };
 
   const sideButtons = [
-    { icon: Mic, label: "Party", path: "/more-services", color: "#EF4444" },
+    { icon: Mic, label: "Party", path: "/party-dashboard", color: "#EF4444" },
     { icon: ImagePlay, label: "Community", path: "/community-dashboard", color: "#EC4899" },
   ];
   const rightButtons = [
