@@ -32,7 +32,7 @@ export default function MoreServicesPage() {
     } else if (s.name === "Apply Center") {
       navigate("/apply-center");
     } else if (s.name === "Finance") {
-      navigate("/recharge");
+      navigate("/finance");
     } else if (s.name === "Level System") {
       navigate("/level-system");
     } else if (s.name === "VYRO Mall") {

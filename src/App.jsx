@@ -32,6 +32,7 @@ import CommunityDashboard from '@/pages/CommunityDashboard';
 import PartyDashboard from '@/pages/PartyDashboard';
 import LiveRoom from '@/pages/LiveRoom';
 import GoLivePanel from '@/pages/GoLivePanel';
+import Finance from '@/pages/Finance';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -83,6 +84,7 @@ const AuthenticatedApp = () => {
         <Route path="/party-dashboard" element={<PartyDashboard />} />
         <Route path="/live-room" element={<LiveRoom />} />
         <Route path="/go-live" element={<GoLivePanel />} />
+        <Route path="/finance" element={<Finance />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
