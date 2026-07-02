@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, FileText, Clock, CheckCircle, XCircle, Search } from "lucide-react";
-import { applicationTypes, statusTypes, myApplications } from "@/components/apply/applyData";
+import { applicationTypes, statusTypes, myApplications, applyCategories } from "@/components/apply/applyData";
 
 export default function ApplyCenter() {
   const navigate = useNavigate();
   const [view, setView] = useState("home");
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("hosts");
+
+  const filteredApps = applicationTypes.filter((a) => a.category === activeCategory);
 
   const getStatus = (key) => statusTypes.find((s) => s.key === key);
 
@@ -112,11 +115,27 @@ export default function ApplyCenter() {
             </div>
           </div>
 
+          {/* Category tabs - 4 equal width, single row, no scroll */}
+          <div className="grid grid-cols-4 gap-2">
+            {applyCategories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-[11px] font-semibold transition active:scale-95 ${activeCategory === cat.id ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-200" : "bg-white text-gray-500 border border-gray-100"}`}
+              >
+                <span className="text-base">{cat.icon}</span>
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
           {/* Application types */}
           <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">Application Modules</h3>
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">
+              {applyCategories.find((c) => c.id === activeCategory)?.label} Modules
+            </h3>
             <div className="grid grid-cols-2 gap-2.5">
-              {applicationTypes.map((app) => (
+              {filteredApps.map((app) => (
                 <button
                   key={app.id}
                   onClick={() => navigate(`/apply-center/${app.id}`)}

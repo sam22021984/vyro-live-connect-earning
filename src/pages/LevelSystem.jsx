@@ -6,8 +6,10 @@ import { levelSystems } from "@/components/levels/levelData";
 export default function LevelSystem() {
   const navigate = useNavigate();
   const [activeLevel, setActiveLevel] = useState(null);
+  const [activeTab, setActiveTab] = useState("user");
 
   const formatNum = (n) => n.toLocaleString();
+  const currentLevel = levelSystems.find((l) => l.id === activeTab);
 
   return (
     <div className="min-h-screen bg-[#F8F9FC]">
@@ -33,9 +35,24 @@ export default function LevelSystem() {
             <p className="text-xs text-white/80">Four independent level systems track your growth across VYRO Live Connect.</p>
           </div>
 
-          {/* Level cards */}
-          <div className="space-y-4">
+          {/* 4 tabs - equal width, single row, no scroll */}
+          <div className="grid grid-cols-4 gap-2">
             {levelSystems.map((level) => (
+              <button
+                key={level.id}
+                onClick={() => setActiveTab(level.id)}
+                className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-[11px] font-semibold transition active:scale-95 ${activeTab === level.id ? "text-white shadow-md" : "bg-white text-gray-500 border border-gray-100"}`}
+                style={activeTab === level.id ? { background: `linear-gradient(135deg, ${level.color}, ${level.color}cc)`, boxShadow: `0 4px 12px ${level.color}40` } : {}}
+              >
+                <span className="text-base">{level.icon}</span>
+                {level.name.split(" ")[0]}
+              </button>
+            ))}
+          </div>
+
+          {/* Active level card */}
+          <div className="space-y-4">
+            {[currentLevel].map((level) => (
               <div
                 key={level.id}
                 className="relative rounded-3xl overflow-hidden bg-white border border-gray-50 shadow-sm"
