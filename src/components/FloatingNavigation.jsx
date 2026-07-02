@@ -47,7 +47,7 @@ export default function FloatingNavigation() {
 
   const sideButtons = [
     { icon: Mic, label: "Party", path: "/more-services", color: "#EF4444" },
-    { icon: ImagePlay, label: "Community", path: "/", color: "#EC4899" },
+    { icon: ImagePlay, label: "Community", path: "/community-dashboard", color: "#EC4899" },
   ];
   const rightButtons = [
     { icon: MessageCircle, label: "Messages", path: "/messages", color: "#3B82F6", badge: 3 },

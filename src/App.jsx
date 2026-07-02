@@ -28,6 +28,7 @@ import Messages from '@/pages/Messages';
 import ChatRoom from '@/pages/ChatRoom';
 import Social from '@/pages/Social';
 import RelationshipCenter from '@/pages/RelationshipCenter';
+import CommunityDashboard from '@/pages/CommunityDashboard';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -75,6 +76,7 @@ const AuthenticatedApp = () => {
         <Route path="/chat/:id" element={<ChatRoom />} />
         <Route path="/social" element={<Social />} />
         <Route path="/relationship-center" element={<RelationshipCenter />} />
+        <Route path="/community-dashboard" element={<CommunityDashboard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
