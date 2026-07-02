@@ -5,6 +5,7 @@ import { levelSystems } from "@/components/levels/levelData";
 import UserLevelDashboard from "@/components/levels/UserLevelDashboard";
 import StreamingLevelDashboard from "@/components/levels/StreamingLevelDashboard";
 import HostLevelDashboard from "@/components/levels/HostLevelDashboard";
+import GiftingLevelDashboard from "@/components/levels/GiftingLevelDashboard";
 
 export default function LevelSystem() {
   const navigate = useNavigate();
@@ -55,6 +56,12 @@ export default function LevelSystem() {
               >
                 🎙️ Host Level
               </button>
+              <button
+                onClick={() => setActiveView("gifting-dashboard")}
+                className={`py-2.5 px-4 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 whitespace-nowrap ${activeView === "gifting-dashboard" ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-white shadow-md shadow-amber-200" : "bg-white text-gray-500 border border-gray-100"}`}
+              >
+                🎁 Gifting Level
+              </button>
             </div>
           </div>
         </div>
@@ -79,6 +86,9 @@ export default function LevelSystem() {
 
           {/* Host Level Dashboard */}
           {activeView === "host-dashboard" && <HostLevelDashboard />}
+
+          {/* Gifting Level Dashboard */}
+          {activeView === "gifting-dashboard" && <GiftingLevelDashboard />}
 
           {/* Level cards - overview only */}
           {activeView === "overview" && (
