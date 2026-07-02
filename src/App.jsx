@@ -30,6 +30,7 @@ import Social from '@/pages/Social';
 import RelationshipCenter from '@/pages/RelationshipCenter';
 import CommunityDashboard from '@/pages/CommunityDashboard';
 import PartyDashboard from '@/pages/PartyDashboard';
+import LiveRoom from '@/pages/LiveRoom';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -79,6 +80,7 @@ const AuthenticatedApp = () => {
         <Route path="/relationship-center" element={<RelationshipCenter />} />
         <Route path="/community-dashboard" element={<CommunityDashboard />} />
         <Route path="/party-dashboard" element={<PartyDashboard />} />
+        <Route path="/live-room" element={<LiveRoom />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
