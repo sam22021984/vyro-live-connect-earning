@@ -33,6 +33,8 @@ export default function MoreServicesPage() {
       navigate("/apply-center");
     } else if (s.name === "Finance") {
       navigate("/finance");
+    } else if (s.name === "Control Center") {
+      navigate("/agency-dashboard");
     } else if (s.name === "Level System") {
       navigate("/level-system");
     } else if (s.name === "VYRO Mall") {

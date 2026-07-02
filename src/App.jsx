@@ -35,6 +35,7 @@ import GoLivePanel from '@/pages/GoLivePanel';
 import Finance from '@/pages/Finance';
 import FinanceModule from '@/pages/FinanceModule';
 import CoinsRecharge from '@/pages/CoinsRecharge';
+import AgencyDashboard from '@/pages/AgencyDashboard';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -89,6 +90,7 @@ const AuthenticatedApp = () => {
         <Route path="/finance" element={<Finance />} />
         <Route path="/finance-module" element={<FinanceModule />} />
         <Route path="/coins-recharge" element={<CoinsRecharge />} />
+        <Route path="/agency-dashboard" element={<AgencyDashboard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
