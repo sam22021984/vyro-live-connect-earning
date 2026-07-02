@@ -1,19 +1,7 @@
 import React, { useState } from "react";
-import { LogOut, ChevronDown, Sparkles, ChevronRight, ArrowLeft } from "lucide-react";
+import { LogOut, ChevronDown, Sparkles } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-
-const settingsList = [
-  { name: "App Settings", icon: "⚙️", color: "from-slate-400 to-gray-500" },
-  { name: "Device Settings", icon: "📱", color: "from-blue-400 to-cyan-500" },
-  { name: "Language Settings", icon: "🌐", color: "from-green-400 to-emerald-500" },
-  { name: "Notification Settings", icon: "🔔", color: "from-red-400 to-orange-500" },
-  { name: "Storage & Data", icon: "💾", color: "from-purple-400 to-violet-500" },
-  { name: "About Application", icon: "ℹ️", color: "from-sky-400 to-blue-500" },
-  { name: "Account Actions", icon: "👤", color: "from-indigo-400 to-blue-500" },
-  { name: "Security Settings", icon: "🛡️", color: "from-green-400 to-teal-500" },
-  { name: "Legal & Policies", icon: "📜", color: "from-amber-400 to-yellow-500" },
-  { name: "Developer Options", icon: "🧪", color: "from-fuchsia-400 to-purple-500" },
-];
+import { useNavigate } from "react-router-dom";
 
 const services = [
   { name: "Finance", icon: "💰", gradient: "from-green-400 to-emerald-500", highlight: false },
@@ -78,7 +66,7 @@ function ServiceCard({ service, onClick }) {
 
 export default function MoreServices() {
   const [open, setOpen] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  const navigate = useNavigate();
   const handleLogout = async () => {
     await base44.auth.logout("/login");
   };
@@ -141,7 +129,7 @@ export default function MoreServices() {
                   <ServiceCard
                     key={i}
                     service={s}
-                    onClick={s.name === "Settings" ? () => setShowSettings(true) : undefined}
+                    onClick={s.name === "Settings" ? () => navigate("/settings") : undefined}
                   />
                 ))}
               </div>
@@ -149,40 +137,6 @@ export default function MoreServices() {
           </div>
         </div>
       </div>
-
-      {/* Settings Panel - shows when Settings is tapped */}
-      {showSettings && (
-        <div className="mt-3 bg-white rounded-[20px] p-4 shadow-sm border border-gray-50 animate-fadeIn">
-          <button
-            onClick={() => setShowSettings(false)}
-            className="flex items-center gap-2 mb-4 text-gray-500 active:scale-[0.98] transition-all"
-          >
-            <ArrowLeft size={16} />
-            <span className="text-xs font-semibold">Back</span>
-          </button>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-lg">⚙️</span>
-            <h3 className="text-sm font-bold text-gray-800">Settings</h3>
-          </div>
-          <div className="space-y-1">
-            {settingsList.map((s, i) => (
-              <div
-                key={i}
-                className="w-full flex items-center gap-3 p-3 rounded-[14px] transition-all duration-200 hover:bg-gray-50 active:bg-gray-100 cursor-pointer"
-              >
-                <div
-                  className={`w-9 h-9 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center shrink-0`}
-                  style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.3)" }}
-                >
-                  <span className="text-base">{s.icon}</span>
-                </div>
-                <span className="flex-1 text-left text-sm font-medium text-gray-700">{s.name}</span>
-                <ChevronRight size={16} className="text-gray-300 shrink-0" />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Logout Button */}
       <button
