@@ -16,7 +16,7 @@ const services = [
   { name: "Control Center", icon: "🎛️", gradient: "from-fuchsia-400 to-purple-500", highlight: true },
   { name: "Creator Center", icon: "🚀", gradient: "from-purple-400 to-violet-600", highlight: true },
   { name: "VIP Membership", icon: "💎", gradient: "from-amber-300 to-yellow-500", highlight: true },
-  { name: "Mall", icon: "🏪", gradient: "from-orange-400 to-red-400", highlight: false },
+  { name: "VYRO Mall", icon: "🛒", gradient: "from-orange-400 to-red-500", highlight: true },
   { name: "Trust & Reputation", icon: "🛡️", gradient: "from-green-400 to-teal-500", highlight: false },
   { name: "Lucky ID Store", icon: "🍀", gradient: "from-lime-400 to-green-500", highlight: false },
 ];
@@ -35,6 +35,8 @@ export default function MoreServicesPage() {
       navigate("/recharge");
     } else if (s.name === "Level System") {
       navigate("/level-system");
+    } else if (s.name === "VYRO Mall") {
+      navigate("/vyro-mall");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
