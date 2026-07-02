@@ -12,6 +12,105 @@ export const vipLevels = [
   { id: 11, name: "ROYAL IMISSVIP", title: "Royal Emperor Throne", icon: "👑", color: "#FFD700", glow: "#DC143C", coins: 50000000, cash: 4200, benefits: ["Highest VIP Identity", "Royal Badge", "Royal Frame", "Exclusive Royal Gifts", "Elite VIP Lounge", "Maximum VIP Privileges"] },
 ];
 
+export const vipPricingTiers = [
+  {
+    id: "vip1", name: "VIP 1", icon: "🥉", tierIcon: "🥉",
+    color: "#CD7F32", gradient: "from-amber-600 to-yellow-700",
+    coins: "100,000", cash: "$5", dailyCoins: "300",
+    benefits: ["VIP Badge", "Basic Profile Frame", "Colored Username", "Exclusive VIP Emojis", "VIP Welcome Message", "Basic Priority Support"],
+    authority: ["No seat access without VIP rule (basic restriction only)", "Warning permission (only if room admin)"],
+    rewardTime: { dailyCoins: "Every 24 hours", frameEntry: "7 days" },
+  },
+  {
+    id: "vvip", name: "VVIP", icon: "🥈", tierIcon: "🥈",
+    color: "#C0C0C0", gradient: "from-slate-300 to-slate-500",
+    coins: "200,000", cash: "$10", dailyCoins: "500",
+    benefits: ["VVIP Badge", "Premium Profile Frame", "Colored Username", "Exclusive Chat Bubble", "VIP Emojis Pack", "Priority Support", "2% Gift Cashback"],
+    authority: ["Seat access allowed", "Mute / warning (if room admin)", "Seat reservation (admin only)"],
+    rewardTime: { dailyCoins: "24 hours", frameEntry: "7 days" },
+  },
+  {
+    id: "svip", name: "SVIP", icon: "🥇", tierIcon: "🥇",
+    color: "#FFD700", gradient: "from-yellow-400 to-amber-500",
+    coins: "500,000", cash: "$25", dailyCoins: "700",
+    benefits: ["SVIP Badge", "Animated Profile Frame", "Premium Chat Bubble", "Exclusive Stickers", "Entrance Effect", "Priority Support", "3% Gift Cashback"],
+    authority: ["Mute users (admin only)", "Seat invite control", "Music play control", "Private message only friends"],
+    rewardTime: { frame: "30 days", badge: "7 days", entry: "7 days" },
+  },
+  {
+    id: "ssvip", name: "SSVIP", icon: "💠", tierIcon: "💠",
+    color: "#22D3EE", gradient: "from-cyan-400 to-blue-500",
+    coins: "800,000", cash: "$40", dailyCoins: "1,000",
+    benefits: ["SSVIP Badge", "Animated Frame", "Animated Entrance Effect", "Exclusive Username Color", "Room Entry Priority", "VIP Support", "5% Gift Cashback"],
+    authority: ["Mute / warning", "Seat reservation", "Mic on/off control", "Invite/remove from mic (admin only)"],
+    rewardTime: { frame: "15 days", entry: "15 days" },
+  },
+  {
+    id: "msvip", name: "MSVIP", icon: "🥇", tierIcon: "🥇",
+    color: "#A855F7", gradient: "from-purple-500 to-violet-600",
+    coins: "1,500,000", cash: "$75", dailyCoins: "1,500",
+    benefits: ["MSVIP Crown Badge", "Luxury Profile Frame", "Vehicle Entry Effect", "Premium Chat Bubble", "Exclusive Gifts Access", "VIP Support", "7% Gift Cashback"],
+    authority: ["Full seat control", "Mute / kick (admin only)", "Music control", "Private message friends"],
+    rewardTime: { frame: "20 days", entry: "20 days" },
+  },
+  {
+    id: "mssvip", name: "MSSVIP", icon: "👑", tierIcon: "👑",
+    color: "#EC4899", gradient: "from-pink-500 to-rose-600",
+    coins: "2,500,000", cash: "$125", dailyCoins: "2,500",
+    benefits: ["MSSVIP Crown Badge", "Luxury Animated Frame", "Premium Entrance Animation", "Exclusive Gift Collection", "VIP Lounge Access", "Enhanced Support", "10% Gift Cashback"],
+    authority: ["Advanced moderation", "Seat lock/unlock", "Mic remove control", "Full room control tools"],
+    rewardTime: { frame: "25 days", entry: "25 days" },
+  },
+  {
+    id: "misvip", name: "MISVIP", icon: "💎", tierIcon: "💎",
+    color: "#3B82F6", gradient: "from-blue-400 to-indigo-600",
+    coins: "5,000,000", cash: "$250", dailyCoins: "4,000",
+    benefits: ["MISVIP Royal Crown", "Diamond Profile Frame", "Premium Vehicle Effect", "Exclusive ID Tag", "VIP Room Access", "Priority Verification", "VIP Exclusive Tasks", "VIP Lucky Draw Tickets", "VIP Shop Discounts", "12% Gift Cashback"],
+    authority: ["Highlight comments", "Topic change", "Full moderation tools", "Mic + seat full control"],
+    rewardTime: { dailyCoins: "Enabled", frame: "30 days" },
+  },
+  {
+    id: "missvip", name: "MISSVIP", icon: "👑", tierIcon: "👑",
+    color: "#9932CC", gradient: "from-purple-500 to-fuchsia-600",
+    coins: "10,000,000", cash: "$500", dailyCoins: "6,000",
+    benefits: ["MISSVIP Diamond Crown", "Diamond Animated Frame", "Legendary Entrance Effect", "Exclusive Room Theme", "Exclusive Avatar Items", "VIP Event Access", "Monthly Exclusive Gift Pack", "Double Daily Check-in Rewards", "VIP Event Invitations", "15% Gift Cashback"],
+    authority: ["Kick / mute / ban", "Room topic + cover change", "Full admin control"],
+    rewardTime: { frame: "45 days", entry: "45 days", dailyCoins: "Enabled" },
+  },
+  {
+    id: "ultra", name: "ULTRA MISSVIP", icon: "🔥", tierIcon: "🔥",
+    color: "#EF4444", gradient: "from-red-500 to-orange-600",
+    coins: "20,000,000", cash: "$1,000", dailyCoins: "30,000",
+    benefits: ["Ultra Crown Badge", "Ultra Animated Frame", "Super Entrance Effect", "Ultra Vehicle Effect", "Exclusive Gifts", "VIP Event Priority", "Monthly 500,000 Bonus Coins", "Priority Room Seat Reservation", "Exclusive Seasonal Avatar Set", "18% Gift Cashback"],
+    authority: ["Full admin system control", "Advanced moderation tools", "Room priority control"],
+    rewardTime: { frame: "50 days", entry: "50 days", monthlyBonus: "Enabled" },
+  },
+  {
+    id: "legend", name: "LEGEND IMISVIP", icon: "👑", tierIcon: "👑",
+    color: "#6366F1", gradient: "from-indigo-500 to-purple-600",
+    coins: "50,000,000", cash: "$2,500", dailyCoins: "50,000",
+    benefits: ["Legend Crown Badge", "Legendary Profile Frame", "Mythical Entrance Effect", "Custom Chat Bubble", "Exclusive Username Style", "Special VIP Events", "Monthly 1,500,000 Bonus Coins", "Custom Profile Background", "Priority Feature Testing Access", "Dedicated VIP Support", "20% Gift Cashback"],
+    authority: ["Super admin level control", "Feature testing access", "Full room governance"],
+    rewardTime: { frame: "60 days", entry: "60 days", monthlyBonus: "Enabled" },
+  },
+  {
+    id: "royal", name: "ROYAL IMISSVIP", icon: "🌌", tierIcon: "🌌",
+    color: "#FFD700", gradient: "from-amber-400 via-yellow-500 to-orange-500",
+    coins: "100,000,000", cash: "$5,000", dailyCoins: "100,000",
+    benefits: ["Royal King Crown Badge", "Ultimate Animated Frame", "Royal Entrance Effect", "Royal Vehicle Effect", "Custom Username Color", "Custom Profile Theme", "Exclusive Royal Gifts", "Highest Room Priority", "Dedicated Account Manager", "Premium 24/7 Support", "Private VIP Events", "Monthly 5,000,000 Bonus Coins", "Custom Animated Profile Background", "Royal Leaderboard Badge", "Early Access To New Features", "25% Gift Cashback"],
+    authority: ["Absolute room authority", "Global room control", "System-level permissions (room scope)"],
+    rewardTime: { frame: "60 days", entry: "60 days", note: "Highest reward system active" },
+  },
+];
+
+export const globalVipBenefits = [
+  "Daily Coin Rewards", "VIP Badges", "Profile Frames", "Username Styling",
+  "Exclusive Emojis", "Exclusive Chat Bubbles", "Entrance Effects", "Vehicle Effects",
+  "Gift Cashback Rewards", "VIP Support Access", "VIP Tasks & Rewards", "VIP Lucky Draw Access",
+  "VIP Leaderboards", "VIP Events Access", "VIP Room Privileges", "Exclusive Gifts & Gift Packs",
+  "Seasonal Rewards", "Priority Access Features", "Premium Recognition Across Platform",
+];
+
 export const durationPlans = [
   { id: 1, name: "15 Days", icon: "⚡", discount: 0, desc: "Short Premium Access" },
   { id: 2, name: "1 Month", icon: "📅", discount: 0, desc: "Standard Membership" },
@@ -22,6 +121,7 @@ export const durationPlans = [
 
 export const vipTabs = [
   { key: "home", label: "VIP Home", icon: "👑" },
+  { key: "pricing", label: "Pricing & Benefits", icon: "💰" },
   { key: "levels", label: "VIP Levels", icon: "💎" },
   { key: "benefits", label: "VIP Benefits", icon: "🎁" },
   { key: "upgrade", label: "Upgrade Center", icon: "🚀" },

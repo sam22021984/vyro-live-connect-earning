@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Crown } from "lucide-react";
 import { vipTabs } from "@/components/vip/vipData";
 import VipHomeTab from "@/components/vip/VipHomeTab";
+import VipPricingTab from "@/components/vip/VipPricingTab";
 import VipLevelsTab from "@/components/vip/VipLevelsTab";
 import VipBenefitsTab from "@/components/vip/VipBenefitsTab";
 import VipUpgradeTab from "@/components/vip/VipUpgradeTab";
@@ -22,6 +23,7 @@ export default function VipMembership() {
   const renderTab = () => {
     switch (activeTab) {
       case "home": return <VipHomeTab onNavigate={setActiveTab} />;
+      case "pricing": return <VipPricingTab />;
       case "levels": return <VipLevelsTab />;
       case "benefits": return <VipBenefitsTab />;
       case "upgrade": return <VipUpgradeTab />;
