@@ -4,7 +4,6 @@ const tabs = [
   { key: "profile", label: "Profile", icon: "👤" },
   { key: "stats", label: "Stats", icon: "📊" },
   { key: "history", label: "History", icon: "🕐" },
-  { key: "settings", label: "Settings", icon: "⚙️" },
 ];
 
 export default function ProfileTabs({ activeTab, onTabChange }) {
