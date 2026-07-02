@@ -22,6 +22,7 @@ import ApplicationDetail from '@/pages/ApplicationDetail';
 import Recharge from '@/pages/Recharge';
 import LevelSystem from '@/pages/LevelSystem';
 import VyroMall from '@/pages/VyroMall';
+import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -44,6 +45,7 @@ const AuthenticatedApp = () => {
   }
 
   return (
+    <>
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
@@ -64,6 +66,8 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    <FloatingNavigation />
+    </>
   );
 };
 
