@@ -14,6 +14,7 @@ export default function ProfileTabs({ activeTab, onTabChange }) {
         {tabs.map((tab) => (
           <button
             key={tab.key}
+            type="button"
             onClick={() => onTabChange(tab.key)}
             className={`flex-1 py-2.5 rounded-[14px] text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-1.5
               ${activeTab === tab.key
