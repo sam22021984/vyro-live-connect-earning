@@ -39,6 +39,8 @@ export default function MoreServicesPage() {
       navigate("/vyro-mall");
     } else if (s.name === "Tasks & Rewards") {
       navigate("/tasks-rewards");
+    } else if (s.name === "Profile & Stats") {
+      navigate("/profile-stats");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
