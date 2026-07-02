@@ -19,6 +19,7 @@ import MoreServicesPage from '@/pages/MoreServicesPage';
 import VipMembership from '@/pages/VipMembership';
 import ApplyCenter from '@/pages/ApplyCenter';
 import ApplicationDetail from '@/pages/ApplicationDetail';
+import Recharge from '@/pages/Recharge';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -55,6 +56,7 @@ const AuthenticatedApp = () => {
         <Route path="/vip-membership" element={<VipMembership />} />
         <Route path="/apply-center" element={<ApplyCenter />} />
         <Route path="/apply-center/:id" element={<ApplicationDetail />} />
+        <Route path="/recharge" element={<Recharge />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
