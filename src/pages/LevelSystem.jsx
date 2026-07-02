@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, X, Check, Coins, TrendingUp } from "lucide-react";
 import { levelSystems } from "@/components/levels/levelData";
 import UserLevelDashboard from "@/components/levels/UserLevelDashboard";
+import StreamingLevelDashboard from "@/components/levels/StreamingLevelDashboard";
 
 export default function LevelSystem() {
   const navigate = useNavigate();
@@ -27,19 +28,27 @@ export default function LevelSystem() {
 
         {/* View tabs */}
         <div className="sticky top-[57px] z-10 bg-[#F8F9FC]/90 backdrop-blur-xl px-4 pt-3 pb-2">
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => setActiveView("overview")}
-              className={`py-2.5 rounded-xl text-xs font-bold transition active:scale-95 ${activeView === "overview" ? "bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-md shadow-purple-200" : "bg-white text-gray-500 border border-gray-100"}`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveView("user-dashboard")}
-              className={`py-2.5 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 ${activeView === "user-dashboard" ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-200" : "bg-white text-gray-500 border border-gray-100"}`}
-            >
-              👤 User Level
-            </button>
+          <div className="overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2 min-w-max">
+              <button
+                onClick={() => setActiveView("overview")}
+                className={`py-2.5 px-4 rounded-xl text-xs font-bold transition active:scale-95 whitespace-nowrap ${activeView === "overview" ? "bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-md shadow-purple-200" : "bg-white text-gray-500 border border-gray-100"}`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveView("user-dashboard")}
+                className={`py-2.5 px-4 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 whitespace-nowrap ${activeView === "user-dashboard" ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-200" : "bg-white text-gray-500 border border-gray-100"}`}
+              >
+                👤 User Level
+              </button>
+              <button
+                onClick={() => setActiveView("stream-dashboard")}
+                className={`py-2.5 px-4 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 whitespace-nowrap ${activeView === "stream-dashboard" ? "bg-gradient-to-r from-blue-400 to-cyan-500 text-white shadow-md shadow-blue-200" : "bg-white text-gray-500 border border-gray-100"}`}
+              >
+                📡 Streaming Level
+              </button>
+            </div>
           </div>
         </div>
 
@@ -57,6 +66,9 @@ export default function LevelSystem() {
 
           {/* User Level Dashboard */}
           {activeView === "user-dashboard" && <UserLevelDashboard />}
+
+          {/* Streaming Level Dashboard */}
+          {activeView === "stream-dashboard" && <StreamingLevelDashboard />}
 
           {/* Level cards - overview only */}
           {activeView === "overview" && (
