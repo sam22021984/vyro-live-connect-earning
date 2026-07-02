@@ -91,7 +91,7 @@ export default function FloatingNavigation() {
       }}
     >
       <div
-        className="flex items-center gap-0 mb-2 px-2.5 py-1.5 rounded-full pointer-events-auto"
+        className="flex items-center gap-0 mb-0.5 px-2 py-1 rounded-full pointer-events-auto"
         style={{
           background: "rgba(255,255,255,0.72)",
           backdropFilter: "blur(24px) saturate(180%)",
