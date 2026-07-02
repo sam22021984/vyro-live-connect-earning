@@ -34,6 +34,7 @@ import LiveRoom from '@/pages/LiveRoom';
 import GoLivePanel from '@/pages/GoLivePanel';
 import Finance from '@/pages/Finance';
 import FinanceModule from '@/pages/FinanceModule';
+import CoinsRecharge from '@/pages/CoinsRecharge';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -87,6 +88,7 @@ const AuthenticatedApp = () => {
         <Route path="/go-live" element={<GoLivePanel />} />
         <Route path="/finance" element={<Finance />} />
         <Route path="/finance-module" element={<FinanceModule />} />
+        <Route path="/coins-recharge" element={<CoinsRecharge />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

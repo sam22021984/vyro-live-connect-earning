@@ -19,6 +19,12 @@ export default function FinanceModule() {
     setExpanded(expanded === id ? null : id);
   };
 
+  const handleOptionClick = (optionName) => {
+    if (optionName === "Coins Recharge") {
+      navigate("/coins-recharge");
+    }
+  };
+
   const filteredCategories = FINANCE_CATEGORIES.map((cat) => ({
     ...cat,
     options: cat.options.filter((opt) =>
@@ -76,6 +82,32 @@ export default function FinanceModule() {
             })}
           </div>
         </div>
+      </div>
+
+      {/* Quick Access Buttons */}
+      <div className="px-4 pt-3 grid grid-cols-2 gap-2">
+        <button
+          onClick={() => navigate("/coins-recharge")}
+          className="rounded-xl p-3 flex items-center gap-2 active:scale-95 transition"
+          style={{ background: "linear-gradient(135deg, #B8941E, #D4AF37)", boxShadow: "0 2px 8px rgba(212,175,55,0.25)" }}
+        >
+          <span className="text-lg">⚡</span>
+          <div className="text-left">
+            <p className="text-[11px] font-bold text-white">Coins Recharge</p>
+            <p className="text-[8px] text-white/80">20 Tiers · Wallet</p>
+          </div>
+        </button>
+        <button
+          onClick={() => navigate("/finance")}
+          className="rounded-xl p-3 flex items-center gap-2 active:scale-95 transition"
+          style={{ background: FINANCE_COLORS.navyGradient, boxShadow: "0 2px 8px rgba(15,27,61,0.2)" }}
+        >
+          <span className="text-lg">📊</span>
+          <div className="text-left">
+            <p className="text-[11px] font-bold text-white">Finance Dashboard</p>
+            <p className="text-[8px] text-white/60">Overview & Reports</p>
+          </div>
+        </button>
       </div>
 
       {/* Search */}
@@ -146,6 +178,7 @@ export default function FinanceModule() {
                   {cat.options.map((opt, i) => (
                     <button
                       key={i}
+                      onClick={() => handleOptionClick(opt.name)}
                       className="w-full flex items-center gap-3 px-4 py-2.5 active:scale-[0.98] transition"
                       style={{ background: "rgba(245,247,250,0.5)" }}
                     >

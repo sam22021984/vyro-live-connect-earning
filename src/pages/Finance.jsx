@@ -125,6 +125,30 @@ export default function Finance() {
               </div>
             </button>
 
+            {/* Coins Recharge Access Button */}
+            <button
+              onClick={() => navigate("/coins-recharge")}
+              className="w-full rounded-2xl p-4 flex items-center gap-3 active:scale-[0.98] transition"
+              style={{
+                background: "linear-gradient(135deg, #B8941E 0%, #D4AF37 50%, #E5C158 100%)",
+                boxShadow: "0 4px 16px rgba(212,175,55,0.3)",
+              }}
+            >
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)" }}
+              >
+                <span className="text-xl">⚡</span>
+              </div>
+              <div className="flex-1 text-left">
+                <h3 className="text-sm font-bold text-white">Coins Recharge Wallet</h3>
+                <p className="text-[10px] text-white/80">20 tiers · $1 → $5000 · Up to 22% bonus</p>
+              </div>
+              <div className="px-3 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)" }}>
+                <span className="text-xs font-bold text-white">Recharge →</span>
+              </div>
+            </button>
+
             <StatsCards />
             <AnalyticsChart />
             <TransactionsList />
