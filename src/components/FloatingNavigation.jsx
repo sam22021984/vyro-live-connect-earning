@@ -87,7 +87,7 @@ export default function FloatingNavigation() {
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(24px)",
-        paddingBottom: "env(safe-area-inset-bottom)",
+        bottom: "env(safe-area-inset-bottom)",
       }}
     >
       <div
