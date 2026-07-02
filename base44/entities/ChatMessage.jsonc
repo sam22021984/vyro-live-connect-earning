@@ -1,0 +1,79 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "conversation_id": {
+      "type": "string"
+    },
+    "sender_id": {
+      "type": "string"
+    },
+    "receiver_id": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
+    },
+    "translation": {
+      "type": "string"
+    },
+    "translation_lang": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "time": {
+      "type": "string"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_delivered": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_own": {
+      "type": "boolean",
+      "default": false
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "text",
+        "gift",
+        "call"
+      ],
+      "default": "text"
+    },
+    "gift_id": {
+      "type": "string"
+    },
+    "gift_name": {
+      "type": "string"
+    },
+    "gift_icon": {
+      "type": "string"
+    },
+    "gift_price": {
+      "type": "number",
+      "default": 0
+    },
+    "call_duration": {
+      "type": "string"
+    },
+    "call_type": {
+      "type": "string",
+      "enum": [
+        "outgoing",
+        "incoming",
+        "missed",
+        "declined"
+      ]
+    }
+  },
+  "required": [
+    "conversation_id"
+  ]
+}

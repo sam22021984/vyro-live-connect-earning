@@ -1,0 +1,27 @@
+{
+  "name": "Gift",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number",
+      "default": 0
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "luxury"
+      ],
+      "default": "standard"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

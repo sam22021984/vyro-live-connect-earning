@@ -24,6 +24,8 @@ import LevelSystem from '@/pages/LevelSystem';
 import VyroMall from '@/pages/VyroMall';
 import TasksRewards from '@/pages/TasksRewards';
 import ProfileStats from '@/pages/ProfileStats';
+import Messages from '@/pages/Messages';
+import ChatRoom from '@/pages/ChatRoom';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -67,6 +69,8 @@ const AuthenticatedApp = () => {
         <Route path="/vyro-mall" element={<VyroMall />} />
         <Route path="/tasks-rewards" element={<TasksRewards />} />
         <Route path="/profile-stats" element={<ProfileStats />} />
+        <Route path="/messages" element={<Messages />} />
+        <Route path="/chat/:id" element={<ChatRoom />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

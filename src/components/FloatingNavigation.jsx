@@ -50,7 +50,7 @@ export default function FloatingNavigation() {
     { icon: ImagePlay, label: "Community", path: "/", color: "#EC4899" },
   ];
   const rightButtons = [
-    { icon: MessageCircle, label: "Messages", path: "/more-services", color: "#3B82F6", badge: 3 },
+    { icon: MessageCircle, label: "Messages", path: "/messages", color: "#3B82F6", badge: 3 },
     { icon: User, label: "Me", path: "/", color: "#F59E0B" },
   ];
 
