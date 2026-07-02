@@ -129,7 +129,7 @@ export default function MoreServices() {
                   <ServiceCard
                     key={i}
                     service={s}
-                    onClick={s.name === "Settings" ? () => navigate("/settings") : undefined}
+                    onClick={() => navigate(s.name === "Settings" ? "/settings" : `/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } })}
                   />
                 ))}
               </div>

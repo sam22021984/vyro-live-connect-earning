@@ -14,6 +14,7 @@ import ResetPassword from '@/pages/ResetPassword';
 import Home from '@/pages/Home';
 import Settings from '@/pages/Settings';
 import SettingDetail from '@/pages/SettingDetail';
+import ServiceDetail from '@/pages/ServiceDetail';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -45,6 +46,7 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Home />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/settings/:id" element={<SettingDetail />} />
+        <Route path="/service/:id" element={<ServiceDetail />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
