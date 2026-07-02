@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, X, Check, Coins, TrendingUp } from "lucide-react";
 import { levelSystems } from "@/components/levels/levelData";
+import UserLevelDashboard from "@/components/levels/UserLevelDashboard";
 
 export default function LevelSystem() {
   const navigate = useNavigate();
   const [activeLevel, setActiveLevel] = useState(null);
+  const [activeView, setActiveView] = useState("overview");
 
   const formatNum = (n) => n.toLocaleString();
 
@@ -23,8 +25,27 @@ export default function LevelSystem() {
           </div>
         </div>
 
+        {/* View tabs */}
+        <div className="sticky top-[57px] z-10 bg-[#F8F9FC]/90 backdrop-blur-xl px-4 pt-3 pb-2">
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setActiveView("overview")}
+              className={`py-2.5 rounded-xl text-xs font-bold transition active:scale-95 ${activeView === "overview" ? "bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-md shadow-purple-200" : "bg-white text-gray-500 border border-gray-100"}`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveView("user-dashboard")}
+              className={`py-2.5 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 ${activeView === "user-dashboard" ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-200" : "bg-white text-gray-500 border border-gray-100"}`}
+            >
+              👤 User Level
+            </button>
+          </div>
+        </div>
+
         <div className="p-4 space-y-4">
-          {/* Hero banner */}
+          {/* Hero banner - overview only */}
+          {activeView === "overview" && (
           <div className="rounded-2xl p-4 bg-gradient-to-br from-purple-500 via-violet-500 to-indigo-600 text-white shadow-lg shadow-purple-200">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp size={16} />
@@ -32,8 +53,13 @@ export default function LevelSystem() {
             </div>
             <p className="text-xs text-white/80">Four independent level systems track your growth across VYRO Live Connect.</p>
           </div>
+          )}
 
-          {/* Level cards */}
+          {/* User Level Dashboard */}
+          {activeView === "user-dashboard" && <UserLevelDashboard />}
+
+          {/* Level cards - overview only */}
+          {activeView === "overview" && (
           <div className="space-y-4">
             {levelSystems.map((level) => (
               <div
@@ -98,6 +124,7 @@ export default function LevelSystem() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </div>
 
