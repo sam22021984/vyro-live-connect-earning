@@ -58,26 +58,26 @@ export default function FloatingNavigation() {
     <button
       key={btn.label}
       onClick={() => handleTap(btn.path)}
-      className="flex flex-col items-center gap-0.5 w-12 py-1 active:scale-90 transition"
+      className="flex flex-col items-center gap-0 w-9 py-0.5 active:scale-90 transition"
     >
       <div
-        className="w-9 h-9 rounded-full flex items-center justify-center relative"
+        className="w-7 h-7 rounded-full flex items-center justify-center relative"
         style={{
           background: `${btn.color}12`,
           border: `1px solid ${btn.color}20`,
         }}
       >
-        <btn.icon size={18} style={{ color: btn.color }} strokeWidth={2.5} />
+        <btn.icon size={14} style={{ color: btn.color }} strokeWidth={2.5} />
         {btn.badge && (
           <span
-            className="absolute -top-0.5 -right-0.5 min-w-[15px] h-[15px] px-1 rounded-full text-white text-[8px] font-bold flex items-center justify-center"
-            style={{ background: "#EF4444", border: "2px solid #fff" }}
+            className="absolute -top-0.5 -right-0.5 min-w-[13px] h-[13px] px-0.5 rounded-full text-white text-[7px] font-bold flex items-center justify-center"
+            style={{ background: "#EF4444", border: "1.5px solid #fff" }}
           >
             {btn.badge}
           </span>
         )}
       </div>
-      <span className="text-[8px] font-bold text-gray-600">{btn.label}</span>
+      <span className="text-[7px] font-bold text-gray-600">{btn.label}</span>
     </button>
   );
 
@@ -91,7 +91,7 @@ export default function FloatingNavigation() {
       }}
     >
       <div
-        className="flex items-center gap-0.5 mb-5 px-3 py-2 rounded-full pointer-events-auto"
+        className="flex items-center gap-0 mb-2 px-2.5 py-1.5 rounded-full pointer-events-auto"
         style={{
           background: "rgba(255,255,255,0.72)",
           backdropFilter: "blur(24px) saturate(180%)",
@@ -105,20 +105,20 @@ export default function FloatingNavigation() {
         {/* Go Live — Center Main Button */}
         <button
           onClick={() => handleTap("/")}
-          className="flex flex-col items-center gap-0.5 mx-2 active:scale-90 transition"
-          style={{ transform: "translateY(-4px)" }}
+          className="flex flex-col items-center gap-0 mx-1.5 active:scale-90 transition"
+          style={{ transform: "translateY(-3px)" }}
         >
           <div
-            className="w-14 h-14 rounded-full flex items-center justify-center"
+            className="w-11 h-11 rounded-full flex items-center justify-center"
             style={{
               background: "linear-gradient(135deg, #8B5CF6 0%, #3B82F6 50%, #EC4899 100%)",
               boxShadow: "0 6px 20px rgba(139,92,246,0.5), 0 0 12px rgba(236,72,153,0.25), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.15)",
               animation: "floatingGlow 2.5s ease-in-out infinite",
             }}
           >
-            <Video size={26} className="text-white" strokeWidth={2.5} style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.2))" }} />
+            <Video size={20} className="text-white" strokeWidth={2.5} style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.2))" }} />
           </div>
-          <span className="text-[8px] font-bold text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #8B5CF6, #EC4899)" }}>Go Live</span>
+          <span className="text-[7px] font-bold text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #8B5CF6, #EC4899)" }}>Go Live</span>
         </button>
 
         {rightButtons.map(renderSideButton)}
