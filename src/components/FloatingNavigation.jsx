@@ -104,7 +104,7 @@ export default function FloatingNavigation() {
 
         {/* Go Live — Center Main Button */}
         <button
-          onClick={() => handleTap("/live-room")}
+          onClick={() => handleTap("/go-live")}
           className="flex flex-col items-center gap-0 mx-3 active:scale-90 transition"
           style={{ transform: "translateY(-3px)" }}
         >
