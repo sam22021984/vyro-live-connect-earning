@@ -55,7 +55,7 @@ export default function BadgeTab() {
             <div className="sticky top-0 bg-white pt-3 pb-2 z-10">
               <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-2" />
               <div className="flex items-center justify-between px-4">
-                <h2 className="text-sm font-bold" style={{ color: COLORS.navy }>Badge Details</h2>
+                <h2 className="text-sm font-bold" style={{ color: COLORS.navy }}>Badge Details</h2>
                 <button onClick={() => setDetail(null)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center active:scale-95">
                   <X size={16} className="text-gray-500" />
                 </button>
