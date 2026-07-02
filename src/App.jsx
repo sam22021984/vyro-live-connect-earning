@@ -26,6 +26,8 @@ import TasksRewards from '@/pages/TasksRewards';
 import ProfileStats from '@/pages/ProfileStats';
 import Messages from '@/pages/Messages';
 import ChatRoom from '@/pages/ChatRoom';
+import Social from '@/pages/Social';
+import RelationshipCenter from '@/pages/RelationshipCenter';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -71,6 +73,8 @@ const AuthenticatedApp = () => {
         <Route path="/profile-stats" element={<ProfileStats />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/chat/:id" element={<ChatRoom />} />
+        <Route path="/social" element={<Social />} />
+        <Route path="/relationship-center" element={<RelationshipCenter />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

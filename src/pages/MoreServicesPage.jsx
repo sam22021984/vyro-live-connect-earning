@@ -41,6 +41,8 @@ export default function MoreServicesPage() {
       navigate("/tasks-rewards");
     } else if (s.name === "Profile & Stats") {
       navigate("/profile-stats");
+    } else if (s.name === "Social") {
+      navigate("/social");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }

@@ -1,0 +1,61 @@
+{
+  "name": "Relationship",
+  "type": "object",
+  "properties": {
+    "sender_name": {
+      "type": "string"
+    },
+    "sender_avatar": {
+      "type": "string"
+    },
+    "sender_id": {
+      "type": "string"
+    },
+    "sender_country": {
+      "type": "string"
+    },
+    "receiver_name": {
+      "type": "string"
+    },
+    "receiver_avatar": {
+      "type": "string"
+    },
+    "receiver_id": {
+      "type": "string"
+    },
+    "receiver_country": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "rejected",
+        "cancelled",
+        "ended"
+      ],
+      "default": "pending"
+    },
+    "request_date": {
+      "type": "string"
+    },
+    "request_time": {
+      "type": "string"
+    },
+    "start_date": {
+      "type": "string"
+    },
+    "end_date": {
+      "type": "string"
+    },
+    "is_own": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "sender_name",
+    "receiver_name"
+  ]
+}
