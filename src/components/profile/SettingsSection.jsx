@@ -1,5 +1,4 @@
 import React from "react";
-import { ChevronRight } from "lucide-react";
 
 const settings = [
   { name: "App Settings", icon: "⚙️", color: "from-slate-400 to-gray-500" },
@@ -25,10 +24,9 @@ export default function SettingsSection() {
 
         <div className="space-y-1">
           {settings.map((s, i) => (
-            <button
+            <div
               key={i}
-              type="button"
-              className="w-full flex items-center gap-3 p-3 rounded-[14px] transition-all duration-200 hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98]"
+              className="w-full flex items-center gap-3 p-3 rounded-[14px] transition-all duration-200 hover:bg-gray-50 active:bg-gray-100 cursor-pointer"
             >
               <div
                 className={`w-9 h-9 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center shrink-0`}
@@ -37,8 +35,8 @@ export default function SettingsSection() {
                 <span className="text-base">{s.icon}</span>
               </div>
               <span className="flex-1 text-left text-sm font-medium text-gray-700">{s.name}</span>
-              <ChevronRight size={16} className="text-gray-300 shrink-0" />
-            </button>
+              <span className="text-gray-300 text-lg leading-none">›</span>
+            </div>
           ))}
         </div>
       </div>

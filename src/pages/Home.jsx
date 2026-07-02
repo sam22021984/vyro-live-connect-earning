@@ -88,7 +88,7 @@ export default function Home() {
         <ProfileHeader profile={profile} />
         
         {/* Quick Stats Row */}
-        <div className="px-4 -mt-1">
+        <div className="px-4 -mt-1 relative z-10">
           <div className="bg-white rounded-[18px] grid grid-cols-4 divide-x divide-gray-100 shadow-sm border border-gray-50">
             {[
               { label: "Followers", value: profile?.followers || 0 },
@@ -104,7 +104,9 @@ export default function Home() {
           </div>
         </div>
 
-        <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <div className="relative z-10">
+          <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
 
         {activeTab === "profile" && (
           <div className="animate-fadeIn">
