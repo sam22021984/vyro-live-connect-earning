@@ -17,6 +17,8 @@ import SettingDetail from '@/pages/SettingDetail';
 import ServiceDetail from '@/pages/ServiceDetail';
 import MoreServicesPage from '@/pages/MoreServicesPage';
 import VipMembership from '@/pages/VipMembership';
+import ApplyCenter from '@/pages/ApplyCenter';
+import ApplicationDetail from '@/pages/ApplicationDetail';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -51,6 +53,8 @@ const AuthenticatedApp = () => {
         <Route path="/service/:id" element={<ServiceDetail />} />
         <Route path="/more-services" element={<MoreServicesPage />} />
         <Route path="/vip-membership" element={<VipMembership />} />
+        <Route path="/apply-center" element={<ApplyCenter />} />
+        <Route path="/apply-center/:id" element={<ApplicationDetail />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

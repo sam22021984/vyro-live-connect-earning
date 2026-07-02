@@ -29,6 +29,8 @@ export default function MoreServicesPage() {
       navigate("/settings");
     } else if (s.name === "VIP Membership") {
       navigate("/vip-membership");
+    } else if (s.name === "Apply Center") {
+      navigate("/apply-center");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
