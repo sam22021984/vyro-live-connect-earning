@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Building2, User, ChevronRight, Shield } from "lucide-react";
+import { ArrowLeft, Building2, User, Radio, ChevronRight, Shield } from "lucide-react";
 
 const dashboards = [
   {
@@ -22,6 +22,16 @@ const dashboards = [
     gradient: "linear-gradient(135deg, #2563EB, #3B82F6)",
     color: "#3B82F6",
     modules: ["Agent Overview", "Recruitment Management", "Host Support Center", "Target & KPI Center", "Earnings & Commission", "Analytics Center", "Tasks & Achievements", "Support & Compliance"],
+  },
+  {
+    id: "host",
+    title: "Host Dashboard",
+    description: "Streamers manage live performance, earnings, audience analytics, growth, achievements, and compliance",
+    icon: Radio,
+    path: "/host-dashboard",
+    gradient: "linear-gradient(135deg, #DB2777, #EC4899)",
+    color: "#EC4899",
+    modules: ["Host Overview", "Live Streaming Center", "Earnings Center", "Audience Analytics", "Host Tasks & Rewards", "Content Management", "Host Ranking Center", "Support & Compliance"],
   },
 ];
 
