@@ -4,6 +4,7 @@ import { ArrowLeft, X, Check, Coins, TrendingUp } from "lucide-react";
 import { levelSystems } from "@/components/levels/levelData";
 import UserLevelDashboard from "@/components/levels/UserLevelDashboard";
 import StreamingLevelDashboard from "@/components/levels/StreamingLevelDashboard";
+import HostLevelDashboard from "@/components/levels/HostLevelDashboard";
 
 export default function LevelSystem() {
   const navigate = useNavigate();
@@ -48,6 +49,12 @@ export default function LevelSystem() {
               >
                 📡 Streaming Level
               </button>
+              <button
+                onClick={() => setActiveView("host-dashboard")}
+                className={`py-2.5 px-4 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 whitespace-nowrap ${activeView === "host-dashboard" ? "bg-gradient-to-r from-red-400 to-orange-500 text-white shadow-md shadow-red-200" : "bg-white text-gray-500 border border-gray-100"}`}
+              >
+                🎙️ Host Level
+              </button>
             </div>
           </div>
         </div>
@@ -69,6 +76,9 @@ export default function LevelSystem() {
 
           {/* Streaming Level Dashboard */}
           {activeView === "stream-dashboard" && <StreamingLevelDashboard />}
+
+          {/* Host Level Dashboard */}
+          {activeView === "host-dashboard" && <HostLevelDashboard />}
 
           {/* Level cards - overview only */}
           {activeView === "overview" && (
