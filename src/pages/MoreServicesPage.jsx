@@ -48,6 +48,8 @@ export default function MoreServicesPage() {
       navigate("/social");
     } else if (s.name === "Message Center") {
       navigate("/message-center");
+    } else if (s.name === "Creator Center") {
+      navigate("/creator-center");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
