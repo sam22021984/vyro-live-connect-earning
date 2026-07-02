@@ -2,27 +2,36 @@ import React from "react";
 import { Armchair, Mic, MicOff, Crown } from "lucide-react";
 import { COLORS } from "./roomData";
 
-export default function Seat({ seat, size = 56 }) {
+export default function Seat({ seat, size = 56, onClick, effects = [] }) {
   const { user, id, role } = seat;
   const isEmpty = !user;
   const isHost = role === "host";
+  const hasShake = effects.some((e) => e.effect === "hammer");
+  const hasGlow = effects.length > 0 && !hasShake;
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1" style={{ animation: hasShake ? "seatShake 0.5s ease-in-out 3" : "none" }}>
       <div className="relative" style={{ width: size, height: size }}>
         {isEmpty ? (
-          // Empty seat - gold dashed circle with armchair icon
           <div
             className="w-full h-full rounded-full flex items-center justify-center"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: `2px dashed ${COLORS.gold}40`,
-            }}
+            style={{ background: "rgba(255,255,255,0.04)", border: `2px dashed ${COLORS.gold}40` }}
           >
             <Armchair size={18} style={{ color: `${COLORS.gold}50` }} />
           </div>
         ) : (
-          <>
+          <button onClick={() => onClick && onClick(id)} className="w-full h-full block active:scale-95 transition" style={{ cursor: "pointer" }}>
+            {/* Seat glow effect from gifts/emojis */}
+            {hasGlow && (
+              <div
+                className="absolute -inset-2 rounded-full pointer-events-none"
+                style={{
+                  background: `radial-gradient(circle, ${COLORS.gold}40, transparent 70%)`,
+                  animation: "seatGlow 1.5s ease-in-out infinite",
+                }}
+              />
+            )}
+
             {/* Speaking ring */}
             {user.speaking && (
               <div
@@ -52,9 +61,7 @@ export default function Seat({ seat, size = 56 }) {
             <img
               src={user.avatar}
               className="relative w-full h-full rounded-full object-cover border-2"
-              style={{
-                borderColor: isHost || user.vip ? "transparent" : `${COLORS.gold}40`,
-              }}
+              style={{ borderColor: isHost || user.vip ? "transparent" : `${COLORS.gold}40` }}
               alt={user.name}
             />
 
@@ -75,7 +82,7 @@ export default function Seat({ seat, size = 56 }) {
             >
               {user.muted ? <MicOff size={9} className="text-white" /> : <Mic size={9} className="text-white" />}
             </div>
-          </>
+          </button>
         )}
       </div>
 
@@ -96,6 +103,18 @@ export default function Seat({ seat, size = 56 }) {
           {user.name}
         </span>
       )}
+
+      <style>{`
+        @keyframes seatShake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-3px) rotate(-1deg); }
+          75% { transform: translateX(3px) rotate(1deg); }
+        }
+        @keyframes seatGlow {
+          0%, 100% { opacity: 0.5; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.1); }
+        }
+      `}</style>
     </div>
   );
 }
