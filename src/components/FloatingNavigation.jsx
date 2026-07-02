@@ -91,7 +91,7 @@ export default function FloatingNavigation() {
       }}
     >
       <div
-        className="flex items-center gap-1 mb-0 px-2.5 py-1 rounded-full pointer-events-auto"
+        className="flex items-center gap-3 mb-0 px-5 py-1 rounded-full pointer-events-auto"
         style={{
           background: "rgba(255,255,255,0.72)",
           backdropFilter: "blur(24px) saturate(180%)",
@@ -105,7 +105,7 @@ export default function FloatingNavigation() {
         {/* Go Live — Center Main Button */}
         <button
           onClick={() => handleTap("/")}
-          className="flex flex-col items-center gap-0 mx-1.5 active:scale-90 transition"
+          className="flex flex-col items-center gap-0 mx-3 active:scale-90 transition"
           style={{ transform: "translateY(-3px)" }}
         >
           <div
