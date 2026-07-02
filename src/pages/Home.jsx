@@ -12,6 +12,7 @@ import AchievementsGrid from "@/components/profile/AchievementsGrid";
 import SocialSection from "@/components/profile/SocialSection";
 import AboutMe from "@/components/profile/AboutMe";
 import MoreServices from "@/components/profile/MoreServices";
+import SettingsSection from "@/components/profile/SettingsSection";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -138,12 +139,8 @@ export default function Home() {
         )}
 
         {activeTab === "settings" && (
-          <div className="animate-fadeIn px-4 mb-4">
-            <div className="bg-white rounded-[20px] p-8 shadow-sm border border-gray-50 flex flex-col items-center">
-              <span className="text-4xl mb-3">⚙️</span>
-              <h3 className="text-sm font-bold text-gray-700 mb-1">Settings</h3>
-              <p className="text-xs text-gray-400 text-center">Account settings and preferences</p>
-            </div>
+          <div className="animate-fadeIn">
+            <SettingsSection />
           </div>
         )}
 
