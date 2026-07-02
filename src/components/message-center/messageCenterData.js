@@ -1,0 +1,122 @@
+export const MESSAGE_CENTER_STATS = [
+  { label: "Total Messages", value: "1,284", icon: "Mail", color: "#3B82F6", trend: "+42 today" },
+  { label: "Unread Messages", value: "38", icon: "Bell", color: "#EF4444", trend: "Needs attention" },
+  { label: "Official Announcements", value: "12", icon: "Megaphone", color: "#8B5CF6", trend: "3 new" },
+  { label: "Open Support Tickets", value: "4", icon: "LifeBuoy", color: "#F59E0B", trend: "2 pending" },
+  { label: "Verification Requests", value: "3", icon: "BadgeCheck", color: "#10B981", trend: "In review" },
+  { label: "Verification Approvals", value: "2", icon: "CheckCircle", color: "#10B981", trend: "This week" },
+  { label: "Verification Rejections", value: "1", icon: "XCircle", color: "#EF4444", trend: "Resubmit" },
+  { label: "Active Reports", value: "6", icon: "Flag", color: "#EC4899", trend: "Under review" },
+  { label: "Active Appeals", value: "2", icon: "Scale", color: "#06B6D4", trend: "Processing" },
+  { label: "Security Alerts", value: "5", icon: "ShieldAlert", color: "#DC2626", trend: "2 critical" },
+  { label: "System Notifications", value: "28", icon: "Server", color: "#6366F1", trend: "All read" },
+  { label: "Archived Messages", value: "184", icon: "Archive", color: "#6B7280", trend: "Stored" },
+];
+
+export const MESSAGE_CATEGORIES = [
+  {
+    id: "official_announcements",
+    name: "Official Announcements",
+    icon: "Megaphone",
+    color: "#8B5CF6",
+    gradient: "linear-gradient(135deg, #7C3AED, #8B5CF6)",
+    description: "Platform announcements, updates, policy changes, maintenance notices, and event communications",
+    options: [
+      "Platform Announcements", "New Features Updates", "Application Updates", "Maintenance Notices",
+      "Event Announcements", "Campaign Announcements", "Festival Announcements", "Security Announcements",
+      "Policy Updates", "Terms & Conditions Updates",
+    ],
+    actions: ["View Message", "Mark as Read", "Mark as Unread", "Pin Announcement", "Archive Announcement", "Search Announcement", "Filter by Category", "Share Announcement", "Delete Announcement"],
+  },
+  {
+    id: "customer_support",
+    name: "Customer Support",
+    icon: "LifeBuoy",
+    color: "#F59E0B",
+    gradient: "linear-gradient(135deg, #D97706, #F59E0B)",
+    description: "Direct communication with support teams for technical, account, payment, feedback, and appeal issues",
+    options: [
+      "Support Tickets", "Open Tickets", "Closed Tickets", "Pending Tickets", "Technical Support",
+      "Account Support", "Payment Support", "Feedback Requests", "Appeal Requests", "Complaint Requests",
+    ],
+    actions: ["Create Ticket", "View Ticket", "Reply to Ticket", "Upload Evidence", "Upload Screenshot", "Add Attachment", "Track Ticket Status", "Reopen Ticket", "Close Ticket", "Rate Support Experience", "Search Tickets", "Filter Tickets"],
+  },
+  {
+    id: "verification_center",
+    name: "Verification Center",
+    icon: "BadgeCheck",
+    color: "#10B981",
+    gradient: "linear-gradient(135deg, #059669, #10B981)",
+    description: "Identity verification, host verification, agency verification, KYC processing, and compliance communications",
+    options: [
+      "User Verification", "Host Verification", "Agency Verification", "KYC Verification", "Verification Updates",
+      "Verification Requests", "Verification Approval", "Verification Rejection", "Document Requests", "Compliance Notifications",
+    ],
+    actions: ["Submit Documents", "Upload ID Card", "Upload Passport", "Upload Selfie Verification", "View Verification Status", "View Verification History", "Resubmit Documents", "Download Verification Report", "Contact Verification Team", "Appeal Verification Decision"],
+  },
+  {
+    id: "reports_violations",
+    name: "Reports & Violations",
+    icon: "Flag",
+    color: "#EC4899",
+    gradient: "linear-gradient(135deg, #DB2777, #EC4899)",
+    description: "Community reports, violations, warnings, restrictions, suspensions, investigations, and appeals",
+    options: [
+      "Submitted Reports", "User Reports", "Content Reports", "Violation Notices", "Warning Notices",
+      "Restriction Notices", "Suspension Notices", "Investigation Updates", "Appeal Requests", "Appeal Decisions",
+    ],
+    actions: ["Submit Report", "View Report Status", "Upload Evidence", "Upload Screenshot", "Upload Recording", "View Violation Details", "Submit Appeal", "Track Appeal Status", "Contact Moderation Team", "Download Report Details", "Close Report", "Search Reports", "Filter Reports"],
+  },
+  {
+    id: "system_messages",
+    name: "System Messages",
+    icon: "Server",
+    color: "#6366F1",
+    gradient: "linear-gradient(135deg, #4F46E5, #6366F1)",
+    description: "Automated notifications for account activity, security, earnings, transactions, and platform status",
+    options: [
+      "Account Notifications", "Security Alerts", "Login Alerts", "Device Alerts", "Password Alerts",
+      "Wallet Notifications", "Earnings Notifications", "Withdrawal Notifications", "Deposit Notifications", "System Status Notifications",
+    ],
+    actions: ["View Message", "Mark as Read", "Mark as Unread", "Archive Message", "Pin Message", "Search Messages", "Filter Messages", "Delete Message", "Export Message History", "Notification Preferences"],
+  },
+];
+
+export const MESSAGE_ITEMS = {
+  official_announcements: [
+    { id: "ANN-001", title: "Summer Festival 2026 is Live!", category: "Event Announcements", body: "Join the biggest celebration of the year with exclusive rewards, PK tournaments, and special gifts.", time: "2h ago", isRead: false, isPinned: true, priority: "high" },
+    { id: "ANN-002", title: "New Feature: Family Treasury System", category: "New Features Updates", body: "We've launched the Family Treasury system for managing family contributions and rewards.", time: "1d ago", isRead: false, isPinned: false, priority: "medium" },
+    { id: "ANN-003", title: "Scheduled Maintenance on July 5", category: "Maintenance Notices", body: "The platform will undergo scheduled maintenance from 2:00 AM to 4:00 AM UTC on July 5, 2026.", time: "2d ago", isRead: true, isPinned: false, priority: "medium" },
+    { id: "ANN-004", title: "Updated Terms & Conditions", category: "Terms & Conditions Updates", body: "Our Terms & Conditions have been updated. Please review the changes to continue using the platform.", time: "3d ago", isRead: true, isPinned: false, priority: "high" },
+    { id: "ANN-005", title: "Security Update: Two-Factor Authentication", category: "Security Announcements", body: "Enable 2FA to protect your account. New security features are now available in settings.", time: "5d ago", isRead: true, isPinned: false, priority: "high" },
+  ],
+  customer_support: [
+    { id: "TKT-1024", title: "Payment not reflected in wallet", category: "Payment Support", status: "open", priority: "high", time: "3h ago", messages: 4, isRead: false },
+    { id: "TKT-1031", title: "Cannot upload profile picture", category: "Technical Support", status: "pending", priority: "medium", time: "1d ago", messages: 2, isRead: false },
+    { id: "TKT-1038", title: "Account login issue on new device", category: "Account Support", status: "open", priority: "high", time: "2d ago", messages: 6, isRead: true },
+    { id: "TKT-1045", title: "Withdrawal request delayed", category: "Payment Support", status: "pending", priority: "medium", time: "3d ago", messages: 3, isRead: true },
+    { id: "TKT-1052", title: "Feedback on new UI design", category: "Feedback Requests", status: "closed", priority: "low", time: "1w ago", messages: 2, isRead: true },
+  ],
+  verification_center: [
+    { id: "VRF-201", title: "Identity Verification Approved", category: "Verification Approval", status: "approved", time: "1d ago", isRead: false },
+    { id: "VRF-198", title: "Host Verification In Review", category: "Host Verification", status: "pending", time: "3d ago", isRead: true },
+    { id: "VRF-195", title: "KYC Documents Required", category: "Document Requests", status: "action_required", time: "5d ago", isRead: true },
+    { id: "VRF-192", title: "Selfie Verification Rejected", category: "Verification Rejection", status: "rejected", time: "1w ago", isRead: true },
+    { id: "VRF-188", title: "Agency Verification Approved", category: "Verification Approval", status: "approved", time: "2w ago", isRead: true },
+  ],
+  reports_violations: [
+    { id: "RPT-301", title: "Report: Inappropriate content in live room", category: "Content Reports", status: "investigating", time: "6h ago", isRead: false },
+    { id: "RPT-298", title: "Warning: Minor community guideline violation", category: "Warning Notices", status: "acknowledged", time: "2d ago", isRead: true },
+    { id: "RPT-295", title: "Appeal Submitted: Content removal", category: "Appeal Requests", status: "processing", time: "4d ago", isRead: true },
+    { id: "RPT-291", title: "Investigation Update: Case #291", category: "Investigation Updates", status: "ongoing", time: "1w ago", isRead: true },
+    { id: "RPT-287", title: "Appeal Decision: Restriction lifted", category: "Appeal Decisions", status: "resolved", time: "2w ago", isRead: true },
+  ],
+  system_messages: [
+    { id: "SYS-501", title: "New login from Chrome on Windows", category: "Login Alerts", time: "1h ago", isRead: false, priority: "high" },
+    { id: "SYS-498", title: "Earnings of $420 received", category: "Earnings Notifications", time: "5h ago", isRead: false, priority: "medium" },
+    { id: "SYS-495", title: "Withdrawal of $2,000 processed", category: "Withdrawal Notifications", time: "1d ago", isRead: true, priority: "medium" },
+    { id: "SYS-492", title: "Password changed successfully", category: "Password Alerts", time: "2d ago", isRead: true, priority: "high" },
+    { id: "SYS-489", title: "New device connected: iPhone 15 Pro", category: "Device Alerts", time: "3d ago", isRead: true, priority: "medium" },
+    { id: "SYS-486", title: "System status: All services operational", category: "System Status Notifications", time: "5d ago", isRead: true, priority: "low" },
+  ],
+};
