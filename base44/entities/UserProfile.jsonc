@@ -1,0 +1,217 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "string"
+    },
+    "avatar_url": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "country_flag": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "birthday": {
+      "type": "string"
+    },
+    "zodiac": {
+      "type": "string"
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "Male",
+        "Female",
+        "Other"
+      ]
+    },
+    "signature": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "global_id": {
+      "type": "string"
+    },
+    "is_online": {
+      "type": "boolean",
+      "default": true
+    },
+    "is_verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_official": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_vip": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_host": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_agency": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_app_owner": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_admin": {
+      "type": "boolean",
+      "default": false
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "user",
+        "host",
+        "agent",
+        "agency",
+        "admin",
+        "owner"
+      ],
+      "default": "user"
+    },
+    "vip_tier": {
+      "type": "string"
+    },
+    "vip_expiry": {
+      "type": "string"
+    },
+    "user_level": {
+      "type": "number",
+      "default": 1
+    },
+    "user_xp": {
+      "type": "number",
+      "default": 0
+    },
+    "user_xp_max": {
+      "type": "number",
+      "default": 10000
+    },
+    "host_level": {
+      "type": "number",
+      "default": 1
+    },
+    "host_xp": {
+      "type": "number",
+      "default": 0
+    },
+    "host_xp_max": {
+      "type": "number",
+      "default": 10000
+    },
+    "gifting_level": {
+      "type": "number",
+      "default": 1
+    },
+    "gifting_xp": {
+      "type": "number",
+      "default": 0
+    },
+    "gifting_xp_max": {
+      "type": "number",
+      "default": 10000
+    },
+    "streaming_level": {
+      "type": "number",
+      "default": 1
+    },
+    "streaming_xp": {
+      "type": "number",
+      "default": 0
+    },
+    "streaming_xp_max": {
+      "type": "number",
+      "default": 10000
+    },
+    "followers": {
+      "type": "number",
+      "default": 0
+    },
+    "following": {
+      "type": "number",
+      "default": 0
+    },
+    "friends": {
+      "type": "number",
+      "default": 0
+    },
+    "visitors": {
+      "type": "number",
+      "default": 0
+    },
+    "total_xp": {
+      "type": "number",
+      "default": 0
+    },
+    "gifts_received": {
+      "type": "number",
+      "default": 0
+    },
+    "gifts_sent": {
+      "type": "number",
+      "default": 0
+    },
+    "coins": {
+      "type": "number",
+      "default": 0
+    },
+    "activity_score": {
+      "type": "number",
+      "default": 0
+    },
+    "trust_score": {
+      "type": "number",
+      "default": 0
+    },
+    "reputation_rating": {
+      "type": "number",
+      "default": 0
+    },
+    "profile_completion": {
+      "type": "number",
+      "default": 0
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": [
+        "unverified",
+        "pending",
+        "verified"
+      ],
+      "default": "unverified"
+    },
+    "safety_status": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "high"
+    }
+  },
+  "required": [
+    "username"
+  ]
+}

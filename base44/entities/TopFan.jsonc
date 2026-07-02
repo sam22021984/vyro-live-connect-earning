@@ -1,0 +1,26 @@
+{
+  "name": "TopFan",
+  "type": "object",
+  "properties": {
+    "fan_name": {
+      "type": "string"
+    },
+    "avatar_url": {
+      "type": "string"
+    },
+    "score": {
+      "type": "number",
+      "default": 0
+    },
+    "rank": {
+      "type": "number"
+    },
+    "profile_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "fan_name",
+    "rank"
+  ]
+}

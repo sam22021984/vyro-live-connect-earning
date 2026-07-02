@@ -1,0 +1,34 @@
+{
+  "name": "Badge",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
+    },
+    "bg_color": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "special",
+        "achievement",
+        "role",
+        "event"
+      ]
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "category"
+  ]
+}

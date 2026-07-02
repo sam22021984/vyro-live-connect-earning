@@ -1,0 +1,32 @@
+{
+  "name": "Achievement",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
+    },
+    "bg_color": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "is_unlocked": {
+      "type": "boolean",
+      "default": false
+    },
+    "progress": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
