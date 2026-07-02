@@ -15,7 +15,7 @@ export const GRADIENT_DARK = "linear-gradient(160deg, #1A0B2E 0%, #2D1B4E 50%, #
 
 export const SOCIAL_MODULES = [
   { name: "Friends", icon: "👥", gradient: "from-blue-400 to-cyan-500", path: null },
-  { name: "Family", icon: "🏠", gradient: "from-green-400 to-emerald-500", path: null },
+  { name: "Family", icon: "🏠", gradient: "from-green-400 to-emerald-500", path: "/family-center" },
   { name: "My People", icon: "🌟", gradient: "from-amber-400 to-orange-500", path: null },
   { name: "Relationship", icon: "❤️", gradient: "from-pink-400 to-purple-500", path: "/relationship-center", highlight: true },
 ];

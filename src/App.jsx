@@ -39,6 +39,7 @@ import AgencyDashboard from '@/pages/AgencyDashboard';
 import AgentDashboard from '@/pages/AgentDashboard';
 import ControlCenter from '@/pages/ControlCenter';
 import HostDashboard from '@/pages/HostDashboard';
+import FamilyCenter from '@/pages/FamilyCenter';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -97,6 +98,7 @@ const AuthenticatedApp = () => {
         <Route path="/agency-dashboard" element={<AgencyDashboard />} />
         <Route path="/agent-dashboard" element={<AgentDashboard />} />
         <Route path="/host-dashboard" element={<HostDashboard />} />
+        <Route path="/family-center" element={<FamilyCenter />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
