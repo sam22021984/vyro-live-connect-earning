@@ -36,6 +36,8 @@ import Finance from '@/pages/Finance';
 import FinanceModule from '@/pages/FinanceModule';
 import CoinsRecharge from '@/pages/CoinsRecharge';
 import AgencyDashboard from '@/pages/AgencyDashboard';
+import AgentDashboard from '@/pages/AgentDashboard';
+import ControlCenter from '@/pages/ControlCenter';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -90,7 +92,9 @@ const AuthenticatedApp = () => {
         <Route path="/finance" element={<Finance />} />
         <Route path="/finance-module" element={<FinanceModule />} />
         <Route path="/coins-recharge" element={<CoinsRecharge />} />
+        <Route path="/control-center" element={<ControlCenter />} />
         <Route path="/agency-dashboard" element={<AgencyDashboard />} />
+        <Route path="/agent-dashboard" element={<AgentDashboard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
