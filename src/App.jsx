@@ -20,6 +20,7 @@ import VipMembership from '@/pages/VipMembership';
 import ApplyCenter from '@/pages/ApplyCenter';
 import ApplicationDetail from '@/pages/ApplicationDetail';
 import Recharge from '@/pages/Recharge';
+import LevelSystem from '@/pages/LevelSystem';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -57,6 +58,7 @@ const AuthenticatedApp = () => {
         <Route path="/apply-center" element={<ApplyCenter />} />
         <Route path="/apply-center/:id" element={<ApplicationDetail />} />
         <Route path="/recharge" element={<Recharge />} />
+        <Route path="/level-system" element={<LevelSystem />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

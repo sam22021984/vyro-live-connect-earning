@@ -33,6 +33,8 @@ export default function MoreServicesPage() {
       navigate("/apply-center");
     } else if (s.name === "Finance") {
       navigate("/recharge");
+    } else if (s.name === "Level System") {
+      navigate("/level-system");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
