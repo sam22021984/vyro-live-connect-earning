@@ -27,6 +27,8 @@ export default function MoreServicesPage() {
   const handleServiceClick = (s, i) => {
     if (s.name === "Settings") {
       navigate("/settings");
+    } else if (s.name === "VIP Membership") {
+      navigate("/vip-membership");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
