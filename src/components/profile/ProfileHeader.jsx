@@ -30,12 +30,12 @@ export default function ProfileHeader({ profile }) {
 
       <div className="relative z-10 px-5 pt-12 pb-6">
         {/* Top bar */}
-        <div className="flex items-center justify-between mb-6">
-          <button className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-white/30">
-            <Menu size={18} className="text-white" />
-          </button>
+        <div className="flex items-center justify-end gap-2 mb-6">
           <button className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-white/30">
             <Search size={18} className="text-white" />
+          </button>
+          <button className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-white/30">
+            <Menu size={18} className="text-white" />
           </button>
         </div>
 
