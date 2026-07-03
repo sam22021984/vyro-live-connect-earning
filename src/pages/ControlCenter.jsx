@@ -23,11 +23,10 @@ export default function ControlCenter() {
     if (!user?.id) { setLoading(false); return; }
     (async () => {
       try {
-        let profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
-        if (profiles.length === 0) {
-          profiles = await base44.entities.UserProfile.filter({ created_by_id: user.id });
-        }
-        if (profiles.length > 0) setProfile(profiles[0]);
+        const res = await base44.functions.invoke("dashboardData", {
+          action: "getProfile",
+        });
+        if (res.data?.profile) setProfile(res.data.profile);
       } catch (e) {
         // profile may not exist yet
       }

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, Lock } from "lucide-react";
 import { AGENCY_INFO as AGENCY_INFO_D, AGENCY_MODULES as AGENCY_MODULES_D, AGENCY_QUICK_ACTIONS as AGENCY_QUICK_ACTIONS_D } from "@/components/agency-dashboard/agencyDashboardData";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { GOLD, TEXT_MUTED } from "@/components/user-dashboard/Shared";
 import HomeSection from "@/components/agency-dashboard/sections/HomeSection";
 import ProfileSection from "@/components/agency-dashboard/sections/ProfileSection";
@@ -31,10 +32,36 @@ const SECTIONS = {
 
 export default function AgencyDashboard() {
   const navigate = useNavigate();
+  const { hasAccess, loading: roleLoading } = useRoleGuard("agency");
   const { info: AGENCY_INFO, modules: AGENCY_MODULES, quickActions: AGENCY_QUICK_ACTIONS, loading } = useDashboardData("agency", { info: AGENCY_INFO_D, modules: AGENCY_MODULES_D, quickActions: AGENCY_QUICK_ACTIONS_D });
   const [activeModule, setActiveModule] = useState("home");
   const ActiveComponent = SECTIONS[activeModule] || HomeSection;
   const currentModule = AGENCY_MODULES.find((m) => m.id === activeModule) || AGENCY_MODULES[0];
+
+  if (roleLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0A0E1A" }}>
+        <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6" style={{ background: "#0A0E1A" }}>
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+            <Lock size={28} className="text-red-400" />
+          </div>
+          <h2 className="text-base font-bold text-white mb-1">Access Denied</h2>
+          <p className="text-xs text-gray-400 mb-4">Your role does not have access to the Agency Dashboard.</p>
+          <button onClick={() => navigate("/control-center")} className="px-6 py-2.5 rounded-xl bg-purple-500 text-white text-sm font-bold active:scale-95 transition">
+            Back to Control Center
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading || !currentModule) {
     return (

@@ -6,10 +6,11 @@ import {
   CheckCircle, XCircle, MessageSquare, Headphones, Activity, AlertCircle,
   Eye, Pencil, Sun, CalendarDays, Calendar, LifeBuoy, DollarSign, Gift,
   Award, Download, ArrowDownToLine, Percent, TrendingUp, CheckSquare,
-  Trophy, History, Scale, AlertTriangle, ShieldCheck, Circle, Clock,
+  Trophy, History, Scale, AlertTriangle, ShieldCheck, Circle, Clock, Lock,
 } from "lucide-react";
 import { AGENT_INFO as AGENT_INFO_D, AGENT_STATS as AGENT_STATS_D, AGENT_MODULES as AGENT_MODULES_D } from "@/components/agent/agentData";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useRoleGuard } from "@/hooks/useRoleGuard";
 import ReportToSection from "@/components/shared/ReportToSection";
 import AgentPolicyTab from "@/components/agent/AgentPolicyTab";
 
@@ -350,9 +351,35 @@ function ModuleContent({ module }) {
 
 export default function AgentDashboard() {
   const navigate = useNavigate();
+  const { hasAccess, loading: roleLoading } = useRoleGuard("agent");
   const { info: AGENT_INFO, stats: AGENT_STATS, modules: AGENT_MODULES, loading } = useDashboardData("agent", { info: AGENT_INFO_D, stats: AGENT_STATS_D, modules: AGENT_MODULES_D });
   const [activeModule, setActiveModule] = useState(AGENT_MODULES[0]?.id);
   const currentModule = AGENT_MODULES.find((m) => m.id === activeModule) || AGENT_MODULES[0];
+
+  if (roleLoading) {
+    return (
+      <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center px-6">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <Lock size={28} className="text-red-400" />
+          </div>
+          <h2 className="text-base font-bold text-gray-800 mb-1">Access Denied</h2>
+          <p className="text-xs text-gray-400 mb-4">Your role does not have access to the Agent Dashboard.</p>
+          <button onClick={() => navigate("/control-center")} className="px-6 py-2.5 rounded-xl bg-blue-500 text-white text-sm font-bold active:scale-95 transition">
+            Back to Control Center
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading || !currentModule) {
     return (
