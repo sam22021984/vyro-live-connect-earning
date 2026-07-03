@@ -24,8 +24,12 @@ export default function ProfileHeader({ profile }) {
 
   return (
     <div className="relative overflow-hidden rounded-b-[30px]">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-purple-400 to-blue-400 opacity-90" />
+      {/* Cover image or background gradient */}
+      {profile?.cover_url ? (
+        <img src={profile.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-purple-400 to-blue-400 opacity-90" />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-purple-600/30 to-transparent" />
       
       {/* Decorative circles */}

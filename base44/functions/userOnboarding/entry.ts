@@ -162,11 +162,12 @@ Deno.serve(async (req) => {
         host_level: 1,
         gifting_level: 1,
         streaming_level: 1,
-        trust_score: 50,
+        trust_score: 0,
         reputation_rating: 0,
-        profile_completion: 20,
+        profile_completion: 0,
         activity_score: 0,
         coins: 0,
+        safety_status: 'medium',
       });
 
       return Response.json({ profile, isNew: true, global_id: applicationId });

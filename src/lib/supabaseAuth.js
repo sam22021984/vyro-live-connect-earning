@@ -25,11 +25,13 @@ export const supabaseAuth = {
 
   setToken(token, refreshToken) {
     localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem("base44_access_token", token);
     if (refreshToken) localStorage.setItem(REFRESH_KEY, refreshToken);
   },
 
   clearToken() {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem("base44_access_token");
     localStorage.removeItem(REFRESH_KEY);
   },
 

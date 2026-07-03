@@ -39,9 +39,11 @@ const getAppParams = () => {
 		storage.removeItem('base44_access_token');
 		storage.removeItem('token');
 	}
+	// Extract access_token from URL once (for OAuth redirects)
+	getAppParamValue("access_token", { removeFromUrl: true });
+
 	return {
 		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID }),
-		token: getAppParamValue("access_token", { removeFromUrl: true }),
 		fromUrl: getAppParamValue("from_url", { defaultValue: window.location.href }),
 		functionsVersion: getAppParamValue("functions_version", { defaultValue: import.meta.env.VITE_BASE44_FUNCTIONS_VERSION }),
 		appBaseUrl: getAppParamValue("app_base_url", { defaultValue: import.meta.env.VITE_BASE44_APP_BASE_URL }),
@@ -50,5 +52,9 @@ const getAppParams = () => {
 
 
 export const appParams = {
-	...getAppParams()
+	...getAppParams(),
+	// Token is read dynamically — picks up tokens set after page load (e.g., after signup)
+	get token() {
+		return storage.getItem('base44_access_token') || storage.getItem('sb_access_token');
+	}
 }
