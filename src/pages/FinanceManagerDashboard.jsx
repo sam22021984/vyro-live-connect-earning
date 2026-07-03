@@ -19,6 +19,7 @@ import {
   FIN_AI_INSIGHTS, FIN_COMM_TARGETS, FIN_COMM_TYPES, FIN_TEAM_MEMBERS,
   FIN_SETTINGS_GROUPS, FIN_EXCLUSIVE_TOOLS, FIN_REPORTING_STRUCTURE,
 } from "@/components/finance-manager/financeManagerData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, TrendingUp, Banknote, CreditCard, Wallet, Coins, Gift,
@@ -861,6 +862,10 @@ export default function FinanceManagerDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="finance-manager" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />

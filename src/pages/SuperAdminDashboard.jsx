@@ -17,6 +17,7 @@ import {
   VIOLATIONS, SECURITY_DATA, SECURITY_ACTIONS, COMM_TARGETS, COMM_TYPES,
   ANALYTICS_DATA, AUDIT_LOGS, SETTINGS_GROUPS, EVENTS,
 } from "@/components/super-admin/superAdminData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Building2, Handshake, Mic, UserCog, FileText, TrendingUp,
@@ -700,6 +701,10 @@ export default function SuperAdminDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="super-admin" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />

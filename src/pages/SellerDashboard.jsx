@@ -6,6 +6,7 @@ import {
   ChevronRight, Star, AlertTriangle, Clock, Award,
 } from "lucide-react";
 import { SELLER_DASHBOARD } from "@/components/seller-dashboard/sellerData";
+import ReportToSection from "@/components/shared/ReportToSection";
 import { useToast } from "@/components/ui/use-toast";
 
 const DARK_BG = "#0A0E1A";
@@ -112,6 +113,9 @@ export default function SellerDashboard() {
                   </div>
                 </div>
               </div>
+
+              {/* Report To Section */}
+              <ReportToSection roleKey="seller" theme="dark" />
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-2.5">

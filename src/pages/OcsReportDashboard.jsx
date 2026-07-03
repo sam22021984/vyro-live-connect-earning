@@ -5,6 +5,7 @@ import {
   Upload, Send, Clock, Filter,
 } from "lucide-react";
 import { OCS_REPORT } from "@/components/seller-dashboard/ocsReportData";
+import ReportToSection from "@/components/shared/ReportToSection";
 import { useToast } from "@/components/ui/use-toast";
 
 const DARK_BG = "#0A0E1A";
@@ -110,6 +111,9 @@ export default function OcsReportDashboard() {
                   </div>
                 </div>
               </div>
+
+              {/* Report To Section */}
+              <ReportToSection roleKey="seller" theme="dark" />
 
               {/* Stats */}
               <div className="grid grid-cols-3 gap-2.5">

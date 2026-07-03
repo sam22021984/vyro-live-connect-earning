@@ -19,6 +19,7 @@ import {
   SUPPORT_REPORTS, SUPPORT_COMM_TYPES, SUPPORT_EXCLUSIVE_TOOLS,
   SUPPORT_PERMISSIONS_ALLOWED, SUPPORT_PERMISSIONS_RESTRICTED,
 } from "@/components/support-manager/supportManagerData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Ticket, User, Mic, Handshake, Building2, Crown, Lock,
@@ -544,6 +545,10 @@ export default function SupportManagerDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="support-manager" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />

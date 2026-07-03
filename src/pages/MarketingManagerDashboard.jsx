@@ -19,6 +19,7 @@ import {
   MKTG_CONTENT_TYPES, MKTG_PROMOTIONS, MKTG_REPORTS, MKTG_TEAM_MEMBERS,
   MKTG_SETTINGS_GROUPS, MKTG_EXCLUSIVE_TOOLS, MKTG_REPORTING_STRUCTURE,
 } from "@/components/marketing-manager/marketingManagerData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Megaphone, Target, Mic, Building2, Globe, Smartphone,
@@ -832,6 +833,10 @@ export default function MarketingManagerDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="marketing-manager" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />

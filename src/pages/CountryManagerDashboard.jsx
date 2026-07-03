@@ -18,6 +18,7 @@ import {
   CTRY_REPORTS, CTRY_SECURITY_LOGS, CTRY_BROADCAST_TARGETS, CTRY_BROADCAST_TYPES,
   CTRY_ANALYTICS, CTRY_SETTINGS_GROUPS, CTRY_COUNTRY_INFO, CTRY_REPORTING_STRUCTURE,
 } from "@/components/country-manager/countryManagerData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Search, Users, Mic, User, Building2, FileCheck,
@@ -834,6 +835,10 @@ export default function CountryManagerDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="country" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />

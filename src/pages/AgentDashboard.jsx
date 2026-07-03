@@ -9,6 +9,7 @@ import {
   Trophy, History, Scale, AlertTriangle, ShieldCheck, Circle, Clock,
 } from "lucide-react";
 import { AGENT_INFO, AGENT_STATS, AGENT_MODULES } from "@/components/agent/agentData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const formatNum = (n) => n.toLocaleString();
 
@@ -409,6 +410,11 @@ export default function AgentDashboard() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Report To Section */}
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="agent" theme="light" />
         </div>
 
         {/* Stats Grid */}

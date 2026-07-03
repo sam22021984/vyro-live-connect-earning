@@ -10,6 +10,7 @@ import {
   AlertTriangle, AlertCircle, Scale, MessageSquare, Circle, Users2,
 } from "lucide-react";
 import { HOST_INFO, HOST_STATS, HOST_MODULES } from "@/components/host/hostData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICON_MAP = {
   ArrowLeft, User, BadgeCheck, Hash, Layers, Building2, Users, Heart,
@@ -414,6 +415,11 @@ export default function HostDashboard() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Report To Section */}
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="host" theme="light" />
         </div>
 
         {/* Stats Grid */}

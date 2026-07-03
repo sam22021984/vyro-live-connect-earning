@@ -19,6 +19,7 @@ import {
   ANALYTICS_DATA, REWARD_REPORTS, TEAM_MEMBERS, SETTINGS_GROUPS,
   EXCLUSIVE_TOOLS, REPORTING_STRUCTURE,
 } from "@/components/reward-manager/rewardManagerData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Trophy, Target, PartyPopper, Crown, Handshake, Building2,
@@ -813,6 +814,10 @@ export default function RewardManagerDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="reward-manager" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />

@@ -23,6 +23,7 @@ import {
   AUDIT_LOGS, AUTOMATION_RULES, BI_INSIGHTS, SETTINGS_GROUPS,
   OWNER_POWERS, TIME_FILTERS,
 } from "@/components/owner-dashboard/ownerData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Globe, Users, FileText, DollarSign, Gift, Coins, Trophy,
@@ -708,6 +709,11 @@ export default function OwnerDashboard() {
             </div>
             <h2 className="text-sm font-bold" style={{ color: DARK }}>{currentSection.label}</h2>
           </div>
+        </div>
+
+        {/* Report To Section */}
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="owner" theme="light" />
         </div>
 
         {/* Section Content */}

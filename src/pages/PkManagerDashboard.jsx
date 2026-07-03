@@ -18,6 +18,7 @@ import {
   PK_COMM_TARGETS, PK_COMM_TYPES, PK_REPORTS, PK_TEAM_MEMBERS,
   PK_SETTINGS_GROUPS, PK_EXCLUSIVE_TOOLS, PK_REPORTING_STRUCTURE,
 } from "@/components/pk-manager/pkManagerData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Swords, Trophy, PartyPopper, Gift, Award, Globe, BrainCircuit,
@@ -813,6 +814,10 @@ export default function PkManagerDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="pk-manager" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />

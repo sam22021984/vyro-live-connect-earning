@@ -14,6 +14,7 @@ import {
   ADMIN_REPORTS, ADMIN_EVENTS, ADMIN_PK_BATTLES, ADMIN_COMM_TARGETS,
   ADMIN_COMM_TYPES, ADMIN_ANALYTICS, ADMIN_AUDIT_LOGS, ADMIN_REPORTING_STRUCTURE,
 } from "@/components/admin-dashboard/adminDashboardData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Users, Mic, Handshake, Building2, TrendingUp, FileCheck,
@@ -594,6 +595,10 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="admin" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />

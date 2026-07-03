@@ -18,6 +18,7 @@ import {
   BDEV_DOCUMENTS, BDEV_ANALYTICS, BDEV_SETTINGS_GROUPS, BDEV_EXCLUSIVE_TOOLS,
   BDEV_REPORTING_STRUCTURE,
 } from "@/components/business-developer/businessDeveloperData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Users, Mic, Handshake, Building2, TrendingUp, Target,
@@ -773,6 +774,10 @@ export default function BusinessDeveloperDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="business-developer" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />

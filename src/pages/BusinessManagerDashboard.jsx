@@ -18,6 +18,7 @@ import {
   BIZ_DOCUMENTS, BIZ_OPERATIONS, BIZ_NOTIFICATION_LOGS, BIZ_SETTINGS_GROUPS,
   BIZ_EXCLUSIVE_TOOLS, BIZ_REPORTING_STRUCTURE,
 } from "@/components/business-manager/businessManagerData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Users, Mic, Handshake, Building2, TrendingUp, Target,
@@ -778,6 +779,10 @@ export default function BusinessManagerDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="business-manager" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />

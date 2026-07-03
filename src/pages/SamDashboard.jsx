@@ -17,6 +17,7 @@ import SecurityModule from "@/components/sam-dashboard/SecurityModule";
 import AdminControlModule from "@/components/sam-dashboard/AdminControlModule";
 import SystemHealthModule from "@/components/sam-dashboard/SystemHealthModule";
 import SamProfileModule from "@/components/sam-dashboard/SamProfileModule";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const DARK_BG = "linear-gradient(160deg, #0A0F1E 0%, #131A2E 40%, #1A1240 100%)";
 const SOFT_WHITE = "#F4F0FA";
@@ -87,6 +88,11 @@ export default function SamDashboard() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Report To Section */}
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="sam" theme="dark" />
         </div>
 
         {/* Module Grid */}

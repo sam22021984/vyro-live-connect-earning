@@ -17,6 +17,7 @@ import {
   EVT_COUNTRY_PERFORMANCE, EVT_AI_INSIGHTS, EVT_ANALYTICS, EVT_REPORTS,
   EVT_TEAM_MEMBERS, EVT_SETTINGS_GROUPS, EVT_EXCLUSIVE_TOOLS, EVT_REPORTING_STRUCTURE,
 } from "@/components/event-manager/eventManagerData";
+import ReportToSection from "@/components/shared/ReportToSection";
 
 const ICONS = {
   LayoutDashboard, Calendar, Trophy, Gift, Users, Globe, Mic, Building2,
@@ -821,6 +822,10 @@ export default function EventManagerDashboard() {
             </div>
           </div>
         )}
+
+        <div className="px-4 pt-3">
+          <ReportToSection roleKey="event-manager" theme="light" />
+        </div>
 
         <div className="px-4 pt-3">
           <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />
