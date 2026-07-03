@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog, Store } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog, Store, FileText } from "lucide-react";
 
 const dashboards = [
   {
@@ -145,6 +145,17 @@ const dashboards = [
     color: "#3B82F6",
     badge: "BIZ DEVELOPER",
     modules: ["Business Overview", "Host Recruitment", "Talent Agent Recruitment", "Agency Development", "Lead Management", "Market Expansion", "Partnership Management", "Campaign Management", "Revenue Growth", "Regional Performance", "Application Management", "Communication Center", "Event Development", "Performance Tracking", "Business Intelligence", "Task Management", "Document Center", "Analytics Center", "Business Settings", "Exclusive Tools"],
+  },
+  {
+    id: "seller-policy",
+    title: "Official Coin Seller Policy",
+    description: "Official Coin Seller (OCS) policy, authority, responsibilities, revenue model, sale rules, prohibited activities, KPIs, benefits, disciplinary actions, confidentiality, and agreement terms",
+    icon: FileText,
+    path: "/official-coin-seller-policy",
+    gradient: "linear-gradient(135deg, #FFD700, #22D3EE)",
+    color: "#FFD700",
+    badge: "POLICY",
+    modules: ["Position & Department", "Authority Level", "Coin Distribution", "Sales Reporting", "User Support", "Revenue & Commission", "Sale Rules", "Prohibited Activities", "Performance Expectations", "KPIs", "Benefits", "Disciplinary Actions", "Confidentiality", "Professional Conduct", "Agreement"],
   },
   {
     id: "seller",
