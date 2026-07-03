@@ -44,10 +44,13 @@ export default function LiveRoom() {
   const [showChatInput, setShowChatInput] = useState(false);
   const [tempProfileUser, setTempProfileUser] = useState(null);
 
-  // Sync Supabase chat messages into local chat state
+  // Sync Supabase chat messages into local chat state (preserve locally-sent messages)
   useEffect(() => {
     if (supabaseChat.length > 0) {
-      setChat(supabaseChat);
+      setChat((prev) => {
+        const myMessages = prev.filter((m) => m.user === "You");
+        return [...supabaseChat, ...myMessages];
+      });
     }
   }, [supabaseChat]);
 
@@ -315,9 +318,9 @@ export default function LiveRoom() {
           muted={muted}
           onChatClick={() => setShowChatInput(!showChatInput)}
           onGiftClick={() => { setPanelType("gift"); setPanelTargetId(null); }}
+          onEmojiClick={() => { setPanelType("emoji"); setPanelTargetId(null); }}
           onMicToggle={handleMicToggle}
           onMenuClick={() => setShowSettings(true)}
-          onGameClick={() => toast({ title: "Games coming soon!" })}
         />
       </div>
 

@@ -1,9 +1,9 @@
 import React from "react";
-import { Smile, MessageSquare, Gamepad2, Gift, Volume2, LayoutGrid } from "lucide-react";
+import { Smile, MessageSquare, Gift, Volume2, LayoutGrid } from "lucide-react";
 import { COLORS } from "./roomData";
 
 // Reference-style bottom nav: Hi pill, Chat, Game, Gift (center), Speaker, Menu
-export default function BottomNav({ muted, onChatClick, onGiftClick, onMicToggle, onMenuClick, onGameClick }) {
+export default function BottomNav({ muted, onChatClick, onGiftClick, onMicToggle, onMenuClick, onEmojiClick }) {
   const btnStyle = (color) => ({
     background: "#185B5D",
     border: `1px solid ${COLORS.gold}50`,
@@ -31,9 +31,9 @@ export default function BottomNav({ muted, onChatClick, onGiftClick, onMicToggle
         <MessageSquare size={16} style={{ color: COLORS.gold }} />
       </button>
 
-      {/* 3. Game */}
-      <button onClick={onGameClick} className="flex items-center justify-center rounded-full transition active:scale-90" style={{ width: 36, height: 36, ...btnStyle() }}>
-        <Gamepad2 size={16} style={{ color: COLORS.gold }} />
+      {/* 3. Emoji */}
+      <button onClick={onEmojiClick} className="flex items-center justify-center rounded-full transition active:scale-90" style={{ width: 36, height: 36, ...btnStyle() }}>
+        <Smile size={16} style={{ color: COLORS.gold }} />
       </button>
 
       {/* 4. Gift — center, larger */}
