@@ -9,7 +9,8 @@ import {
   Star, Archive, Image, Upload, Trash2, Film, MapPin, BookOpen,
   AlertTriangle, AlertCircle, Scale, MessageSquare, Circle, Users2,
 } from "lucide-react";
-import { HOST_INFO, HOST_STATS, HOST_MODULES } from "@/components/host/hostData";
+import { HOST_INFO as HOST_INFO_D, HOST_STATS as HOST_STATS_D, HOST_MODULES as HOST_MODULES_D } from "@/components/host/hostData";
+import { useDashboardData } from "@/hooks/useDashboardData";
 import ReportToSection from "@/components/shared/ReportToSection";
 import HostPolicyTab from "@/components/host/HostPolicyTab";
 
@@ -354,8 +355,17 @@ function ModuleContent({ module }) {
 
 export default function HostDashboard() {
   const navigate = useNavigate();
-  const [activeModule, setActiveModule] = useState(HOST_MODULES[0].id);
-  const currentModule = HOST_MODULES.find((m) => m.id === activeModule);
+  const { info: HOST_INFO, stats: HOST_STATS, modules: HOST_MODULES, loading } = useDashboardData("host", { info: HOST_INFO_D, stats: HOST_STATS_D, modules: HOST_MODULES_D });
+  const [activeModule, setActiveModule] = useState(HOST_MODULES[0]?.id);
+  const currentModule = HOST_MODULES.find((m) => m.id === activeModule) || HOST_MODULES[0];
+
+  if (loading || !currentModule) {
+    return (
+      <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">

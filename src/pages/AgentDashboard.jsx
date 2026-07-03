@@ -8,7 +8,8 @@ import {
   Award, Download, ArrowDownToLine, Percent, TrendingUp, CheckSquare,
   Trophy, History, Scale, AlertTriangle, ShieldCheck, Circle, Clock,
 } from "lucide-react";
-import { AGENT_INFO, AGENT_STATS, AGENT_MODULES } from "@/components/agent/agentData";
+import { AGENT_INFO as AGENT_INFO_D, AGENT_STATS as AGENT_STATS_D, AGENT_MODULES as AGENT_MODULES_D } from "@/components/agent/agentData";
+import { useDashboardData } from "@/hooks/useDashboardData";
 import ReportToSection from "@/components/shared/ReportToSection";
 import AgentPolicyTab from "@/components/agent/AgentPolicyTab";
 
@@ -349,8 +350,17 @@ function ModuleContent({ module }) {
 
 export default function AgentDashboard() {
   const navigate = useNavigate();
-  const [activeModule, setActiveModule] = useState(AGENT_MODULES[0].id);
-  const currentModule = AGENT_MODULES.find((m) => m.id === activeModule);
+  const { info: AGENT_INFO, stats: AGENT_STATS, modules: AGENT_MODULES, loading } = useDashboardData("agent", { info: AGENT_INFO_D, stats: AGENT_STATS_D, modules: AGENT_MODULES_D });
+  const [activeModule, setActiveModule] = useState(AGENT_MODULES[0]?.id);
+  const currentModule = AGENT_MODULES.find((m) => m.id === activeModule) || AGENT_MODULES[0];
+
+  if (loading || !currentModule) {
+    return (
+      <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">

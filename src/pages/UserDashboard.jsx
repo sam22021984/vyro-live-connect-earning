@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Search } from "lucide-react";
-import { USER_INFO, USER_MODULES, QUICK_ACTIONS } from "@/components/user-dashboard/userDashboardData";
+import { USER_INFO as USER_INFO_D, USER_MODULES as USER_MODULES_D, QUICK_ACTIONS as QUICK_ACTIONS_D } from "@/components/user-dashboard/userDashboardData";
+import { useDashboardData } from "@/hooks/useDashboardData";
 import { GOLD, TEXT_MUTED } from "@/components/user-dashboard/Shared";
 import HomeSection from "@/components/user-dashboard/sections/HomeSection";
 import ProfileSection from "@/components/user-dashboard/sections/ProfileSection";
@@ -31,9 +32,18 @@ const SECTIONS = {
 
 export default function UserDashboard() {
   const navigate = useNavigate();
+  const { info: USER_INFO, modules: USER_MODULES, quickActions: QUICK_ACTIONS, loading } = useDashboardData("user", { info: USER_INFO_D, modules: USER_MODULES_D, quickActions: QUICK_ACTIONS_D });
   const [activeModule, setActiveModule] = useState("home");
   const ActiveComponent = SECTIONS[activeModule] || HomeSection;
   const currentModule = USER_MODULES.find((m) => m.id === activeModule) || USER_MODULES[0];
+
+  if (loading || !currentModule) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0A0E1A" }}>
+        <div className="w-8 h-8 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ background: "#0A0E1A" }}>
