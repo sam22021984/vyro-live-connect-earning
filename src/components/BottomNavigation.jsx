@@ -104,13 +104,14 @@ export default function BottomNavigation() {
     <>
       {/* Offline indicator */}
       {isOffline && (
-        <div className="fixed top-0 left-0 right-0 z-[60] bg-amber-500 text-white text-center py-1 text-[10px] font-bold flex items-center justify-center gap-1.5">
+        <div className="fixed top-0 right-0 z-[60] bg-amber-500 text-white text-center py-1 text-[10px] font-bold flex items-center justify-center gap-1.5" style={{ left: "48px" }}>
           <WifiOff size={11} /> You're offline. Showing cached content.
         </div>
       )}
 
       <div
-        className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
+        className="fixed bottom-0 right-0 z-50 safe-bottom"
+        style={{ left: "48px" }}
       >
         <div
           className="flex items-center justify-around px-1 py-1 mx-auto"

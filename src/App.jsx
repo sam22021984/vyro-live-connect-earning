@@ -89,6 +89,7 @@ import WelcomeAnimation from '@/pages/WelcomeAnimation';
 import ProfileDashboard from '@/pages/ProfileDashboard';
 import Discover from '@/pages/Discover';
 import BottomNavigation from '@/components/BottomNavigation';
+import LeftNav from '@/components/LeftNav';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -199,6 +200,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    <LeftNav />
     <BottomNavigation />
     </>
   );

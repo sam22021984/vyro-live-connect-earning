@@ -104,6 +104,8 @@
     text-rendering: optimizeLegibility;
     /* Reserve space for the fixed bottom navigation bar on all screens */
     padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    /* Reserve space for the fixed left-side navigation rail */
+    padding-left: 48px;
   }
 
   /* Ensure all form controls inherit font for consistent sizing */
