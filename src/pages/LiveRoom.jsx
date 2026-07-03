@@ -15,7 +15,7 @@ export default function LiveRoom() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { id: roomId } = useParams();
-  const { joined, joining, error: joinError, recommendations, audioAction, publishEvent, archiveRoom, backupRoom } = useLiveRoomApi(roomId);
+  const { joined, joining, error: joinError, recommendations, giftStats, roomScore, audioAction, publishEvent, archiveRoom, backupRoom, requestMic, verifyPayment, runScheduler } = useLiveRoomApi(roomId);
   const [themeIndex, setThemeIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
@@ -109,7 +109,11 @@ export default function LiveRoom() {
   };
 
   // Handle gift send from panel
-  const handlePanelSendGift = (gift, targetId) => {
+  const handlePanelSendGift = async (gift, targetId) => {
+    if (roomId) {
+      const payRes = await verifyPayment(gift.price || 0);
+      if (payRes?.success === false) { toast({ title: "Payment verification failed", variant: "destructive" }); return; }
+    }
     sendGift(gift, targetId);
     setPanelType(null);
     setPanelTargetId(null);
@@ -222,6 +226,7 @@ export default function LiveRoom() {
       <div className="absolute bottom-0 left-0 right-0 z-30 px-3 pb-4 pt-2" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)" }}>
         <div className="flex items-center gap-2 rounded-2xl px-3 py-2 mb-2" style={{ background: COLORS.glassOverlay, backdropFilter: "blur(20px)", border: `1px solid ${COLORS.gold}30` }}>
           <span className="text-[10px] font-bold text-white flex-1">✋ Request to Speak</span>
+          <button onClick={async () => { if (roomId) { const res = await requestMic(); toast({ title: res?.success ? "Mic request sent ✓" : "Request failed", variant: res?.success ? "default" : "destructive" }); } else { toast({ title: "Mic request sent" }); } }} className="px-2 py-1 rounded-lg text-[9px] font-bold text-white transition active:scale-90" style={{ background: COLORS.gold }}>Request</button>
           <button onClick={() => { setLocked(!locked); toast({ title: locked ? "Room unlocked" : "Room locked" }); }} className="flex items-center gap-1 px-2 py-1 rounded-lg transition active:scale-90" style={{ background: locked ? `${COLORS.gold}20` : "rgba(255,255,255,0.06)" }}>
             <Lock size={12} style={{ color: locked ? COLORS.gold : COLORS.softGray }} fill={locked ? COLORS.gold : "none"} />
             <span className="text-[9px] font-bold" style={{ color: locked ? COLORS.gold : COLORS.softGray }}>{locked ? "Locked" : "Open"}</span>
@@ -270,7 +275,7 @@ export default function LiveRoom() {
       {showLeaderboard && <GiftLeaderboard onClose={() => setShowLeaderboard(false)} />}
 
       {/* Settings */}
-      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} />}
+      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} onScheduler={runScheduler} giftStats={giftStats} roomScore={roomScore} />}
 
       <style>{`
         @keyframes pulse {
