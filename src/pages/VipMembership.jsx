@@ -24,6 +24,12 @@ import VipSecurityAdminSystem from "@/pages/VipSecurityAdminSystem";
 export default function VipMembership() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("home");
+  const [selectedDurationId, setSelectedDurationId] = useState(null);
+
+  const handleSelectDuration = (planId) => {
+    setSelectedDurationId(planId);
+    setActiveTab("purchase");
+  };
 
   const renderTab = () => {
     switch (activeTab) {
@@ -37,8 +43,8 @@ export default function VipMembership() {
       case "frames": return <VipCollectionsTab type="frames" />;
       case "badges": return <VipCollectionsTab type="badges" />;
       case "effects": return <VipCollectionsTab type="effects" />;
-      case "purchase": return <VipPurchaseTab />;
-      case "duration": return <VipDurationTab />;
+      case "purchase": return <VipPurchaseTab selectedDurationId={selectedDurationId} onDurationSelected={setSelectedDurationId} />;
+      case "duration": return <VipDurationTab onSelectPlan={handleSelectDuration} selectedDurationId={selectedDurationId} />;
       case "history": return <VipHistoryTab />;
       case "settings": return <VipSettingsTab />;
       case "notifications": return <VipNotificationsTab />;
