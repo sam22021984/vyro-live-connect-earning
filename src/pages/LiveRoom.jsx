@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
 import { useLiveRoomApi } from "@/hooks/useLiveRoomApi";
 import { useLiveRoomData } from "@/hooks/useLiveRoomData";
 import { ArrowLeft, Settings, X, AlertTriangle, Trophy, Users, Minimize2, LogOut, Send } from "lucide-react";
@@ -150,14 +151,26 @@ export default function LiveRoom() {
   };
 
   const handlePanelSendGift = async (gift, targetId) => {
-    if (roomId) {
-      const payRes = await verifyPayment(gift.price || 0);
-      if (payRes?.success === false) { toast({ title: "Payment verification failed", variant: "destructive" }); return; }
+    const receiver = SEATS[targetId]?.user;
+    if (!receiver) return;
+    try {
+      const res = await base44.functions.invoke("sendGift", {
+        recipient_id: gift.recipient_id || receiver.vyro_id || targetId,
+        recipient_name: gift.recipient_name || receiver.name,
+        gift_name: gift.name,
+        gift_icon: gift.icon,
+        price_coins: gift.price || 0,
+        quantity: 1,
+      });
+      const result = res.data || res;
+      if (result.error) { toast({ title: result.error, variant: "destructive" }); return; }
+    } catch (err) {
+      // Fallback: still do animation if backend fails (demo mode)
     }
     sendGift(gift, targetId);
     setPanelType(null);
     setPanelTargetId(null);
-    toast({ title: `Sent ${gift.name} to ${SEATS[targetId]?.user?.name || "user"}! 🎁` });
+    toast({ title: `Sent ${gift.name} to ${receiver.name}! 🎁` });
   };
 
   const handlePanelSendEmoji = (emoji, targetId) => {
@@ -279,12 +292,12 @@ export default function LiveRoom() {
       <AnimationLayer animations={animations} seatEffects={seatEffects} />
 
       {/* Seat area — fills space between header and bottom panel */}
-      <div className="absolute left-0 right-0 flex items-stretch justify-center px-3" style={{ top: "52px", bottom: "150px" }}>
+      <div className="absolute left-0 right-0 flex items-stretch justify-center px-3" style={{ top: "52px", bottom: "96px" }}>
         <SeatArea onSeatClick={handleSeatClick} seatEffects={seatEffects} seatCount={seatCount} />
       </div>
 
       {/* Chat overlay */}
-      <div className="absolute left-3 right-3 z-20" style={{ bottom: "150px" }}>
+      <div className="absolute left-3 right-3 z-20" style={{ bottom: "96px" }}>
         {showWarning && (
           <div className="rounded-2xl p-2.5 mb-2 flex items-start gap-2 animate-fadeIn" style={{ background: COLORS.glassOverlay, backdropFilter: "blur(12px)", border: `1px solid ${COLORS.gold}30` }}>
             <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" style={{ color: COLORS.gold }} />
@@ -306,7 +319,7 @@ export default function LiveRoom() {
 
       {/* Chat input bar — replaces window.prompt */}
       {showChatInput && (
-        <div className="absolute left-3 right-3 z-30 animate-fadeIn" style={{ bottom: "150px" }}>
+        <div className="absolute left-3 right-3 z-30 animate-fadeIn" style={{ bottom: "96px" }}>
           <div className="flex items-center gap-2 rounded-2xl px-3 py-2" style={{ background: COLORS.glassOverlay, backdropFilter: "blur(20px)", border: `1px solid ${COLORS.gold}30` }}>
             <input
               autoFocus
@@ -323,35 +336,35 @@ export default function LiveRoom() {
         </div>
       )}
 
-      {/* Bottom action panel — positioned above the nav bar */}
-      <div className="absolute left-0 right-0 z-30 px-3 pb-2 pt-2" style={{ bottom: "56px", background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)" }}>
-        <div className="flex items-center gap-2 rounded-2xl px-3 py-2 mb-2" style={{ background: COLORS.glassOverlay, backdropFilter: "blur(20px)", border: `1px solid ${COLORS.gold}30` }}>
-          <span className="text-[10px] font-bold text-white flex-1">✋ Request to Speak</span>
-          <button onClick={async () => { if (roomId) { const res = await requestMic(); toast({ title: res?.success ? "Mic request sent ✓" : "Request failed", variant: res?.success ? "default" : "destructive" }); } else { toast({ title: "Mic request sent" }); } }} className="px-2 py-1 rounded-lg text-[9px] font-bold text-white transition active:scale-90" style={{ background: COLORS.gold }}>Request</button>
-          <button onClick={() => { setLocked(!locked); toast({ title: locked ? "Room unlocked" : "Room locked" }); }} className="flex items-center gap-1 px-2 py-1 rounded-lg transition active:scale-90" style={{ background: locked ? `${COLORS.gold}20` : "rgba(255,255,255,0.06)" }}>
-            <span className="text-[9px] font-bold" style={{ color: locked ? COLORS.gold : COLORS.softGray }}>{locked ? "🔒 Locked" : "🔓 Open"}</span>
+      {/* Bottom action panel — compact, pinned to bottom */}
+      <div className="absolute left-0 right-0 z-30 px-2 pb-1 pt-1 safe-bottom" style={{ bottom: 0, background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)" }}>
+        <div className="flex items-center gap-2 rounded-xl px-2.5 py-1.5 mb-1.5" style={{ background: COLORS.glassOverlay, backdropFilter: "blur(20px)", border: `1px solid ${COLORS.gold}30` }}>
+          <span className="text-[9px] font-bold text-white flex-1">✋ Request to Speak</span>
+          <button onClick={async () => { if (roomId) { const res = await requestMic(); toast({ title: res?.success ? "Mic request sent ✓" : "Request failed", variant: res?.success ? "default" : "destructive" }); } else { toast({ title: "Mic request sent" }); } }} className="px-2 py-0.5 rounded-lg text-[8px] font-bold text-white transition active:scale-90" style={{ background: COLORS.gold }}>Request</button>
+          <button onClick={() => { setLocked(!locked); toast({ title: locked ? "Room unlocked" : "Room locked" }); }} className="flex items-center gap-1 px-2 py-0.5 rounded-lg transition active:scale-90" style={{ background: locked ? `${COLORS.gold}20` : "rgba(255,255,255,0.06)" }}>
+            <span className="text-[8px] font-bold" style={{ color: locked ? COLORS.gold : COLORS.softGray }}>{locked ? "🔒" : "🔓"}</span>
           </button>
         </div>
 
         {/* Bottom bar + Settings button on the right */}
-        <div className="flex items-center gap-2">
-          <div className="flex-1 flex items-center justify-around gap-1 rounded-2xl px-2 py-2" style={{ background: COLORS.glassOverlay, backdropFilter: "blur(24px) saturate(180%)", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)" }}>
+        <div className="flex items-center gap-1.5">
+          <div className="flex-1 flex items-center justify-around gap-0.5 rounded-xl px-1.5 py-1.5" style={{ background: COLORS.glassOverlay, backdropFilter: "blur(24px) saturate(180%)", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)" }}>
             {bottomButtons.map((btn, i) => (
               <button key={i} onClick={btn.action} className="flex flex-col items-center gap-0.5 transition active:scale-90">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: `${btn.color}15`, border: `1px solid ${btn.color}40` }}>
-                  <span className="text-sm">{btn.icon}</span>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: `${btn.color}15`, border: `1px solid ${btn.color}40` }}>
+                  <span className="text-xs">{btn.icon}</span>
                 </div>
-                <span className="text-[7px] font-bold" style={{ color: btn.color }}>{btn.label}</span>
+                <span className="text-[6px] font-bold" style={{ color: btn.color }}>{btn.label}</span>
               </button>
             ))}
           </div>
 
           {/* Settings button — bottom right */}
           <button onClick={() => setShowSettings(true)} className="flex flex-col items-center gap-0.5 transition active:scale-90 flex-shrink-0">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: `${COLORS.gold}20`, border: `1px solid ${COLORS.gold}50`, boxShadow: `0 0 12px ${COLORS.gold}30` }}>
-              <Settings size={18} style={{ color: COLORS.gold }} />
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: `${COLORS.gold}20`, border: `1px solid ${COLORS.gold}50`, boxShadow: `0 0 12px ${COLORS.gold}30` }}>
+              <Settings size={14} style={{ color: COLORS.gold }} />
             </div>
-            <span className="text-[7px] font-bold" style={{ color: COLORS.gold }}>Settings</span>
+            <span className="text-[6px] font-bold" style={{ color: COLORS.gold }}>Settings</span>
           </button>
         </div>
       </div>

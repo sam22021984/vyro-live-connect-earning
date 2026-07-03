@@ -1,14 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { X, Gift, Smile } from "lucide-react";
-import { COLORS, GIFT_CATALOG, EMOJIS_3D, EMOJI_CATEGORIES, SEATS } from "./roomData";
-
-const GIFT_CATS = [
-  { id: "standard", name: "Standard", icon: "🌹" },
-  { id: "premium", name: "Premium", icon: "💎" },
-  { id: "luxury", name: "Luxury", icon: "🚀" },
-];
+import { COLORS, EMOJIS_3D, EMOJI_CATEGORIES, SEATS } from "./roomData";
+import { useGifts } from "@/hooks/useGifts";
 
 export default function InteractionPanel({ type, targetId, onSend, onClose }) {
+  const { gifts, coins, loading } = useGifts();
   const [giftCat, setGiftCat] = useState("standard");
   const [emojiCat, setEmojiCat] = useState("basic");
   const [selectedTarget, setSelectedTarget] = useState(targetId);
@@ -16,21 +12,51 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
   const occupiedSeats = SEATS.filter((s) => s.user && s.id !== 0);
   const targetSeat = SEATS.find((s) => s.id === selectedTarget);
 
-  const items = type === "gift"
-    ? GIFT_CATALOG.filter((g) => g.category === giftCat)
-    : EMOJIS_3D.filter((e) => e.category === emojiCat);
+  // Build categories from database gifts
+  const giftCategories = useMemo(() => {
+    const cats = [...new Set(gifts.map((g) => g.category).filter(Boolean))];
+    if (cats.length === 0) return [{ id: "standard", name: "Standard", icon: "🌹" }];
+    const icons = { standard: "🌹", luxury: "🚀", fun: "🎉", special: "💎", popular: "🔥" };
+    return cats.map((c) => ({ id: c, name: c.charAt(0).toUpperCase() + c.slice(1), icon: icons[c] || "🎁" }));
+  }, [gifts]);
 
-  const categories = type === "gift" ? GIFT_CATS : EMOJI_CATEGORIES;
+  const activeGiftCat = giftCategories.some((c) => c.id === giftCat) ? giftCat : giftCategories[0]?.id;
+
+  const giftItems = gifts.filter((g) => g.category === activeGiftCat && g.is_active !== false);
+  const emojiItems = EMOJIS_3D.filter((e) => e.category === emojiCat);
+
+  const items = type === "gift" ? giftItems : emojiItems;
+  const categories = type === "gift" ? giftCategories : EMOJI_CATEGORIES;
+
+  const handleGiftClick = (gift) => {
+    if (!targetSeat) return;
+    onSend({
+      id: gift.id,
+      name: gift.name,
+      icon: gift.icon,
+      price: gift.price_coins || gift.price || 0,
+      category: gift.category,
+      effect: "hearts",
+      recipient_id: targetSeat.user?.vyro_id || targetSeat.id,
+      recipient_name: targetSeat.user?.name,
+    }, selectedTarget);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative w-full max-w-md rounded-t-3xl max-h-[75vh] overflow-y-auto scrollbar-hide animate-fadeIn"
-        style={{ background: COLORS.tealDeep, border: `1px solid ${COLORS.gold}30`, boxShadow: "0 -8px 32px rgba(0,0,0,0.5)" }}
+        className="relative w-full max-w-md rounded-t-3xl flex flex-col animate-fadeIn"
+        style={{
+          background: COLORS.tealDeep,
+          border: `1px solid ${COLORS.gold}30`,
+          boxShadow: "0 -8px 32px rgba(0,0,0,0.5)",
+          maxHeight: "82vh",
+          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        }}
       >
-        {/* Header */}
-        <div className="sticky top-0 z-10 pt-3 pb-2 px-4" style={{ background: COLORS.tealDeep }}>
+        {/* Header — sticky */}
+        <div className="sticky top-0 z-10 pt-3 pb-2 px-4 flex-shrink-0" style={{ background: COLORS.tealDeep }}>
           <div className="w-10 h-1 rounded-full mx-auto mb-2" style={{ background: `${COLORS.gold}40` }} />
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -44,14 +70,15 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
 
           {/* Coin balance (gift mode only) */}
           {type === "gift" && (
-            <div className="flex items-center justify-end gap-1 mb-2">
+            <div className="flex items-center justify-end gap-1 mb-1">
               <span className="text-[8px]" style={{ color: COLORS.gold }}>🪙</span>
-              <span className="text-[10px] font-bold" style={{ color: COLORS.gold }}>5,000,000 coins</span>
+              <span className="text-[10px] font-bold" style={{ color: COLORS.gold }}>{coins.toLocaleString()} coins</span>
             </div>
           )}
         </div>
 
-        <div className="px-4 pb-6 space-y-3">
+        {/* Scrollable content */}
+        <div className="px-4 pb-4 space-y-2.5 overflow-y-auto scrollbar-hide flex-1">
           {/* Target seat selector */}
           <div>
             <p className="text-[10px] font-bold mb-1.5 px-1" style={{ color: COLORS.gold }}>🎯 Select Target Seat</p>
@@ -82,7 +109,7 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
                 key={c.id}
                 onClick={() => type === "gift" ? setGiftCat(c.id) : setEmojiCat(c.id)}
                 className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[9px] font-bold transition active:scale-95"
-                style={(type === "gift" ? giftCat : emojiCat) === c.id
+                style={(type === "gift" ? activeGiftCat : emojiCat) === c.id
                   ? { background: `${type === "gift" ? COLORS.gold : COLORS.pink}25`, color: type === "gift" ? COLORS.gold : COLORS.pink, border: `1px solid ${type === "gift" ? COLORS.gold : COLORS.pink}40` }
                   : { background: "rgba(255,255,255,0.04)", color: COLORS.softGray, border: "1px solid rgba(255,255,255,0.06)" }}
               >
@@ -92,35 +119,43 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
             ))}
           </div>
 
-          {/* Category description (emoji mode) */}
-          {type === "emoji" && (
-            <p className="text-[9px] text-center" style={{ color: COLORS.softGray }}>
-              {EMOJI_CATEGORIES.find((c) => c.id === emojiCat)?.desc}
-            </p>
-          )}
-
           {/* Items grid */}
-          <div className="grid grid-cols-4 gap-2">
-            {items.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => targetSeat && onSend(item, selectedTarget)}
-                disabled={!targetSeat}
-                className="flex flex-col items-center gap-1 p-2 rounded-xl transition active:scale-90 disabled:opacity-40"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-              >
-                <span className="text-2xl" style={{ filter: `drop-shadow(0 0 6px ${type === "gift" ? COLORS.gold : item.color || COLORS.pink})` }}>
-                  {type === "gift" ? item.icon : item.emoji}
-                </span>
-                <span className="text-[7px] font-bold" style={{ color: COLORS.white }}>{item.name}</span>
-                {type === "gift" && (
-                  <span className="text-[7px] font-bold" style={{ color: COLORS.gold }}>
-                    🪙 {item.price >= 1000 ? `${(item.price / 1000).toFixed(0)}K` : item.price}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
+          {type === "gift" && loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 gap-1">
+              <span className="text-2xl">🎁</span>
+              <p className="text-[10px]" style={{ color: COLORS.softGray }}>No gifts available</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-2">
+              {items.map((item) => {
+                const price = type === "gift" ? (item.price_coins || item.price || 0) : 0;
+                const canAfford = type !== "gift" || coins >= price;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => type === "gift" ? handleGiftClick(item) : targetSeat && onSend(item, selectedTarget)}
+                    disabled={!targetSeat || (type === "gift" && !canAfford)}
+                    className="flex flex-col items-center gap-1 p-2 rounded-xl transition active:scale-90 disabled:opacity-40"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  >
+                    <span className="text-2xl" style={{ filter: `drop-shadow(0 0 6px ${type === "gift" ? COLORS.gold : item.color || COLORS.pink})` }}>
+                      {type === "gift" ? item.icon : item.emoji}
+                    </span>
+                    <span className="text-[7px] font-bold" style={{ color: COLORS.white }}>{item.name}</span>
+                    {type === "gift" && (
+                      <span className="text-[7px] font-bold" style={{ color: canAfford ? COLORS.gold : COLORS.crimson }}>
+                        🪙 {price >= 1000 ? `${(price / 1000).toFixed(0)}K` : price}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* Selected target info */}
           {targetSeat && (
@@ -128,13 +163,6 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
               <img src={targetSeat.user.avatar} alt="" className="w-7 h-7 rounded-full" />
               <span className="text-[10px] font-bold text-white">→ {targetSeat.user.name}</span>
               <span className="text-[8px] ml-auto" style={{ color: COLORS.softGray }}>Seat {targetSeat.id}</span>
-            </div>
-          )}
-
-          {/* VIP/Premium notice */}
-          {type === "emoji" && (emojiCat === "vip" || emojiCat === "premium") && (
-            <div className="rounded-xl p-2 flex items-center gap-1.5" style={{ background: `${COLORS.gold}10`, border: `1px solid ${COLORS.gold}20` }}>
-              <span className="text-[9px]" style={{ color: COLORS.gold }}>👑 {emojiCat === "vip" ? "VIP members only" : "Premium & VIP users only"}</span>
             </div>
           )}
         </div>
