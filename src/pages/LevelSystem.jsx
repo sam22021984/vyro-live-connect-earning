@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, X, Check, Coins, TrendingUp } from "lucide-react";
+import { ArrowLeft, X, Check, Coins, TrendingUp, BookOpen, ChevronRight } from "lucide-react";
 import { levelSystems } from "@/components/levels/levelData";
 import UserLevelDashboard from "@/components/levels/UserLevelDashboard";
 import StreamingLevelDashboard from "@/components/levels/StreamingLevelDashboard";
@@ -117,6 +117,22 @@ export default function LevelSystem() {
                 </div>
               </div>
             ))}
+
+            {/* Level System Guide Button */}
+            <button
+              onClick={() => navigate("/level-system-guide")}
+              className="w-full rounded-2xl p-4 flex items-center gap-3 active:scale-[0.98] transition mb-2"
+              style={{ background: "linear-gradient(135deg, #1E1B4B 0%, #4C1D95 100%)", boxShadow: "0 8px 24px rgba(76,29,175,0.2)" }}
+            >
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.15)" }}>
+                <BookOpen size={20} className="text-yellow-400" />
+              </div>
+              <div className="flex-1 text-left">
+                <h3 className="text-sm font-bold text-white">Level System Guide</h3>
+                <p className="text-[10px] text-white/70">Complete guide to all four level systems</p>
+              </div>
+              <ChevronRight size={18} className="text-white/50" />
+            </button>
 
             {/* Bottom navigation tiles */}
             <div className="pt-2">

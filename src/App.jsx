@@ -21,6 +21,7 @@ import ApplyCenter from '@/pages/ApplyCenter';
 import ApplicationDetail from '@/pages/ApplicationDetail';
 import Recharge from '@/pages/Recharge';
 import LevelSystem from '@/pages/LevelSystem';
+import LevelSystemGuide from '@/pages/LevelSystemGuide';
 import VyroMall from '@/pages/VyroMall';
 import TasksRewards from '@/pages/TasksRewards';
 import ProfileStats from '@/pages/ProfileStats';
@@ -99,6 +100,7 @@ const AuthenticatedApp = () => {
         <Route path="/apply-center/:id" element={<ApplicationDetail />} />
         <Route path="/recharge" element={<Recharge />} />
         <Route path="/level-system" element={<LevelSystem />} />
+        <Route path="/level-system-guide" element={<LevelSystemGuide />} />
         <Route path="/vyro-mall" element={<VyroMall />} />
         <Route path="/tasks-rewards" element={<TasksRewards />} />
         <Route path="/profile-stats" element={<ProfileStats />} />
