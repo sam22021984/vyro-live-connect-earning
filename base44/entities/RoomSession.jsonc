@@ -5,6 +5,9 @@
     "room_id": {
       "type": "string"
     },
+    "party_name": {
+      "type": "string"
+    },
     "host_id": {
       "type": "string"
     },

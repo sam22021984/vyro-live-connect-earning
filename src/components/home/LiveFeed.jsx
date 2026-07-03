@@ -77,7 +77,7 @@ export default function LiveFeed({ rooms }) {
 
             {/* Info */}
             <div className="p-2">
-              <p className="text-xs font-bold text-gray-800 truncate">{room.host_name || "Host"}</p>
+              <p className="text-xs font-bold text-gray-800 truncate">{room.party_name || room.room_id || "Party Room"}</p>
               <p className="text-[10px] text-gray-400 truncate">{room.category || "Live Stream"}</p>
 
               <div className="flex items-center gap-2 mt-1">
