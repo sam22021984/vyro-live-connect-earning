@@ -1,8 +1,17 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { GlassCard, SectionHeader, ActionButton, TEXT_MUTED } from "../Shared";
 import { REWARD_DATA } from "../userDashboardData";
 
 export default function RewardSection() {
+  const navigate = useNavigate();
+
+  const ACTION_ROUTES = {
+    "Claim Rewards": "/tasks-rewards",
+    "Reward History": "/tasks-rewards",
+    "Check Eligibility": "/tasks-rewards",
+  };
+
   return (
     <div className="space-y-4">
       <GlassCard className="text-center !p-4">
@@ -40,7 +49,10 @@ export default function RewardSection() {
         <SectionHeader title="Actions" icon="⚡" />
         <div className="grid grid-cols-3 gap-2">
           {REWARD_DATA.actions.map((a, i) => (
-            <ActionButton key={i} label={a.label} icon={a.icon} color={a.color} />
+            <ActionButton key={i} label={a.label} icon={a.icon} color={a.color} onClick={() => {
+              const route = ACTION_ROUTES[a.label];
+              if (route) navigate(route);
+            }} />
           ))}
         </div>
       </div>

@@ -1,22 +1,52 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { GlassCard, SectionHeader, ActionButton, TEXT_MUTED } from "../Shared";
 import { WALLET_DATA } from "../userDashboardData";
+import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function WalletSection() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    (async () => {
+      try {
+        let p = await base44.entities.UserProfile.filter({ user_id: user.id });
+        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+        if (p.length > 0) setProfile(p[0]);
+      } catch (e) {}
+    })();
+  }, [user?.id]);
+
+  const coins = profile?.coins || 0;
+  const diamonds = Math.floor((profile?.coins || 0) / 10);
+
+  const ACTION_ROUTES = {
+    "Buy Coins": "/coins-recharge",
+    "Gift History": "/finance",
+    "Payment History": "/finance",
+    "Reward History": "/tasks-rewards",
+    "Wallet Records": "/finance",
+    "Redeem Coupons": "/tasks-rewards",
+  };
+
   return (
     <div className="space-y-4">
       <GlassCard className="text-center !p-4">
         <p className="text-[10px]" style={{ color: TEXT_MUTED }}>Total Balance</p>
-        <h2 className="text-2xl font-bold text-white mt-1">$1,240.00</h2>
+        <h2 className="text-2xl font-bold text-white mt-1">{coins.toLocaleString()} 🪙</h2>
         <div className="flex justify-center gap-4 mt-3">
           <div>
             <p className="text-[9px]" style={{ color: TEXT_MUTED }}>Coins</p>
-            <p className="text-sm font-bold" style={{ color: "#D4AF37" }}>12,450</p>
+            <p className="text-sm font-bold" style={{ color: "#D4AF37" }}>{coins.toLocaleString()}</p>
           </div>
           <div className="w-px" style={{ background: "rgba(255,255,255,0.1)" }} />
           <div>
             <p className="text-[9px]" style={{ color: TEXT_MUTED }}>Diamonds</p>
-            <p className="text-sm font-bold" style={{ color: "#3B82F6" }}>8,920</p>
+            <p className="text-sm font-bold" style={{ color: "#3B82F6" }}>{diamonds.toLocaleString()}</p>
           </div>
         </div>
       </GlassCard>
@@ -55,7 +85,10 @@ export default function WalletSection() {
         <SectionHeader title="Actions" icon="⚡" />
         <div className="grid grid-cols-3 gap-2">
           {WALLET_DATA.actions.map((a, i) => (
-            <ActionButton key={i} label={a.label} icon={a.icon} color={a.color} />
+            <ActionButton key={i} label={a.label} icon={a.icon} color={a.color} onClick={() => {
+              const route = ACTION_ROUTES[a.label];
+              if (route) navigate(route);
+            }} />
           ))}
         </div>
       </div>

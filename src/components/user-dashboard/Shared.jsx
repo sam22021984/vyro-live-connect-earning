@@ -48,9 +48,10 @@ export function StatCard({ label, value, icon, color }) {
   );
 }
 
-export function ActionButton({ label, icon, color }) {
+export function ActionButton({ label, icon, color, onClick }) {
   return (
     <button
+      onClick={onClick}
       className="flex flex-col items-center gap-1.5 p-3 rounded-xl active:scale-95 transition"
       style={{ background: `${color}12`, border: `1px solid ${color}25` }}
     >
