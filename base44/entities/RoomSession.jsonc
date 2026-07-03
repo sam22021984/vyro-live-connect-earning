@@ -1,0 +1,156 @@
+{
+  "name": "RoomSession",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string"
+    },
+    "host_id": {
+      "type": "string"
+    },
+    "host_name": {
+      "type": "string"
+    },
+    "host_avatar": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "live",
+        "paused",
+        "closing",
+        "closed",
+        "shutdown"
+      ],
+      "default": "live"
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "ended_at": {
+      "type": "string"
+    },
+    "duration_seconds": {
+      "type": "number",
+      "default": 0
+    },
+    "peak_viewers": {
+      "type": "number",
+      "default": 0
+    },
+    "current_viewers": {
+      "type": "number",
+      "default": 0
+    },
+    "total_gifts": {
+      "type": "number",
+      "default": 0
+    },
+    "total_coins": {
+      "type": "number",
+      "default": 0
+    },
+    "total_messages": {
+      "type": "number",
+      "default": 0
+    },
+    "gross_revenue_coins": {
+      "type": "number",
+      "default": 0
+    },
+    "host_earnings_coins": {
+      "type": "number",
+      "default": 0
+    },
+    "platform_fee_coins": {
+      "type": "number",
+      "default": 0
+    },
+    "agency_fee_coins": {
+      "type": "number",
+      "default": 0
+    },
+    "agent_fee_coins": {
+      "type": "number",
+      "default": 0
+    },
+    "profit_usd": {
+      "type": "number",
+      "default": 0
+    },
+    "host_share_pct": {
+      "type": "number",
+      "default": 40
+    },
+    "platform_share_pct": {
+      "type": "number",
+      "default": 30
+    },
+    "agency_share_pct": {
+      "type": "number",
+      "default": 20
+    },
+    "agent_share_pct": {
+      "type": "number",
+      "default": 10
+    },
+    "is_force_closed": {
+      "type": "boolean",
+      "default": false
+    },
+    "shutdown_reason": {
+      "type": "string"
+    },
+    "shutdown_by": {
+      "type": "string"
+    },
+    "security_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "health_score": {
+      "type": "number",
+      "default": 100
+    },
+    "category": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "room_id",
+    "host_id"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "data.host_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
