@@ -18,7 +18,19 @@ export default function PhotoStep({ data, updateData, onContinue }) {
     setUploading(true);
     setStatus("");
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const file_base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const res = await base44.functions.invoke("uploadFile", {
+        file_base64,
+        filename: file.name,
+        content_type: file.type,
+      });
+      const file_url = res.data?.file_url;
+      if (!file_url) throw new Error("Upload failed");
       setAvatarUrl(file_url);
       updateData({ avatar_url: file_url });
       setStatus("approved");

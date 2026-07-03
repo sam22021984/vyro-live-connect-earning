@@ -1,9 +1,26 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+function getSupabaseUser(req: Request): { id: string; email: string } | null {
+  try {
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+    if (!authHeader) return null;
+    const token = authHeader.replace('Bearer ', '').trim();
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    let b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const payload = JSON.parse(atob(b64));
+    if (!payload.sub) return null;
+    return { id: payload.sub, email: payload.email || '' };
+  } catch {
+    return null;
+  }
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
+    const user = getSupabaseUser(req);
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { text, image_url, context } = await req.json();

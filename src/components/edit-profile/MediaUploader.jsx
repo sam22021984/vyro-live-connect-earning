@@ -14,7 +14,19 @@ export default function MediaUploader({ field, label, value, onChange, aspect = 
     if (!file) return;
     setUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const file_base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const res = await base44.functions.invoke("uploadFile", {
+        file_base64,
+        filename: file.name,
+        content_type: file.type,
+      });
+      const file_url = res.data?.file_url;
+      if (!file_url) throw new Error("Upload failed");
       onChange(file_url);
       toast({ title: `${label} updated` });
     } catch (e) {

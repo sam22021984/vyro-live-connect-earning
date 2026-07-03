@@ -1,9 +1,26 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+function getSupabaseUser(req: Request): { id: string; email: string } | null {
+  try {
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+    if (!authHeader) return null;
+    const token = authHeader.replace('Bearer ', '').trim();
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    let b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const payload = JSON.parse(atob(b64));
+    if (!payload.sub) return null;
+    return { id: payload.sub, email: payload.email || '' };
+  } catch {
+    return null;
+  }
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
+    const user = getSupabaseUser(req);
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
@@ -36,7 +53,7 @@ Deno.serve(async (req) => {
         // Check if already following
         let isFollowing = false;
         if (myId) {
-          const existing = await base44.entities.FriendRequest.filter({
+          const existing = await base44.asServiceRole.entities.FriendRequest.filter({
             sender_id: myId,
             receiver_id: u.id,
             status: 'accepted',
@@ -69,20 +86,20 @@ Deno.serve(async (req) => {
       if (!myProfile) return Response.json({ error: 'Profile not found' }, { status: 404 });
       if (target_user_id === myProfile.id) return Response.json({ error: 'Cannot follow yourself' }, { status: 400 });
 
-      const existing = await base44.entities.FriendRequest.filter({
+      const existing = await base44.asServiceRole.entities.FriendRequest.filter({
         sender_id: myProfile.id,
         receiver_id: target_user_id,
       });
 
       if (existing && existing.length > 0) {
         if (existing[0].status === 'accepted') return Response.json({ success: true, status: 'already_following' });
-        await base44.entities.FriendRequest.update(existing[0].id, { status: 'accepted' });
+        await base44.asServiceRole.entities.FriendRequest.update(existing[0].id, { status: 'accepted' });
       } else {
         const targetProfiles = await base44.asServiceRole.entities.UserProfile.filter({ id: target_user_id });
         const target = targetProfiles?.[0];
         if (!target) return Response.json({ error: 'Target user not found' }, { status: 404 });
 
-        await base44.entities.FriendRequest.create({
+        await base44.asServiceRole.entities.FriendRequest.create({
           sender_id: myProfile.id,
           receiver_id: target_user_id,
           sender_name: myProfile.username || myProfile.full_name || 'User',
@@ -113,13 +130,13 @@ Deno.serve(async (req) => {
       const myProfile = myProfiles?.[0];
       if (!myProfile) return Response.json({ error: 'Profile not found' }, { status: 404 });
 
-      const existing = await base44.entities.FriendRequest.filter({
+      const existing = await base44.asServiceRole.entities.FriendRequest.filter({
         sender_id: myProfile.id,
         receiver_id: target_user_id,
       });
 
       if (existing && existing.length > 0) {
-        await base44.entities.FriendRequest.delete(existing[0].id);
+        await base44.asServiceRole.entities.FriendRequest.delete(existing[0].id);
       }
 
       const targetProfiles = await base44.asServiceRole.entities.UserProfile.filter({ id: target_user_id });

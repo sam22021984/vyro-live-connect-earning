@@ -41,9 +41,9 @@ export default function EditProfile() {
 
   const loadProfile = async () => {
     try {
-      const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
-      if (profiles.length > 0) {
-        const p = profiles[0];
+      const res = await base44.functions.invoke("userOnboarding", { action: "getProfile" });
+      const p = res.data?.profile;
+      if (p) {
         setProfileId(p.id);
         const formData = {
           username: p.username || "",
@@ -116,12 +116,10 @@ export default function EditProfile() {
         social_links: form.social_links || {},
       };
 
-      if (profileId) {
-        await base44.entities.UserProfile.update(profileId, payload);
-      } else {
-        payload.user_id = user.id;
-        await base44.entities.UserProfile.create(payload);
-      }
+      await base44.functions.invoke("userOnboarding", {
+        action: "updateProfile",
+        ...payload,
+      });
 
       // Sync state
       setSyncing(true);

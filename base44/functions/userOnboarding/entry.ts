@@ -279,7 +279,7 @@ Deno.serve(async (req) => {
 
     // Update profile with onboarding data
     if (action === 'updateProfile') {
-      const { username, full_name, bio, birthday, gender, avatar_url, interests } = body;
+      const { username, full_name, bio, birthday, gender, avatar_url, cover_url, country, language, interests } = body;
 
       let profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id: user.id });
       if (profiles.length === 0) {
@@ -296,6 +296,9 @@ Deno.serve(async (req) => {
       if (birthday) { updates.birthday = birthday; updates.zodiac = getZodiac(birthday); }
       if (gender) updates.gender = gender;
       if (avatar_url) updates.avatar_url = avatar_url;
+      if (cover_url !== undefined) updates.cover_url = cover_url;
+      if (country) updates.country = country;
+      if (language) updates.language = language;
       if (interests) updates.interests = interests;
 
       const updated = await base44.asServiceRole.entities.UserProfile.update(profiles[0].id, updates);
