@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Search, Menu, Shield, CheckCircle, Star } from "lucide-react";
+import SearchOverlay from "@/components/profile/SearchOverlay";
+import FriendsMenu from "@/components/profile/FriendsMenu";
 
 export default function ProfileHeader({ profile }) {
+  const [showSearch, setShowSearch] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const roleBadges = [
     profile?.is_app_owner && { label: "App Owner", color: "bg-purple-600" },
     profile?.is_official && { label: "Official Host", color: "bg-blue-500" },
@@ -31,10 +35,16 @@ export default function ProfileHeader({ profile }) {
       <div className="relative z-10 px-5 pt-12 pb-6">
         {/* Top bar */}
         <div className="flex items-center justify-end gap-2 mb-6">
-          <button className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-white/30">
+          <button
+            onClick={() => setShowSearch(true)}
+            className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-white/30 active:scale-90"
+          >
             <Search size={18} className="text-white" />
           </button>
-          <button className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-white/30">
+          <button
+            onClick={() => setShowMenu(true)}
+            className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-white/30 active:scale-90"
+          >
             <Menu size={18} className="text-white" />
           </button>
         </div>
@@ -97,6 +107,9 @@ export default function ProfileHeader({ profile }) {
           </div>
         </div>
       </div>
+
+      {showSearch && <SearchOverlay onClose={() => setShowSearch(false)} />}
+      {showMenu && <FriendsMenu onClose={() => setShowMenu(false)} />}
     </div>
   );
 }
