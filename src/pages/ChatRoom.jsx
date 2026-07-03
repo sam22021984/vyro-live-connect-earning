@@ -28,6 +28,7 @@ export default function ChatRoom() {
   const [online, setOnline] = useState(conv?.is_online ?? true);
   const [coins, setCoins] = useState(500000);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [emojiMode, setEmojiMode] = useState("standard");
@@ -39,6 +40,10 @@ export default function ChatRoom() {
   const [transLang, setTransLang] = useState(null);
 
   const scrollRef = useRef(null);
+
+  useEffect(() => {
+    base44.auth.me().then((me) => setCurrentUserId(me.id)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     loadMessages();
@@ -70,7 +75,6 @@ export default function ChatRoom() {
     const msgData = {
       conversation_id: id,
       text,
-      is_own: true,
       is_delivered: false,
       is_read: false,
       date: formatDate(now),
@@ -95,16 +99,17 @@ export default function ChatRoom() {
       setIsTyping(true);
       setTimeout(async () => {
         setIsTyping(false);
-        const reply = await base44.entities.ChatMessage.create({
+        const reply = {
+          id: "local-" + Date.now(),
           conversation_id: id,
           text: getReply(text),
-          is_own: false,
+          created_by_id: "__other__",
           is_delivered: true,
           is_read: true,
           date: formatDate(),
           time: formatTime(),
           type: "text",
-        });
+        };
         setMessages((prev) => [...prev, reply]);
         if (conv) {
           await base44.entities.ChatConversation.update(id, {
@@ -139,7 +144,6 @@ export default function ChatRoom() {
     const msg = await base44.entities.ChatMessage.create({
       conversation_id: id,
       type: "gift",
-      is_own: true,
       is_delivered: true,
       is_read: false,
       gift_id: gift.id,
@@ -154,10 +158,11 @@ export default function ChatRoom() {
 
     // simulate gift received reply
     setTimeout(async () => {
-      const reply = await base44.entities.ChatMessage.create({
+      const reply = {
+        id: "local-gift-" + Date.now(),
         conversation_id: id,
         type: "gift",
-        is_own: false,
+        created_by_id: "__other__",
         is_delivered: true,
         is_read: true,
         gift_id: gift.id,
@@ -166,7 +171,7 @@ export default function ChatRoom() {
         gift_price: gift.price,
         date: formatDate(),
         time: formatTime(),
-      });
+      };
       setMessages((prev) => [...prev, reply]);
     }, 1500);
   };
@@ -241,7 +246,7 @@ export default function ChatRoom() {
                   <span className="text-[10px] font-medium text-gray-400 px-3 py-1 rounded-full bg-white/80 backdrop-blur-sm">{item.date}</span>
                 </div>
               ) : (
-                <MessageBubble key={i} msg={item.data} onTranslate={handleTranslate} />
+                <MessageBubble key={i} msg={item.data} currentUserId={currentUserId} onTranslate={handleTranslate} />
               )
             ))
           )}

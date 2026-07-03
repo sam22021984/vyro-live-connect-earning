@@ -58,17 +58,17 @@ export default function RelationshipCenter() {
 
     setSending(true);
     try {
+      const me = await base44.auth.me();
       await base44.entities.Relationship.create({
-        sender_name: "You",
+        sender_name: me.full_name || "You",
         sender_avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop",
-        sender_id: "me",
+        sender_id: me.id,
         sender_country: "Qatar",
         receiver_name: user.username,
         receiver_avatar: user.avatar_url,
         receiver_id: user.id,
         receiver_country: user.country,
         status: "pending",
-        is_own: true,
         request_date: formatDate(),
         request_time: formatTime(),
       });

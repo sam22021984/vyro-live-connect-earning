@@ -9,19 +9,25 @@ export default function RequestsTab({ refreshKey }) {
   const [tab, setTab] = useState("incoming");
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then((me) => setCurrentUserId(me.id)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     loadRequests();
-  }, [tab, refreshKey]);
+  }, [tab, refreshKey, currentUserId]);
 
   const loadRequests = async () => {
+    if (!currentUserId) return;
     try {
       const all = await base44.entities.Relationship.list();
       let filtered;
       if (tab === "incoming") {
-        filtered = all.filter((r) => !r.is_own && r.status === "pending");
+        filtered = all.filter((r) => r.created_by_id !== currentUserId && r.status === "pending");
       } else {
-        filtered = all.filter((r) => r.is_own && r.status === "pending");
+        filtered = all.filter((r) => r.created_by_id === currentUserId && r.status === "pending");
       }
       filtered.sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0));
       setRequests(filtered);

@@ -14,17 +14,23 @@ export default function HistoryTab() {
   const [filter, setFilter] = useState("sent");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then((me) => setCurrentUserId(me.id)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     loadHistory();
-  }, [filter]);
+  }, [filter, currentUserId]);
 
   const loadHistory = async () => {
+    if (!currentUserId) return;
     try {
       const all = await base44.entities.Relationship.list();
       let filtered = [];
-      if (filter === "sent") filtered = all.filter((r) => r.is_own);
-      else if (filter === "received") filtered = all.filter((r) => !r.is_own);
+      if (filter === "sent") filtered = all.filter((r) => r.created_by_id === currentUserId);
+      else if (filter === "received") filtered = all.filter((r) => r.created_by_id !== currentUserId);
       else if (filter === "accepted") filtered = all.filter((r) => r.status === "accepted");
       else if (filter === "rejected") filtered = all.filter((r) => r.status === "rejected");
       else if (filter === "ended") filtered = all.filter((r) => r.status === "ended");
@@ -67,8 +73,9 @@ export default function HistoryTab() {
       ) : (
         <div className="space-y-2.5">
           {items.map((item) => {
-            const name = item.is_own ? item.receiver_name : item.sender_name;
-            const avatar = item.is_own ? item.receiver_avatar : item.sender_avatar;
+            const isOwn = item.created_by_id === currentUserId;
+            const name = isOwn ? item.receiver_name : item.sender_name;
+            const avatar = isOwn ? item.receiver_avatar : item.sender_avatar;
             const style = STATUS_STYLES[item.status] || STATUS_STYLES.pending;
             return (
               <div key={item.id} className="rounded-2xl p-3 backdrop-blur-xl flex items-center gap-3" style={{ background: RELATIONSHIP_COLORS.glassBg, border: `1px solid ${RELATIONSHIP_COLORS.glassBorder}` }}>

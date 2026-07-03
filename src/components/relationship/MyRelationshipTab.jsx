@@ -9,10 +9,15 @@ export default function MyRelationshipTab({ refreshKey }) {
   const [relationship, setRelationship] = useState(null);
   const [loading, setLoading] = useState(true);
   const [confirmEnd, setConfirmEnd] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then((me) => setCurrentUserId(me.id)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     loadRelationship();
-  }, [refreshKey]);
+  }, [refreshKey, currentUserId]);
 
   const loadRelationship = async () => {
     try {
@@ -53,10 +58,11 @@ export default function MyRelationshipTab({ refreshKey }) {
     );
   }
 
-  const partnerName = relationship.is_own ? relationship.receiver_name : relationship.sender_name;
-  const partnerAvatar = relationship.is_own ? relationship.receiver_avatar : relationship.sender_avatar;
-  const partnerCountry = relationship.is_own ? relationship.receiver_country : relationship.sender_country;
-  const partnerId = relationship.is_own ? relationship.receiver_id : relationship.sender_id;
+  const isOwn = relationship.created_by_id === currentUserId;
+  const partnerName = isOwn ? relationship.receiver_name : relationship.sender_name;
+  const partnerAvatar = isOwn ? relationship.receiver_avatar : relationship.sender_avatar;
+  const partnerCountry = isOwn ? relationship.receiver_country : relationship.sender_country;
+  const partnerId = isOwn ? relationship.receiver_id : relationship.sender_id;
   const days = daysSince(relationship.start_date);
 
   return (

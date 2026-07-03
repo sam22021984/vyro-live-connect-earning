@@ -48,10 +48,6 @@
     },
     "end_date": {
       "type": "string"
-    },
-    "is_own": {
-      "type": "boolean",
-      "default": true
     }
   },
   "required": [

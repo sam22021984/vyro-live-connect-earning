@@ -2,8 +2,8 @@ import React from "react";
 import { Check, CheckCheck, Phone, PhoneMissed } from "lucide-react";
 import { COLORS, formatCoins } from "./chatData";
 
-export default function MessageBubble({ msg, onTranslate }) {
-  const own = msg.is_own;
+export default function MessageBubble({ msg, currentUserId, onTranslate }) {
+  const own = msg.created_by_id === currentUserId;
 
   if (msg.type === "call") {
     const missed = msg.call_type === "missed" || msg.call_type === "declined";

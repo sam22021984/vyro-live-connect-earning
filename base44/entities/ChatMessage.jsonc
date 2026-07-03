@@ -34,10 +34,6 @@
       "type": "boolean",
       "default": false
     },
-    "is_own": {
-      "type": "boolean",
-      "default": false
-    },
     "type": {
       "type": "string",
       "enum": [
