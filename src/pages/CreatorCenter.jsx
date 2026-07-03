@@ -20,10 +20,19 @@ import { getRoleLevel, getCreatorCenterDashboards } from "@/lib/roleUtils";
 export default function CreatorCenter() {
   const navigate = useNavigate();
   const handleBack = useBackNav("/more-services");
-  const { profile, stats, loading } = useCreatorCenter();
+  const { profile, stats, loading, approvedApplications } = useCreatorCenter();
 
   const userRole = profile?.role || "user";
   const { visible: visibleDashboards, locked: lockedDashboards } = getCreatorCenterDashboards(dashboards, userRole);
+
+  // Move seller dashboard from locked to visible if user has an approved coins_seller application
+  const isApprovedSeller = approvedApplications.includes("coins_seller");
+  const finalVisible = isApprovedSeller
+    ? [...visibleDashboards, ...lockedDashboards.filter((d) => d.id === "seller")]
+    : visibleDashboards;
+  const finalLocked = isApprovedSeller
+    ? lockedDashboards.filter((d) => d.id !== "seller")
+    : lockedDashboards;
 
   const handleNavigate = (d) => {
     try {
@@ -75,12 +84,12 @@ export default function CreatorCenter() {
                 <div className="flex gap-3 mt-3">
                   <div className="flex items-center gap-1">
                     <Crown size={12} className="text-amber-400" />
-                    <span className="text-[10px] text-gray-300">{visibleDashboards.length} accessible</span>
+                    <span className="text-[10px] text-gray-300">{finalVisible.length} accessible</span>
                   </div>
-                  {lockedDashboards.length > 0 && (
+                  {finalLocked.length > 0 && (
                     <div className="flex items-center gap-1">
                       <Lock size={12} className="text-gray-500" />
-                      <span className="text-[10px] text-gray-500">{lockedDashboards.length} locked</span>
+                      <span className="text-[10px] text-gray-500">{finalLocked.length} locked</span>
                     </div>
                   )}
                 </div>
@@ -94,14 +103,14 @@ export default function CreatorCenter() {
           {visibleDashboards.length > 0 && (
             <h3 className="text-xs font-bold uppercase tracking-wider px-1" style={{ color: "#9CA3AF" }}>Your Dashboards</h3>
           )}
-          {visibleDashboards.map((d) => (
+          {finalVisible.map((d) => (
             <DashboardCard key={d.id} d={d} onNavigate={handleNavigate} stats={stats} />
           ))}
 
-          {lockedDashboards.length > 0 && (
+          {finalLocked.length > 0 && (
             <>
               <h3 className="text-xs font-bold uppercase tracking-wider px-1 pt-2" style={{ color: "#9CA3AF" }}>Locked Dashboards</h3>
-              {lockedDashboards.map((d) => (
+              {finalLocked.map((d) => (
                 <DashboardCard key={d.id} d={d} onNavigate={() => {}} stats={stats} locked />
               ))}
             </>

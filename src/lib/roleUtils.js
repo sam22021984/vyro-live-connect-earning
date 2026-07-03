@@ -93,7 +93,7 @@ export const CREATOR_CENTER_DASHBOARD_LEVELS = {
   pkmanager: 4,    // PK Manager — admin+
   superadmin: 4,   // Super Admin — admin+
   admin: 4,        // Admin — admin+
-  seller: 0,       // Coin Seller — all users
+  seller: 99,      // Coin Seller — requires approved coins_seller application (handled separately)
 };
 
 /**

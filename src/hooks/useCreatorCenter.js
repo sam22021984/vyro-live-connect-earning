@@ -8,6 +8,7 @@ export function useCreatorCenter() {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [approvedApplications, setApprovedApplications] = useState([]);
 
   const loadProfile = useCallback(async () => {
     try {
@@ -90,17 +91,30 @@ export function useCreatorCenter() {
     }
   }, []);
 
+  const loadApprovedApplications = useCallback(async (userId) => {
+    try {
+      const apps = await base44.entities.RoleApplication.filter({ user_id: userId });
+      const approved = apps.filter((a) => a.status === "approved");
+      setApprovedApplications(approved.map((a) => a.application_type));
+      return approved;
+    } catch (e) {
+      setApprovedApplications([]);
+      return [];
+    }
+  }, []);
+
   useEffect(() => {
     if (!authUser?.id) return;
     const init = async () => {
       setLoading(true);
-      await loadProfile();
+      const p = await loadProfile();
+      await loadApprovedApplications(authUser.id);
       const s = await loadStats();
       setStats(s);
       setLoading(false);
     };
     init();
-  }, [authUser?.id, loadProfile, loadStats]);
+  }, [authUser?.id, loadProfile, loadStats, loadApprovedApplications]);
 
   const refresh = useCallback(async () => {
     const s = await loadStats();
@@ -119,5 +133,5 @@ export function useCreatorCenter() {
     }
   }, []);
 
-  return { profile, user, stats, loading, refresh, trackDashboardVisit };
+  return { profile, user, stats, loading, refresh, trackDashboardVisit, approvedApplications };
 }

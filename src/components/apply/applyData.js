@@ -120,6 +120,16 @@ export const applicationTypes = [
     fields: ["VYRO ID", "Experience Details", "Documents"],
     afterApproval: ["Support Manager Access Granted"],
   },
+  {
+    id: "coins_seller",
+    name: "Official Coin Seller",
+    icon: "🏪",
+    gradient: "from-green-400 to-emerald-500",
+    eligibility: "Any verified user can apply to become an Official Coin Seller.",
+    route: "Seller Dashboard",
+    fields: ["Full Name", "VYRO ID", "Country", "WhatsApp Number", "Payment Methods", "Identity Documents", "Experience Details"],
+    afterApproval: ["Coin Seller Account Activated", "Seller Dashboard Unlocked", "Seller ID Generated Automatically"],
+  },
 ];
 
 export const statusTypes = [

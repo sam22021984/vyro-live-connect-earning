@@ -19,7 +19,8 @@
         "reward_manager",
         "vip_manager",
         "finance_manager",
-        "support_manager"
+        "support_manager",
+        "coins_seller"
       ]
     },
     "application_type_name": {
