@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useLiveRoomApi } from "@/hooks/useLiveRoomApi";
 import { ArrowLeft, MoreVertical, Users, Lock, Settings, X, AlertTriangle, Trophy } from "lucide-react";
 import SeatArea from "@/components/live-room/SeatArea";
 import SettingsPanel from "@/components/live-room/SettingsPanel";
@@ -13,6 +14,8 @@ import { useToast } from "@/components/ui/use-toast";
 export default function LiveRoom() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { id: roomId } = useParams();
+  const { joined, joining, error: joinError, audioAction } = useLiveRoomApi(roomId);
   const [themeIndex, setThemeIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
@@ -130,7 +133,15 @@ export default function LiveRoom() {
   // Bottom panel buttons
   const bottomButtons = [
     { icon: "🎁", label: "Gift", color: COLORS.gold, action: () => { setPanelType("gift"); setPanelTargetId(null); } },
-    { icon: muted ? "🔇" : "🎤", label: muted ? "Muted" : "Mic", color: muted ? COLORS.crimson : COLORS.gold, action: () => { setMuted(!muted); toast({ title: muted ? "Mic ON" : "Mic Muted" }); } },
+    { icon: muted ? "🔇" : "🎤", label: muted ? "Muted" : "Mic", color: muted ? COLORS.crimson : COLORS.gold, action: async () => {
+      const newMuted = !muted;
+      setMuted(newMuted);
+      if (roomId) {
+        const res = await audioAction(newMuted ? "mute" : "unmute");
+        if (res?.success === false) { setMuted(!newMuted); toast({ title: "Audio action failed", variant: "destructive" }); return; }
+      }
+      toast({ title: newMuted ? "Mic Muted" : "Mic ON" });
+    } },
     { icon: "💬", label: "Chat", color: "#3B82F6", action: () => toast({ title: "Chat" }) },
     { icon: "😀", label: "Emoji", color: "#F59E0B", action: () => { setPanelType("emoji"); setPanelTargetId(null); } },
     { icon: "🏆", label: "Ranks", color: COLORS.purple, action: () => setShowLeaderboard(true) },

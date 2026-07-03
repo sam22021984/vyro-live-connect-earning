@@ -115,6 +115,7 @@ const AuthenticatedApp = () => {
         <Route path="/community-dashboard" element={<CommunityDashboard />} />
         <Route path="/party-dashboard" element={<PartyDashboard />} />
         <Route path="/live-room" element={<LiveRoom />} />
+        <Route path="/live-room/:id" element={<LiveRoom />} />
         <Route path="/go-live" element={<GoLivePanel />} />
         <Route path="/finance" element={<Finance />} />
         <Route path="/finance-module" element={<FinanceModule />} />
