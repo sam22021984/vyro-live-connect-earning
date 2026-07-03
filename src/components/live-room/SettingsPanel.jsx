@@ -3,8 +3,20 @@ import { X } from "lucide-react";
 import { COLORS, FUNCTION_ITEMS, ENTERTAINMENT_ITEMS } from "./roomData";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function SettingsPanel({ onClose }) {
+export default function SettingsPanel({ onClose, onArchive, onBackup }) {
   const { toast } = useToast();
+
+  const handleArchive = async () => {
+    toast({ title: "Archiving room…" });
+    const res = onArchive ? await onArchive() : null;
+    toast({ title: res?.success === false ? "Archive failed" : "Room archived ✓" });
+  };
+
+  const handleBackup = async () => {
+    toast({ title: "Backing up room data…" });
+    const res = onBackup ? await onBackup() : null;
+    toast({ title: res?.success === false ? "Backup failed" : "Room backed up ✓" });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
@@ -76,6 +88,29 @@ export default function SettingsPanel({ onClose }) {
                   </span>
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Room management: archive + backup */}
+          <div>
+            <p className="text-[10px] font-bold mb-2" style={{ color: COLORS.gold }}>🗄️ Room Management</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={handleBackup}
+                className="flex items-center justify-center gap-1.5 py-3 rounded-xl transition active:scale-95"
+                style={{ background: `${COLORS.gold}15`, border: `1px solid ${COLORS.gold}40` }}
+              >
+                <span className="text-base">💾</span>
+                <span className="text-[10px] font-bold" style={{ color: COLORS.gold }}>Backup Data</span>
+              </button>
+              <button
+                onClick={handleArchive}
+                className="flex items-center justify-center gap-1.5 py-3 rounded-xl transition active:scale-95"
+                style={{ background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.3)" }}
+              >
+                <span className="text-base">📦</span>
+                <span className="text-[10px] font-bold" style={{ color: "#FF6B6B" }}>Archive Room</span>
+              </button>
             </div>
           </div>
         </div>

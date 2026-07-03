@@ -15,7 +15,7 @@ export default function LiveRoom() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { id: roomId } = useParams();
-  const { joined, joining, error: joinError, audioAction } = useLiveRoomApi(roomId);
+  const { joined, joining, error: joinError, recommendations, audioAction, publishEvent, archiveRoom, backupRoom } = useLiveRoomApi(roomId);
   const [themeIndex, setThemeIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
@@ -36,6 +36,13 @@ export default function LiveRoom() {
   const userRole = "owner";
 
   const profileSeat = SEATS.find((s) => s.id === profileSeatId);
+
+  // Show AI recommendations as they arrive
+  useEffect(() => {
+    if (recommendations.length > 0) {
+      toast({ title: "💡 AI Tip", description: recommendations[0] });
+    }
+  }, [recommendations]);
 
   // Handle seat tap → profile popup
   const handleSeatClick = (seatId) => {
@@ -68,6 +75,8 @@ export default function LiveRoom() {
       id: Date.now(), user: sender.name, color: COLORS.gold, vip: true,
       text: `sent ${gift.icon} ${gift.name} ×1 to ${receiver.name}`, time: "now", isGift: true, gift: gift.icon,
     }]);
+
+    if (roomId) publishEvent("gift_sent", { gift: gift.name, target: receiver.name });
   };
 
   // Send emoji from sender to target
@@ -95,6 +104,8 @@ export default function LiveRoom() {
       id: Date.now(), user: sender.name, color: COLORS.pink, vip: false,
       text: `sent ${emojiObj.emoji} ${emojiObj.name} to ${receiver.name}`, time: "now",
     }]);
+
+    if (roomId) publishEvent("emoji_sent", { emoji: emojiObj.emoji, target: receiver.name });
   };
 
   // Handle gift send from panel
@@ -259,7 +270,7 @@ export default function LiveRoom() {
       {showLeaderboard && <GiftLeaderboard onClose={() => setShowLeaderboard(false)} />}
 
       {/* Settings */}
-      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
+      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} />}
 
       <style>{`
         @keyframes pulse {
