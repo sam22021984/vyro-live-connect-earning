@@ -15,6 +15,7 @@ export const ADMIN_SECTIONS = [
   { id: "communication", label: "Comms", icon: "Megaphone", color: "#56CCF2" },
   { id: "analytics", label: "Analytics", icon: "BarChart3", color: "#2F80ED" },
   { id: "audit", label: "Audit Logs", icon: "ScrollText", color: "#6B7280" },
+  { id: "policy", label: "Policy", icon: "FileText", color: "#64748B" },
 ];
 
 export const ADMIN_KPIS = [

@@ -15,6 +15,7 @@ import {
   ADMIN_COMM_TYPES, ADMIN_ANALYTICS, ADMIN_AUDIT_LOGS, ADMIN_REPORTING_STRUCTURE,
 } from "@/components/admin-dashboard/adminDashboardData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import AdminPolicyTab from "@/components/admin-dashboard/AdminPolicyTab";
 
 const ICONS = {
   LayoutDashboard, Users, Mic, Handshake, Building2, TrendingUp, FileCheck,
@@ -536,7 +537,7 @@ const SECTIONS = {
   hosts: HostsSection, applications: ApplicationsSection, verification: VerificationSection,
   support: SupportSection, compliance: ComplianceSection, events: EventsSection,
   pk: PKSection, communication: CommunicationSection, analytics: AnalyticsSection,
-  audit: AuditSection,
+  audit: AuditSection, policy: AdminPolicyTab,
 };
 
 export default function AdminDashboard() {
