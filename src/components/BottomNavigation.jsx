@@ -71,6 +71,7 @@ export default function BottomNavigation() {
   // Nav is always visible (pinned at bottom)
 
   if (AUTH_PATHS.includes(location.pathname)) return null;
+  if (location.pathname.startsWith("/live-room")) return null;
 
   const tabs = [
     { icon: Home, label: "Home", path: "/", color: "#8B5CF6" },
