@@ -20,6 +20,7 @@ import {
   MKTG_SETTINGS_GROUPS, MKTG_EXCLUSIVE_TOOLS, MKTG_REPORTING_STRUCTURE,
 } from "@/components/marketing-manager/marketingManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import MarketingManagerPolicyTab from "@/components/marketing-manager/MarketingManagerPolicyTab";
 
 const ICONS = {
   LayoutDashboard, Megaphone, Target, Mic, Building2, Globe, Smartphone,
@@ -774,7 +775,7 @@ const SECTIONS = {
   advertising: AdvertisingSection, growth: GrowthSection, ai: AISection,
   brandperf: BrandPerfSection, communication: CommunicationSection, content: ContentSection,
   promotions: PromotionsSection, reports: ReportsSection, team: TeamSection,
-  settings: SettingsSection, exclusive: ExclusiveSection,
+  settings: SettingsSection, exclusive: ExclusiveSection, policy: MarketingManagerPolicyTab,
 };
 
 export default function MarketingManagerDashboard() {
