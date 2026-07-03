@@ -1,11 +1,20 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import DeviceSettingsTab from "@/components/settings/DeviceSettingsTab";
 
 export default function SettingDetail() {
   const navigate = useNavigate();
   const location = useLocation();
   const { name, icon } = location.state || { name: "Settings", icon: "⚙️" };
+
+  // Index 1 = Device Settings (mobile phone settings) — connected to Supabase
+  const pathSegments = location.pathname.split("/");
+  const settingIndex = parseInt(pathSegments[pathSegments.length - 1], 10);
+
+  if (settingIndex === 1) {
+    return <DeviceSettingsTab />;
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F9FC]">
