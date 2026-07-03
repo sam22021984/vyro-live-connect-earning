@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
         'Authorization': `Bearer ${serviceRoleKey}`,
         'Content-Type': 'application/json',
       },
-      body: method !== 'GET' ? JSON.stringify({ ...payload, _base44_user_id: user.id, _base44_user_email: user.email }) : undefined,
+      body: method !== 'GET' ? JSON.stringify({ ...payload, user_id: user.id, _base44_user_email: user.email }) : undefined,
     });
 
     const text = await response.text();
