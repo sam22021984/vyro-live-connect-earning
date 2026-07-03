@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog } from "lucide-react";
 
 const dashboards = [
   {
@@ -145,6 +145,17 @@ const dashboards = [
     color: "#3B82F6",
     badge: "BIZ DEVELOPER",
     modules: ["Business Overview", "Host Recruitment", "Talent Agent Recruitment", "Agency Development", "Lead Management", "Market Expansion", "Partnership Management", "Campaign Management", "Revenue Growth", "Regional Performance", "Application Management", "Communication Center", "Event Development", "Performance Tracking", "Business Intelligence", "Task Management", "Document Center", "Analytics Center", "Business Settings", "Exclusive Tools"],
+  },
+  {
+    id: "admin",
+    title: "Admin Dashboard",
+    description: "Operational support and management center for handling assigned Agencies, Talent Agents, and Hosts — verification, support, monitoring, reporting, communication, compliance management, and operational coordination under Super Admin authority",
+    icon: UserCog,
+    path: "/admin-dashboard",
+    gradient: "linear-gradient(135deg, #64748B, #475569)",
+    color: "#64748B",
+    badge: "ADMIN",
+    modules: ["Agency Management", "Talent Agent Management", "Host Management", "Application Management", "Verification Center", "Support Center", "Reports & Compliance", "Event Support", "PK Support", "Communication Center", "Reporting & Analytics", "Audit Log Center", "Admin Tools"],
   },
 ];
 
