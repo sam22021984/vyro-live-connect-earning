@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe } from "lucide-react";
 
 const dashboards = [
   {
@@ -112,6 +112,17 @@ const dashboards = [
     color: "#EC4899",
     badge: "EVENT MGR",
     modules: ["Dashboard Home", "Event Overview", "Event Management", "Competition Management", "Event Rewards", "Participation Management", "Global Monitoring", "Host Events", "Agency Events", "VIP Events", "Event Revenue", "Event Rankings", "Communication", "Festival & Seasonal", "Country Performance", "AI Intelligence", "Event Analytics", "Report Management", "Team Management", "Settings", "Exclusive Tools"],
+  },
+  {
+    id: "country",
+    title: "Country Manager Dashboard",
+    description: "Highest operational control center for managing all platform activities within a specific country — users, hosts, agents, agencies, revenue, events, applications, security, and country-wide performance",
+    icon: Globe,
+    path: "/country-manager-dashboard",
+    gradient: "linear-gradient(135deg, #10B981, #047857)",
+    color: "#10B981",
+    badge: "COUNTRY MGR",
+    modules: ["Country Overview", "Country Search", "User Management", "Host Management", "Agent Management", "Agency Management", "Application Center", "Country Revenue", "Country Gifts", "Country Coins", "Country Rankings", "Live Monitoring", "PK Monitoring", "Event Management", "VIP Management", "Report Management", "Security Center", "Broadcast Center", "Country Analytics", "Country Settings"],
   },
 ];
 

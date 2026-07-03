@@ -50,6 +50,7 @@ import PkManagerDashboard from '@/pages/PkManagerDashboard';
 import MarketingManagerDashboard from '@/pages/MarketingManagerDashboard';
 import FinanceManagerDashboard from '@/pages/FinanceManagerDashboard';
 import EventManagerDashboard from '@/pages/EventManagerDashboard';
+import CountryManagerDashboard from '@/pages/CountryManagerDashboard';
 import FamilyCenter from '@/pages/FamilyCenter';
 import MessageCenter from '@/pages/MessageCenter';
 import MessageHub from '@/pages/MessageHub';
@@ -122,6 +123,7 @@ const AuthenticatedApp = () => {
         <Route path="/marketing-manager-dashboard" element={<MarketingManagerDashboard />} />
         <Route path="/finance-manager-dashboard" element={<FinanceManagerDashboard />} />
         <Route path="/event-manager-dashboard" element={<EventManagerDashboard />} />
+        <Route path="/country-manager-dashboard" element={<CountryManagerDashboard />} />
         <Route path="/family-center" element={<FamilyCenter />} />
         <Route path="/message-center" element={<MessageCenter />} />
         <Route path="/message-hub" element={<MessageHub />} />
