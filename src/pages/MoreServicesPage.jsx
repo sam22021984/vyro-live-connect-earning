@@ -10,12 +10,10 @@ const services = [
   { name: "Apply Center", icon: "💼", gradient: "from-indigo-400 to-blue-500", path: "/apply-center" },
   { name: "Control Center", icon: "🎛️", gradient: "from-fuchsia-400 to-purple-500", path: "/control-center", highlight: true },
   { name: "VYRO Mall", icon: "🛒", gradient: "from-orange-400 to-red-500", path: "/vyro-mall", highlight: true },
-  { name: "Lucky ID Store", icon: "🎰", gradient: "from-pink-400 to-purple-500", path: "/lucky-id-store", highlight: true },
+  { name: "Creator Center", icon: "🎤", gradient: "from-rose-400 to-red-500", path: "/creator-center", highlight: true },
+  { name: "Message Center", icon: "📨", gradient: "from-blue-400 to-sky-500", path: "/message-center" },
   { name: "Trust & Reputation", icon: "🛡️", gradient: "from-green-400 to-teal-500", path: "/trust-reputation" },
   { name: "Application ID", icon: "🪪", gradient: "from-blue-400 to-indigo-500", path: "/application-id-system" },
-  { name: "AI Tools", icon: "🤖", gradient: "from-violet-400 to-purple-500", path: "/ai-tools" },
-  { name: "Room Management", icon: "🏠", gradient: "from-rose-400 to-pink-500", path: "/room-management" },
-  { name: "Role Control", icon: "🎖️", gradient: "from-amber-400 to-orange-500", path: "/vyro-role-control" },
   { name: "Official Coin Seller", icon: "🏦", gradient: "from-emerald-400 to-green-500", path: "/official-coin-seller-policy" },
 ];
 
