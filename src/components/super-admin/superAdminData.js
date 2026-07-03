@@ -18,6 +18,7 @@ export const SUPERADMIN_SECTIONS = [
   { id: "analytics", label: "Analytics", icon: "BarChart3", color: "#2F80ED" },
   { id: "audit", label: "Audit Logs", icon: "ScrollText", color: "#8B5CF6" },
   { id: "settings", label: "Settings", icon: "Settings", color: "#6B7280" },
+  { id: "policy", label: "Policy", icon: "FileText", color: "#475569" },
 ];
 
 export const SUPERADMIN_KPIS = [

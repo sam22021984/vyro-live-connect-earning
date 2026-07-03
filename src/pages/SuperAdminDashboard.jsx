@@ -18,6 +18,7 @@ import {
   ANALYTICS_DATA, AUDIT_LOGS, SETTINGS_GROUPS, EVENTS,
 } from "@/components/super-admin/superAdminData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import SuperAdminPolicyTab from "@/components/super-admin/SuperAdminPolicyTab";
 
 const ICONS = {
   LayoutDashboard, Building2, Handshake, Mic, UserCog, FileText, TrendingUp,
@@ -642,7 +643,7 @@ const SECTIONS = {
   performance: PerformanceSection, revenue: RevenueSection, events: EventsSection,
   pk: PKSection, violations: ViolationsSection, security: SecuritySection,
   communication: CommunicationSection, analytics: AnalyticsSection,
-  audit: AuditSection, settings: SettingsSection,
+  audit: AuditSection, settings: SettingsSection, policy: SuperAdminPolicyTab,
 };
 
 export default function SuperAdminDashboard() {
