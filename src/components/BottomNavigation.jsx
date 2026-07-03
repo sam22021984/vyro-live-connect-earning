@@ -68,29 +68,7 @@ export default function BottomNavigation() {
     };
   }, []);
 
-  // Auto-hide on auth/onboarding pages
-  useEffect(() => {
-    if (AUTH_PATHS.includes(location.pathname)) return;
-
-    const handleInteraction = () => {
-      setVisible(true);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setVisible(false), HIDE_DELAY);
-    };
-
-    window.addEventListener("touchstart", handleInteraction, { passive: true });
-    window.addEventListener("click", handleInteraction);
-    window.addEventListener("scroll", handleInteraction, { passive: true });
-
-    handleInteraction();
-
-    return () => {
-      window.removeEventListener("touchstart", handleInteraction);
-      window.removeEventListener("click", handleInteraction);
-      window.removeEventListener("scroll", handleInteraction);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [location.pathname]);
+  // Nav is always visible (pinned at bottom)
 
   if (AUTH_PATHS.includes(location.pathname)) return null;
 
@@ -131,22 +109,15 @@ export default function BottomNavigation() {
       )}
 
       <div
-        className="fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ease-out safe-bottom"
-        style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(100%)",
-          pointerEvents: visible ? "auto" : "none",
-        }}
+        className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
       >
         <div
-          className="flex items-center justify-around px-2 py-1.5 mx-auto"
+          className="flex items-center justify-around px-1 py-1 mx-auto"
           style={{
             maxWidth: "480px",
-            background: "rgba(255,255,255,0.92)",
-            backdropFilter: "blur(24px) saturate(180%)",
-            WebkitBackdropFilter: "blur(24px) saturate(180%))",
-            borderTop: "1px solid rgba(0,0,0,0.05)",
-            boxShadow: "0 -4px 24px rgba(13,27,62,0.06)",
+            background: "#FFFFFF",
+            borderTop: "1px solid rgba(0,0,0,0.06)",
+            boxShadow: "0 -2px 8px rgba(13,27,62,0.05)",
           }}
         >
           {tabs.map((tab) => {
@@ -158,17 +129,15 @@ export default function BottomNavigation() {
                   key={tab.label}
                   onClick={() => handleTabClick(tab.path)}
                   className="flex flex-col items-center gap-0.5 active:scale-90 transition"
-                  style={{ transform: "translateY(-8px)" }}
                 >
                   <div
-                    className="w-11 h-11 rounded-full flex items-center justify-center"
+                    className="w-9 h-9 rounded-full flex items-center justify-center"
                     style={{
                       background: "linear-gradient(135deg, #8B5CF6 0%, #3B82F6 50%, #EC4899 100%)",
-                      boxShadow: "0 6px 20px rgba(139,92,246,0.5), 0 0 12px rgba(236,72,153,0.25), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.15)",
-                      animation: "floatingGlow 2.5s ease-in-out infinite",
+                      boxShadow: "0 3px 10px rgba(139,92,246,0.4)",
                     }}
                   >
-                    <tab.icon size={22} className="text-white" strokeWidth={2.5} style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.2))" }} />
+                    <tab.icon size={18} className="text-white" strokeWidth={2.5} />
                   </div>
                   <span className="text-[8px] font-bold text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #8B5CF6, #EC4899)" }}>{tab.label}</span>
                 </button>
@@ -183,7 +152,7 @@ export default function BottomNavigation() {
               >
                 <div className="relative">
                   <tab.icon
-                    size={22}
+                    size={18}
                     strokeWidth={active ? 2.5 : 2}
                     style={{
                       color: active ? tab.color : "#9CA3AF",

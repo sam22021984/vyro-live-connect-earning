@@ -284,7 +284,7 @@ export default function LiveRoom() {
       </div>
 
       {/* Chat overlay */}
-      <div className="absolute bottom-20 left-3 right-3 z-20">
+      <div className="absolute left-3 right-3 z-20" style={{ bottom: "150px" }}>
         {showWarning && (
           <div className="rounded-2xl p-2.5 mb-2 flex items-start gap-2 animate-fadeIn" style={{ background: COLORS.glassOverlay, backdropFilter: "blur(12px)", border: `1px solid ${COLORS.gold}30` }}>
             <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" style={{ color: COLORS.gold }} />
@@ -306,7 +306,7 @@ export default function LiveRoom() {
 
       {/* Chat input bar — replaces window.prompt */}
       {showChatInput && (
-        <div className="absolute bottom-20 left-3 right-3 z-30 animate-fadeIn">
+        <div className="absolute left-3 right-3 z-30 animate-fadeIn" style={{ bottom: "150px" }}>
           <div className="flex items-center gap-2 rounded-2xl px-3 py-2" style={{ background: COLORS.glassOverlay, backdropFilter: "blur(20px)", border: `1px solid ${COLORS.gold}30` }}>
             <input
               autoFocus
@@ -323,8 +323,8 @@ export default function LiveRoom() {
         </div>
       )}
 
-      {/* Bottom action panel */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 px-3 pb-4 pt-2" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)" }}>
+      {/* Bottom action panel — positioned above the nav bar */}
+      <div className="absolute left-0 right-0 z-30 px-3 pb-2 pt-2" style={{ bottom: "56px", background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)" }}>
         <div className="flex items-center gap-2 rounded-2xl px-3 py-2 mb-2" style={{ background: COLORS.glassOverlay, backdropFilter: "blur(20px)", border: `1px solid ${COLORS.gold}30` }}>
           <span className="text-[10px] font-bold text-white flex-1">✋ Request to Speak</span>
           <button onClick={async () => { if (roomId) { const res = await requestMic(); toast({ title: res?.success ? "Mic request sent ✓" : "Request failed", variant: res?.success ? "default" : "destructive" }); } else { toast({ title: "Mic request sent" }); } }} className="px-2 py-1 rounded-lg text-[9px] font-bold text-white transition active:scale-90" style={{ background: COLORS.gold }}>Request</button>
