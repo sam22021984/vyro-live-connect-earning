@@ -7,7 +7,6 @@ const services = [
   { name: "Tasks & Rewards", icon: "🎁", gradient: "from-pink-400 to-rose-500", highlight: false },
   { name: "Live & Audio", icon: "🎙️", gradient: "from-red-400 to-orange-500", highlight: false },
   { name: "Social", icon: "👥", gradient: "from-blue-400 to-cyan-500", highlight: false },
-  { name: "Messages", icon: "💬", gradient: "from-sky-400 to-blue-500", highlight: false },
   { name: "Message Center", icon: "📨", gradient: "from-indigo-400 to-blue-600", highlight: true },
   { name: "Profile & Stats", icon: "📊", gradient: "from-violet-400 to-purple-500", highlight: false },
   { name: "Level System", icon: "⭐", gradient: "from-amber-400 to-yellow-500", highlight: false },
@@ -45,8 +44,6 @@ export default function MoreServicesPage() {
       navigate("/profile-stats");
     } else if (s.name === "Social") {
       navigate("/social");
-    } else if (s.name === "Messages") {
-      navigate("/message-hub");
     } else if (s.name === "Message Center") {
       navigate("/message-center");
     } else if (s.name === "Creator Center") {
