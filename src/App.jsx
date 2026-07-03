@@ -67,6 +67,12 @@ import SupportCenter from '@/pages/SupportCenter';
 import TrustReputation from '@/pages/TrustReputation';
 import PublicProfile from '@/pages/PublicProfile';
 import EditProfile from '@/pages/EditProfile';
+import VyroRoleControl from '@/pages/VyroRoleControl';
+import VipCoreSystem from '@/pages/VipCoreSystem';
+import VipRewardSystem from '@/pages/VipRewardSystem';
+import VipAuthoritySystem from '@/pages/VipAuthoritySystem';
+import VipRoomManager from '@/pages/VipRoomManager';
+import VipSecurityAdminSystem from '@/pages/VipSecurityAdminSystem';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -154,6 +160,12 @@ const AuthenticatedApp = () => {
         <Route path="/trust-reputation" element={<TrustReputation />} />
         <Route path="/profile/:id" element={<PublicProfile />} />
         <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/vyro-role-control" element={<VyroRoleControl />} />
+        <Route path="/vip-core-system" element={<VipCoreSystem />} />
+        <Route path="/vip-reward-system" element={<VipRewardSystem />} />
+        <Route path="/vip-authority-system" element={<VipAuthoritySystem />} />
+        <Route path="/vip-room-manager" element={<VipRoomManager />} />
+        <Route path="/vip-security-admin" element={<VipSecurityAdminSystem />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
