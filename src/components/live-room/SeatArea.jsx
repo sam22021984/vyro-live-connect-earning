@@ -18,6 +18,7 @@ function generateSeats(count) {
 const SEAT_LAYOUTS = {
   2: [2],        // 1 × 2 — center aligned
   3: [3],        // 1 × 3 — center aligned
+  6: [1, 5],    // 1 top, 5 bottom
   8: [4, 4],     // 4 × 2
   10: [5, 5],    // 5 × 2
   15: [5, 5, 5], // 5 × 3
@@ -53,7 +54,7 @@ export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10
 
   // 16dp seat-to-seat spacing, centered alignment
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center" style={{ gap: "16px" }}>
+    <div className="w-full h-full flex flex-col justify-start items-center pt-2" style={{ gap: "16px" }}>
       {rows.map((rowSeats, rowIdx) => (
         <div
           key={rowIdx}

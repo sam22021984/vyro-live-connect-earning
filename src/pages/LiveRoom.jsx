@@ -281,7 +281,7 @@ export default function LiveRoom() {
       </div>
 
       {/* ===== Seat Grid — upper-mid ===== */}
-      <div className="relative z-10 flex-shrink-0 flex items-center justify-center" style={{ padding: "0 16px", flex: "1 1 auto", minHeight: "0" }}>
+      <div className="relative z-10 flex-shrink-0 flex items-center justify-start" style={{ padding: "0 16px", flex: "0 1 auto", minHeight: "0" }}>
         <SeatArea onSeatClick={handleSeatClick} seatEffects={seatEffects} seatCount={seatCount} />
       </div>
 
