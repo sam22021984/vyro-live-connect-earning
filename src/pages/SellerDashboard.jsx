@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Search, Check, X, TrendingUp, TrendingDown, Minus,
@@ -10,6 +10,7 @@ import SellerPolicyTab from "@/components/seller-dashboard/SellerPolicyTab";
 import SellerReportsTab from "@/components/seller-dashboard/SellerReportsTab";
 import ReportToSection from "@/components/shared/ReportToSection";
 import { useToast } from "@/components/ui/use-toast";
+import { useSellerDashboard } from "@/hooks/useSellerDashboard";
 
 const DARK_BG = "#0A0E1A";
 const CARD_BG = "#111827";
@@ -19,32 +20,67 @@ const TEAL = "#22D3EE";
 export default function SellerDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { data, loading, recharging, createRecharge } = useSellerDashboard();
   const [activeTab, setActiveTab] = useState("overview");
   const [showRechargeModal, setShowRechargeModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [rechargeForm, setRechargeForm] = useState({ userId: "", amount: "", coins: "" });
 
-  const handleAction = (action) => {
-    toast({ title: action, description: "Action processed successfully." });
-  };
+  const sellerInfo = useMemo(() => {
+    if (!data) return SELLER_DASHBOARD.sellerInfo;
+    const lvl = data.level || {};
+    const profile = data.sellerProfile || {};
+    return {
+      name: profile.username || "Seller",
+      level: lvl.name || "Starter",
+      levelNum: lvl.id || 0,
+      badge: lvl.icon || "🎯",
+      nextLevel: lvl.nextLevel || "Bronze Seller",
+      monthlyRecharge: lvl.monthlyRecharge || 0,
+      monthlyTarget: lvl.monthlyTarget || 500,
+      memberSince: profile.created_date ? new Date(profile.created_date).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : "—",
+      sellerId: profile.user_id?.slice(0, 12) || "VYRO-SL-0000",
+      commission: lvl.commission || "0%",
+    };
+  }, [data]);
 
-  const handleRechargeSubmit = () => {
+  const stats = data?.stats || {};
+  const transactions = data?.transactions || [];
+  const customers = data?.customers || [];
+
+  const handleRechargeSubmit = async () => {
     if (!rechargeForm.userId || !rechargeForm.amount) {
       toast({ title: "Missing Info", description: "Please enter User ID and amount.", variant: "destructive" });
       return;
     }
-    toast({ title: "Recharge Successful! ✅", description: `${rechargeForm.coins || '0'} coins sent to ${rechargeForm.userId}` });
-    setShowRechargeModal(false);
-    setRechargeForm({ userId: "", amount: "", coins: "" });
+    const res = await createRecharge(rechargeForm.userId, rechargeForm.amount, rechargeForm.coins || "0");
+    if (res.success) {
+      toast({ title: "Recharge Successful! ✅", description: `${(Number(rechargeForm.coins) || 0).toLocaleString()} coins sent to ${rechargeForm.userId}` });
+      setShowRechargeModal(false);
+      setRechargeForm({ userId: "", amount: "", coins: "" });
+    } else {
+      toast({ title: "Recharge Failed", description: res.error, variant: "destructive" });
+    }
   };
 
-  const filteredCustomers = SELLER_DASHBOARD.customers.filter(
-    (c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.id.toLowerCase().includes(searchQuery.toLowerCase())
+  const handleAction = (action) => {
+    toast({ title: action, description: "Action processed successfully." });
+  };
+
+  const filteredTransactions = transactions.filter(
+    (t) => (t.user_id || "").toLowerCase().includes(searchQuery.toLowerCase()) || (t.id || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredHistory = SELLER_DASHBOARD.rechargeHistory.filter(
-    (h) => h.customer.toLowerCase().includes(searchQuery.toLowerCase()) || h.id.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCustomers = customers.filter(
+    (c) => (c.name || "").toLowerCase().includes(searchQuery.toLowerCase()) || (c.id || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const overviewStats = [
+    { icon: DollarSign, label: "Monthly Recharge", value: `$${(stats.monthlyRecharge || 0).toLocaleString()}`, color: GOLD, change: stats.todayRecharges ? `+${stats.todayRecharges} today` : "—" },
+    { icon: Coins, label: "Coins Sold", value: `${((stats.totalCoins || 0) / 1000000).toFixed(1)}M`, color: TEAL, change: "total" },
+    { icon: Users, label: "Customers", value: String(stats.totalCustomers || 0), color: "#A855F7", change: "unique" },
+    { icon: TrendingUp, label: "Earnings", value: `$${(stats.earnings || 0).toLocaleString()}`, color: "#10B981", change: "15%" },
+  ];
 
   return (
     <div className="min-h-screen" style={{ background: DARK_BG }}>
@@ -56,7 +92,7 @@ export default function SellerDashboard() {
           </button>
           <div className="flex-1">
             <h1 className="text-base font-bold" style={{ color: GOLD }}>Offline Seller System</h1>
-            <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>VYRO Coins Seller Dashboard</p>
+            <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>{sellerInfo.name} · {sellerInfo.level}</p>
           </div>
           <button onClick={() => handleAction("Notifications")} className="w-9 h-9 rounded-full flex items-center justify-center relative" style={{ background: "rgba(255,215,0,0.1)" }}>
             <Bell size={16} style={{ color: GOLD }} />
@@ -84,6 +120,13 @@ export default function SellerDashboard() {
           </div>
         </div>
 
+        {loading && (
+          <div className="flex items-center justify-center py-20">
+            <div className="w-6 h-6 border-2 border-amber-200 border-t-amber-500 rounded-full animate-spin" />
+          </div>
+        )}
+
+        {!loading && (
         <div className="px-4 pt-4">
           {/* OVERVIEW */}
           {activeTab === "overview" && (
@@ -93,25 +136,25 @@ export default function SellerDashboard() {
                 <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10" style={{ background: `radial-gradient(circle, ${GOLD}, transparent 70%)`, transform: "translate(30%, -30%)" }} />
                 <div className="relative flex items-center gap-3 mb-3">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl" style={{ background: `linear-gradient(135deg, ${GOLD}, ${TEAL})`, boxShadow: `0 6px 20px ${GOLD}40` }}>
-                    {SELLER_DASHBOARD.sellerInfo.badge}
+                    {sellerInfo.badge}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-1.5">
-                      <h3 className="text-sm font-bold text-white">{SELLER_DASHBOARD.sellerInfo.name}</h3>
+                      <h3 className="text-sm font-bold text-white">{sellerInfo.name}</h3>
                       <Crown size={12} style={{ color: GOLD }} />
                     </div>
-                    <p className="text-[10px]" style={{ color: GOLD }}>{SELLER_DASHBOARD.sellerInfo.level}</p>
-                    <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.4)" }}>ID: {SELLER_DASHBOARD.sellerInfo.sellerId}</p>
+                    <p className="text-[10px]" style={{ color: GOLD }}>{sellerInfo.level}</p>
+                    <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.4)" }}>ID: {sellerInfo.sellerId}</p>
                   </div>
                 </div>
                 {/* Level progress */}
                 <div className="mb-2">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] text-white/60">Progress to {SELLER_DASHBOARD.sellerInfo.nextLevel}</span>
-                    <span className="text-[10px] font-bold" style={{ color: GOLD }}>${SELLER_DASHBOARD.sellerInfo.monthlyRecharge} / ${SELLER_DASHBOARD.sellerInfo.monthlyTarget}</span>
+                    <span className="text-[10px] text-white/60">Progress to {sellerInfo.nextLevel}</span>
+                    <span className="text-[10px] font-bold" style={{ color: GOLD }}>${sellerInfo.monthlyRecharge} / ${sellerInfo.monthlyTarget}</span>
                   </div>
                   <div className="w-full h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
-                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(SELLER_DASHBOARD.sellerInfo.monthlyRecharge / SELLER_DASHBOARD.sellerInfo.monthlyTarget) * 100}%`, background: `linear-gradient(to right, ${GOLD}, ${TEAL})`, boxShadow: `0 0 8px ${GOLD}60` }} />
+                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (sellerInfo.monthlyRecharge / sellerInfo.monthlyTarget) * 100)}%`, background: `linear-gradient(to right, ${GOLD}, ${TEAL})`, boxShadow: `0 0 8px ${GOLD}60` }} />
                   </div>
                 </div>
               </div>
@@ -121,12 +164,7 @@ export default function SellerDashboard() {
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-2.5">
-                {[
-                  { icon: DollarSign, label: "Monthly Recharge", value: "$5,240", color: GOLD, change: "+12%" },
-                  { icon: Coins, label: "Coins Sold", value: "42.5M", color: TEAL, change: "+8%" },
-                  { icon: Users, label: "Customers", value: "128", color: "#A855F7", change: "+5" },
-                  { icon: TrendingUp, label: "Earnings", value: "$1,240", color: "#10B981", change: "+18%" },
-                ].map((s, i) => (
+                {overviewStats.map((s, i) => (
                   <div key={i} className="rounded-2xl p-3" style={{ background: CARD_BG, border: "1px solid rgba(255,255,255,0.06)" }}>
                     <div className="flex items-center justify-between mb-2">
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${s.color}15` }}>
@@ -150,24 +188,33 @@ export default function SellerDashboard() {
                 New Recharge
               </button>
 
-              {/* Recent Notifications */}
-              <div>
-                <h3 className="text-xs font-bold text-white/80 mb-2 flex items-center gap-1.5">
-                  <Bell size={12} style={{ color: GOLD }} /> Recent Notifications
-                </h3>
-                <div className="space-y-2">
-                  {SELLER_DASHBOARD.notifications.map((n, i) => (
-                    <div key={i} className="rounded-xl p-3 flex items-start gap-2.5" style={{ background: CARD_BG, border: "1px solid rgba(255,255,255,0.06)" }}>
-                      <span className="text-lg flex-shrink-0">{n.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-white">{n.title}</p>
-                        <p className="text-[10px] text-white/50">{n.desc}</p>
+              {/* Recent Transactions */}
+              {transactions.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-bold text-white/80 mb-2 flex items-center gap-1.5">
+                    <Clock size={12} style={{ color: GOLD }} /> Recent Recharges
+                  </h3>
+                  <div className="space-y-2">
+                    {transactions.slice(0, 5).map((t) => (
+                      <div key={t.id} className="rounded-xl p-3 flex items-center gap-3" style={{ background: CARD_BG, border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: `linear-gradient(135deg, ${GOLD}, ${TEAL})` }}>
+                          {(t.user_id || "?").slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-white truncate">{t.user_id}</p>
+                          <p className="text-[9px] text-white/40">{(t.coins || 0).toLocaleString()} coins</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold" style={{ color: GOLD }}>${t.amount_usd}</p>
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${t.status === "completed" ? "text-green-400" : "text-yellow-400"}`} style={{ background: t.status === "completed" ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)" }}>
+                            {t.status}
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-[9px] text-white/30 flex-shrink-0">{n.time}</span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Process Flow */}
               <div>
@@ -219,51 +266,43 @@ export default function SellerDashboard() {
 
               {/* History */}
               <div>
-                <h3 className="text-xs font-bold text-white/80 mb-2">Recharge History</h3>
+                <h3 className="text-xs font-bold text-white/80 mb-2">Recharge History ({filteredTransactions.length})</h3>
+                {filteredTransactions.length === 0 ? (
+                  <div className="rounded-xl p-6 text-center" style={{ background: CARD_BG, border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <p className="text-xs text-white/40">No recharge history yet</p>
+                  </div>
+                ) : (
                 <div className="space-y-2">
-                  {filteredHistory.map((h) => (
-                    <div key={h.id} className="rounded-xl p-3" style={{ background: CARD_BG, border: "1px solid rgba(255,255,255,0.06)" }}>
+                  {filteredTransactions.map((t) => (
+                    <div key={t.id} className="rounded-xl p-3" style={{ background: CARD_BG, border: "1px solid rgba(255,255,255,0.06)" }}>
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: `linear-gradient(135deg, ${GOLD}, ${TEAL})` }}>
-                            {h.customer.split(" ").map(n => n[0]).join("")}
+                            {(t.user_id || "?").slice(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <p className="text-xs font-bold text-white">{h.customer}</p>
-                            <p className="text-[9px] text-white/40">{h.id} • {h.userId}</p>
+                            <p className="text-xs font-bold text-white">{t.user_id}</p>
+                            <p className="text-[9px] text-white/40">{t.id?.slice(0, 12)}</p>
                           </div>
                         </div>
-                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${h.status === "completed" ? "text-green-400" : "text-yellow-400"}`} style={{ background: h.status === "completed" ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)" }}>
-                          {h.status}
+                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${t.status === "completed" ? "text-green-400" : "text-yellow-400"}`} style={{ background: t.status === "completed" ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)" }}>
+                          {t.status}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-bold" style={{ color: GOLD }}>${h.amount}</p>
-                          <p className="text-[9px] text-white/40">{h.coins.toLocaleString()} coins</p>
+                          <p className="text-sm font-bold" style={{ color: GOLD }}>${t.amount_usd}</p>
+                          <p className="text-[9px] text-white/40">{(t.coins || 0).toLocaleString()} coins</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[10px] text-white/50">{h.date}</p>
-                          <p className="text-[9px] text-white/30">{h.time}</p>
+                          <p className="text-[10px] text-white/50">{t.created_date ? new Date(t.created_date).toLocaleDateString() : "—"}</p>
+                          <p className="text-[9px] text-white/30">{t.created_date ? new Date(t.created_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</p>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Reports */}
-              <div className="grid grid-cols-2 gap-2.5">
-                <button onClick={() => handleAction("Daily Report")} className="rounded-2xl p-3 text-center active:scale-95 transition" style={{ background: CARD_BG, border: "1px solid rgba(255,215,0,0.15)" }}>
-                  <Clock size={18} style={{ color: GOLD }} className="mx-auto mb-1" />
-                  <p className="text-xs font-bold text-white">Daily Report</p>
-                  <p className="text-[9px] text-white/40">View today's recharges</p>
-                </button>
-                <button onClick={() => handleAction("Monthly Report")} className="rounded-2xl p-3 text-center active:scale-95 transition" style={{ background: CARD_BG, border: "1px solid rgba(34,211,238,0.15)" }}>
-                  <TrendingUp size={18} style={{ color: TEAL }} className="mx-auto mb-1" />
-                  <p className="text-xs font-bold text-white">Monthly Report</p>
-                  <p className="text-[9px] text-white/40">View monthly analytics</p>
-                </button>
+                )}
               </div>
 
               {/* Wallet */}
@@ -273,16 +312,16 @@ export default function SellerDashboard() {
                 </h3>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <p className="text-sm font-bold" style={{ color: GOLD }}>$1,240</p>
-                    <p className="text-[9px] text-white/40">Balance</p>
+                    <p className="text-sm font-bold" style={{ color: GOLD }}>${(stats.earnings || 0).toLocaleString()}</p>
+                    <p className="text-[9px] text-white/40">Earnings</p>
                   </div>
                   <div>
-                    <p className="text-sm font-bold" style={{ color: TEAL }}>$320</p>
-                    <p className="text-[9px] text-white/40">Bonus</p>
+                    <p className="text-sm font-bold" style={{ color: TEAL }}>{sellerInfo.commission}</p>
+                    <p className="text-[9px] text-white/40">Commission</p>
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white/70">$150</p>
-                    <p className="text-[9px] text-white/40">Pending</p>
+                    <p className="text-sm font-bold text-white/70">{stats.totalRecharges || 0}</p>
+                    <p className="text-[9px] text-white/40">Total Sales</p>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-3">
@@ -348,25 +387,25 @@ export default function SellerDashboard() {
                   className="flex-1 bg-transparent text-xs text-white placeholder-white/30 outline-none"
                 />
               </div>
+              {filteredCustomers.length === 0 ? (
+                <div className="rounded-xl p-6 text-center" style={{ background: CARD_BG, border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <Users size={24} className="text-white/20 mx-auto mb-2" />
+                  <p className="text-xs text-white/40">No customers yet</p>
+                </div>
+              ) : (
               <div className="space-y-2">
                 {filteredCustomers.map((c) => (
                   <div key={c.id} className="rounded-xl p-3" style={{ background: CARD_BG, border: "1px solid rgba(255,255,255,0.06)" }}>
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="relative">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: `linear-gradient(135deg, ${c.color}, ${c.color}cc)` }}>
-                          {c.avatar}
-                        </div>
-                        {c.isVip && <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: GOLD }}><Crown size={8} className="text-black" /></div>}
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: `linear-gradient(135deg, ${GOLD}, ${TEAL})` }}>
+                        {(c.name || c.id).slice(0, 2).toUpperCase()}
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <p className="text-xs font-bold text-white">{c.name}</p>
-                          {c.isFavorite && <Star size={10} style={{ color: GOLD, fill: GOLD }} />}
-                        </div>
+                        <p className="text-xs font-bold text-white">{c.name}</p>
                         <p className="text-[9px] text-white/40">{c.id}</p>
                       </div>
-                      <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${c.status === "active" ? "text-green-400" : "text-yellow-400"}`} style={{ background: c.status === "active" ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)" }}>
-                        {c.status}
+                      <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${c.status === "completed" ? "text-green-400" : "text-yellow-400"}`} style={{ background: c.status === "completed" ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)" }}>
+                        {c.status === "completed" ? "active" : c.status}
                       </span>
                     </div>
                     <div className="flex items-center justify-between mb-2">
@@ -380,7 +419,7 @@ export default function SellerDashboard() {
                       </div>
                       <div>
                         <p className="text-[10px] text-white/40">Last</p>
-                        <p className="text-[10px] text-white/60">{c.lastRecharge}</p>
+                        <p className="text-[10px] text-white/60">{c.lastRecharge ? new Date(c.lastRecharge).toLocaleDateString() : "—"}</p>
                       </div>
                     </div>
                     <div className="flex gap-1.5">
@@ -390,13 +429,11 @@ export default function SellerDashboard() {
                       <button onClick={() => handleAction(`Notes for ${c.name}`)} className="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-white active:scale-95 transition" style={{ background: "rgba(255,255,255,0.08)" }}>
                         Notes
                       </button>
-                      <button onClick={() => handleAction(`Block ${c.name}`)} className="w-8 py-1.5 rounded-lg text-[10px] font-bold text-red-400 active:scale-95 transition" style={{ background: "rgba(239,68,68,0.1)" }}>
-                        <X size={12} className="mx-auto" />
-                      </button>
                     </div>
                   </div>
                 ))}
               </div>
+              )}
             </div>
           )}
 
@@ -404,14 +441,14 @@ export default function SellerDashboard() {
           {activeTab === "levels" && (
             <div className="space-y-4 animate-fadeIn">
               <div className="rounded-2xl p-4 text-center" style={{ background: `linear-gradient(135deg, ${GOLD}12, ${TEAL}08)`, border: "1px solid rgba(255,215,0,0.2)" }}>
-                <p className="text-3xl mb-1">{SELLER_DASHBOARD.sellerInfo.badge}</p>
-                <p className="text-sm font-bold text-white">{SELLER_DASHBOARD.sellerInfo.level}</p>
-                <p className="text-[10px]" style={{ color: GOLD }}>Current Level • {SELLER_DASHBOARD.sellerInfo.commission} commission</p>
+                <p className="text-3xl mb-1">{sellerInfo.badge}</p>
+                <p className="text-sm font-bold text-white">{sellerInfo.level}</p>
+                <p className="text-[10px]" style={{ color: GOLD }}>Current Level • {sellerInfo.commission} commission</p>
               </div>
               <div className="space-y-3">
                 {SELLER_DASHBOARD.sellerLevels.map((lvl) => {
-                  const isCurrent = lvl.id === SELLER_DASHBOARD.sellerInfo.levelNum;
-                  const isPassed = lvl.id < SELLER_DASHBOARD.sellerInfo.levelNum;
+                  const isCurrent = lvl.id === sellerInfo.levelNum;
+                  const isPassed = lvl.id < sellerInfo.levelNum;
                   return (
                     <div key={lvl.id} className="rounded-2xl p-4 relative overflow-hidden" style={{ background: CARD_BG, border: isCurrent ? `1px solid ${lvl.color}` : "1px solid rgba(255,255,255,0.06)" }}>
                       {isCurrent && <div className="absolute top-2 right-2 text-[8px] px-2 py-0.5 rounded-full font-bold text-black" style={{ background: lvl.color }}>CURRENT</div>}
@@ -478,8 +515,8 @@ export default function SellerDashboard() {
             <div className="space-y-4 animate-fadeIn">
               <div className="rounded-2xl p-4 text-center" style={{ background: `linear-gradient(135deg, ${GOLD}12, ${TEAL}08)`, border: "1px solid rgba(255,215,0,0.2)" }}>
                 <Award size={24} style={{ color: GOLD }} className="mx-auto mb-1" />
-                <p className="text-sm font-bold text-white">Your Rank: #3</p>
-                <p className="text-[10px]" style={{ color: TEAL }}>Global Seller Rankings</p>
+                <p className="text-sm font-bold text-white">Total Sales: ${stats.monthlyRecharge?.toLocaleString() || 0}</p>
+                <p className="text-[10px]" style={{ color: TEAL }}>{stats.totalRecharges || 0} recharges this period</p>
               </div>
               <div className="space-y-2">
                 {SELLER_DASHBOARD.rankings.map((r) => (
@@ -503,25 +540,14 @@ export default function SellerDashboard() {
                   </div>
                 ))}
               </div>
-              <div className="grid grid-cols-3 gap-2">
-                {["Daily", "Weekly", "Monthly"].map((p) => (
-                  <button key={p} onClick={() => handleAction(`${p} Rankings`)} className="py-2 rounded-xl text-[10px] font-bold text-white active:scale-95 transition" style={{ background: CARD_BG, border: "1px solid rgba(255,215,0,0.15)" }}>
-                    {p}
-                  </button>
-                ))}
-              </div>
             </div>
           )}
 
           {/* POLICY */}
-          {activeTab === "policy" && (
-            <SellerPolicyTab />
-          )}
+          {activeTab === "policy" && <SellerPolicyTab />}
 
           {/* REPORTS */}
-          {activeTab === "reports" && (
-            <SellerReportsTab />
-          )}
+          {activeTab === "reports" && <SellerReportsTab />}
 
           {/* SECURITY */}
           {activeTab === "security" && (
@@ -545,94 +571,92 @@ export default function SellerDashboard() {
                   </div>
                 ))}
               </div>
-              <div className="rounded-2xl p-4" style={{ background: CARD_BG, border: "1px solid rgba(239,68,68,0.15)" }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle size={14} className="text-red-400" />
-                  <h3 className="text-xs font-bold text-white">Admin Controls</h3>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Approve Sellers", "Reject Applications", "Ban Sellers", "Freeze Accounts", "Monitor Transactions", "Set Limits", "Add Bonuses", "Track Fraud", "View Analytics", "Manage Levels"].map((a) => (
-                    <span key={a} className="text-[9px] px-2 py-1 rounded-full font-medium text-white/60" style={{ background: "rgba(255,255,255,0.05)" }}>
-                      {a}
-                    </span>
-                  ))}
-                </div>
-              </div>
             </div>
           )}
         </div>
-      </div>
+        )}
 
-      {/* Recharge Modal */}
-      {showRechargeModal && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowRechargeModal(false)} />
-          <div className="relative w-full max-w-md rounded-t-3xl max-h-[85vh] overflow-y-auto animate-fadeIn" style={{ background: CARD_BG, border: "1px solid rgba(255,215,0,0.2)" }}>
-            <div className="sticky top-0 pt-3 pb-2 z-10" style={{ background: CARD_BG }}>
-              <div className="w-10 h-1 rounded-full mx-auto mb-2" style={{ background: "rgba(255,255,255,0.2)" }} />
-              <div className="flex items-center justify-between px-4">
-                <h2 className="text-sm font-bold" style={{ color: GOLD }}>Manual Recharge</h2>
-                <button onClick={() => setShowRechargeModal(false)} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
-                  <X size={14} className="text-white/60" />
+        {/* Recharge Modal */}
+        {showRechargeModal && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !recharging && setShowRechargeModal(false)} />
+            <div className="relative w-full max-w-md rounded-t-3xl max-h-[85vh] overflow-y-auto animate-fadeIn" style={{ background: CARD_BG, border: "1px solid rgba(255,215,0,0.2)" }}>
+              <div className="sticky top-0 pt-3 pb-2 z-10" style={{ background: CARD_BG }}>
+                <div className="w-10 h-1 rounded-full mx-auto mb-2" style={{ background: "rgba(255,255,255,0.2)" }} />
+                <div className="flex items-center justify-between px-4">
+                  <h2 className="text-sm font-bold" style={{ color: GOLD }}>Manual Recharge</h2>
+                  <button onClick={() => !recharging && setShowRechargeModal(false)} disabled={recharging} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
+                    <X size={14} className="text-white/60" />
+                  </button>
+                </div>
+              </div>
+              <div className="px-4 pb-6 space-y-3">
+                <div>
+                  <label className="text-[10px] font-bold text-white/60 mb-1 block">User ID</label>
+                  <input
+                    value={rechargeForm.userId}
+                    onChange={(e) => setRechargeForm({ ...rechargeForm, userId: e.target.value })}
+                    placeholder="VYRO-XXXX"
+                    className="w-full px-3 py-2.5 rounded-xl text-xs text-white placeholder-white/30 outline-none"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,215,0,0.15)" }}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-white/60 mb-1 block">Amount (USD)</label>
+                  <input
+                    value={rechargeForm.amount}
+                    onChange={(e) => setRechargeForm({ ...rechargeForm, amount: e.target.value })}
+                    placeholder="100"
+                    type="number"
+                    className="w-full px-3 py-2.5 rounded-xl text-xs text-white placeholder-white/30 outline-none"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,215,0,0.15)" }}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-white/60 mb-1 block">Coins Amount</label>
+                  <input
+                    value={rechargeForm.coins}
+                    onChange={(e) => setRechargeForm({ ...rechargeForm, coins: e.target.value })}
+                    placeholder="5000000"
+                    type="number"
+                    className="w-full px-3 py-2.5 rounded-xl text-xs text-white placeholder-white/30 outline-none"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,215,0,0.15)" }}
+                  />
+                </div>
+                <div className="rounded-xl p-3" style={{ background: "rgba(34,211,238,0.08)", border: "1px solid rgba(34,211,238,0.15)" }}>
+                  <p className="text-[10px] text-white/60 mb-1">Recharge Summary</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-white/80">User: {rechargeForm.userId || "—"}</span>
+                    <span className="text-sm font-bold" style={{ color: GOLD }}>${rechargeForm.amount || "0"}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-[10px] text-white/40">Coins to send:</span>
+                    <span className="text-xs font-bold" style={{ color: TEAL }}>{(Number(rechargeForm.coins) || 0).toLocaleString()}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleRechargeSubmit}
+                  disabled={recharging}
+                  className="w-full py-3 rounded-2xl text-sm font-bold text-black active:scale-[0.98] transition flex items-center justify-center gap-2 disabled:opacity-60"
+                  style={{ background: `linear-gradient(135deg, ${GOLD}, ${TEAL})`, boxShadow: `0 6px 20px ${GOLD}30` }}
+                >
+                  {recharging ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Zap size={16} /> Confirm Recharge
+                    </>
+                  )}
                 </button>
+                <p className="text-[9px] text-white/30 text-center">User will receive instant coins credit. Transaction logged automatically.</p>
               </div>
-            </div>
-            <div className="px-4 pb-6 space-y-3">
-              <div>
-                <label className="text-[10px] font-bold text-white/60 mb-1 block">User ID</label>
-                <input
-                  value={rechargeForm.userId}
-                  onChange={(e) => setRechargeForm({ ...rechargeForm, userId: e.target.value })}
-                  placeholder="VYRO-XXXX"
-                  className="w-full px-3 py-2.5 rounded-xl text-xs text-white placeholder-white/30 outline-none"
-                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,215,0,0.15)" }}
-                />
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-white/60 mb-1 block">Amount (USD)</label>
-                <input
-                  value={rechargeForm.amount}
-                  onChange={(e) => setRechargeForm({ ...rechargeForm, amount: e.target.value })}
-                  placeholder="100"
-                  type="number"
-                  className="w-full px-3 py-2.5 rounded-xl text-xs text-white placeholder-white/30 outline-none"
-                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,215,0,0.15)" }}
-                />
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-white/60 mb-1 block">Coins Amount</label>
-                <input
-                  value={rechargeForm.coins}
-                  onChange={(e) => setRechargeForm({ ...rechargeForm, coins: e.target.value })}
-                  placeholder="5000000"
-                  type="number"
-                  className="w-full px-3 py-2.5 rounded-xl text-xs text-white placeholder-white/30 outline-none"
-                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,215,0,0.15)" }}
-                />
-              </div>
-              <div className="rounded-xl p-3" style={{ background: "rgba(34,211,238,0.08)", border: "1px solid rgba(34,211,238,0.15)" }}>
-                <p className="text-[10px] text-white/60 mb-1">Recharge Summary</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-white/80">User: {rechargeForm.userId || "—"}</span>
-                  <span className="text-sm font-bold" style={{ color: GOLD }}>${rechargeForm.amount || "0"}</span>
-                </div>
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-[10px] text-white/40">Coins to send:</span>
-                  <span className="text-xs font-bold" style={{ color: TEAL }}>{(Number(rechargeForm.coins) || 0).toLocaleString()}</span>
-                </div>
-              </div>
-              <button
-                onClick={handleRechargeSubmit}
-                className="w-full py-3 rounded-2xl text-sm font-bold text-black active:scale-[0.98] transition flex items-center justify-center gap-2"
-                style={{ background: `linear-gradient(135deg, ${GOLD}, ${TEAL})`, boxShadow: `0 6px 20px ${GOLD}30` }}
-              >
-                <Zap size={16} /> Confirm Recharge
-              </button>
-              <p className="text-[9px] text-white/30 text-center">User will receive instant notification. Recharge logs auto-updated.</p>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
