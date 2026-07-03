@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, TrendingUp, Clock, ArrowRight, ArrowLeft } from "lucide-react";
+import { Search, X, TrendingUp, Clock, ArrowRight, ArrowLeft, BadgeCheck, Crown, UserPlus, Check, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const TRENDING_SEARCHES = ["Live Music", "Gaming", "PK Battle", "Comedy", "New Creators", "Party Rooms"];
@@ -17,6 +17,41 @@ const SEARCH_CATEGORIES = [
   { label: "Events", icon: "🎪" },
 ];
 
+function FollowButton({ userId, initialFollowed }) {
+  const [followed, setFollowed] = useState(initialFollowed);
+  const [loading, setLoading] = useState(false);
+
+  const handleFollow = async (e) => {
+    e.stopPropagation();
+    if (loading) return;
+    setLoading(true);
+    const wasFollowed = followed;
+    setFollowed(!wasFollowed);
+    try {
+      await base44.functions.invoke("userSearch", {
+        action: wasFollowed ? "unfollow" : "follow",
+        target_user_id: userId,
+      });
+    } catch {
+      setFollowed(wasFollowed);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleFollow}
+      disabled={loading}
+      className={`px-3 py-1.5 rounded-full text-[10px] font-bold transition active:scale-90 flex items-center gap-1 ${
+        followed ? "bg-gray-100 text-gray-500" : "bg-gradient-to-r from-[#6F35E0] to-[#C135E0] text-white"
+      }`}
+    >
+      {loading ? <Loader2 size={10} className="animate-spin" /> : followed ? <><Check size={10} /> Following</> : <><UserPlus size={10} /> Follow</>}
+    </button>
+  );
+}
+
 export default function HomeSearchOverlay({ onClose }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -29,8 +64,8 @@ export default function HomeSearchOverlay({ onClose }) {
     const timer = setTimeout(async () => {
       setSearching(true);
       try {
-        const users = await base44.entities.UserProfile.filter({ username: query }).catch(() => []);
-        setResults(users.slice(0, 8));
+        const res = await base44.functions.invoke("userSearch", { action: "search", query: query.trim() });
+        setResults(res?.data?.users || []);
       } catch { setResults([]); }
       setSearching(false);
     }, 400);
@@ -60,7 +95,7 @@ export default function HomeSearchOverlay({ onClose }) {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input
             type="text"
-            placeholder="Search users, rooms, hashtags..."
+            placeholder="Search by username or ID..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch(query)}
@@ -77,23 +112,36 @@ export default function HomeSearchOverlay({ onClose }) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pt-3">
+        {/* Searching indicator */}
+        {searching && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+          </div>
+        )}
+
         {/* Results */}
-        {query && results.length > 0 && (
+        {query && !searching && results.length > 0 && (
           <div className="mb-4">
-            <p className="text-xs font-bold text-gray-500 mb-2">Results</p>
+            <p className="text-xs font-bold text-gray-500 mb-2">{results.length} Result{results.length !== 1 ? "s" : ""}</p>
             {results.map((u) => (
-              <button
+              <div
                 key={u.id}
                 onClick={() => navigate(`/profile/${u.id}`)}
-                className="w-full flex items-center gap-3 py-2.5 active:bg-gray-50 rounded-xl transition"
+                className="w-full flex items-center gap-3 py-2.5 active:bg-gray-50 rounded-xl transition cursor-pointer"
               >
-                <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}`} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100" />
-                <div className="text-left flex-1">
-                  <p className="text-sm font-semibold text-gray-700">{u.username}</p>
-                  <p className="text-[10px] text-gray-400">{u.followers || 0} followers · {u.country || "Unknown"}</p>
+                <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.username || u.full_name || "User")}`} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100" />
+                <div className="text-left flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                    {u.username || u.full_name || "User"}
+                    {u.is_verified && <BadgeCheck size={12} className="text-blue-500" />}
+                    {u.is_vip && <Crown size={12} className="text-yellow-500" />}
+                  </p>
+                  <p className="text-[10px] text-gray-400">
+                    {u.global_id ? `ID: ${u.global_id} · ` : ""}{u.followers || 0} followers · {u.country || "Unknown"}
+                  </p>
                 </div>
-                <ArrowRight size={16} className="text-gray-300" />
-              </button>
+                <FollowButton userId={u.id} initialFollowed={u.is_following} />
+              </div>
             ))}
           </div>
         )}
@@ -101,7 +149,7 @@ export default function HomeSearchOverlay({ onClose }) {
         {query && !searching && results.length === 0 && (
           <div className="text-center py-12">
             <p className="text-sm text-gray-400 mb-1">No Results Found</p>
-            <p className="text-xs text-gray-300">Try a different search term</p>
+            <p className="text-xs text-gray-300">Try searching by username or ID number</p>
           </div>
         )}
 
