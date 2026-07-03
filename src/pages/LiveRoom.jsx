@@ -150,7 +150,7 @@ export default function LiveRoom() {
     }
   };
 
-  const handlePanelSendGift = async (gift, targetId) => {
+  const handlePanelSendGift = async (gift, targetId, quantity = 1) => {
     const receiver = SEATS[targetId]?.user;
     if (!receiver) return;
     try {
@@ -160,7 +160,7 @@ export default function LiveRoom() {
         gift_name: gift.name,
         gift_icon: gift.icon,
         price_coins: gift.price || 0,
-        quantity: 1,
+        quantity,
       });
       const result = res.data || res;
       if (result.error) { toast({ title: result.error, variant: "destructive" }); return; }
@@ -168,15 +168,10 @@ export default function LiveRoom() {
       // Fallback: still do animation if backend fails (demo mode)
     }
     sendGift(gift, targetId);
-    setPanelType(null);
-    setPanelTargetId(null);
-    toast({ title: `Sent ${gift.name} to ${receiver.name}! 🎁` });
   };
 
   const handlePanelSendEmoji = (emoji, targetId) => {
     sendEmoji(emoji, targetId);
-    setPanelType(null);
-    setPanelTargetId(null);
   };
 
   const handleQuickEmoji = (seatId, emojiChar) => {
