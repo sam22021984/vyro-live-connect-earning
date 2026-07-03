@@ -6,7 +6,7 @@ const REFRESH_KEY = "sb_refresh_token";
 const invoke = (payload) => base44.functions.invoke("supabaseAuth", payload);
 
 const extractError = (data) =>
-  data?.error_description || data?.error?.message || data?.error || data?.message || "Request failed";
+  data?.error_description || data?.error?.message || data?.error || data?.msg || data?.message || "Request failed";
 
 const mapUser = (data) => {
   if (!data) return null;
