@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase } from "lucide-react";
 
 const dashboards = [
   {
@@ -123,6 +123,17 @@ const dashboards = [
     color: "#10B981",
     badge: "COUNTRY MGR",
     modules: ["Country Overview", "Country Search", "User Management", "Host Management", "Agent Management", "Agency Management", "Application Center", "Country Revenue", "Country Gifts", "Country Coins", "Country Rankings", "Live Monitoring", "PK Monitoring", "Event Management", "VIP Management", "Report Management", "Security Center", "Broadcast Center", "Country Analytics", "Country Settings"],
+  },
+  {
+    id: "business",
+    title: "Business Manager Dashboard",
+    description: "Central hub for daily business operations, agency performance, host productivity, revenue optimization, team coordination, growth execution, business planning, and operational efficiency — bridges Business Developers, Agencies, Talent Agents, and Management",
+    icon: Briefcase,
+    path: "/business-manager-dashboard",
+    gradient: "linear-gradient(135deg, #F59E0B, #D97706)",
+    color: "#F59E0B",
+    badge: "BUSINESS MGR",
+    modules: ["Business Overview", "Team Management", "Host Performance", "Agent Management", "Agency Management", "Business Growth", "Target Management", "Revenue Management", "Campaign Management", "Event Management", "Application Management", "Communication Center", "Analytics Center", "Business Intelligence", "Performance Management", "Report Management", "Document Management", "Operations Center", "Notification Center", "Exclusive Tools"],
   },
 ];
 
