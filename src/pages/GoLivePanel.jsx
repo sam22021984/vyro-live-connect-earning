@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Camera, X } from "lucide-react";
+import { ArrowLeft, Camera } from "lucide-react";
 import { COLORS, ROOM_TAGS } from "@/components/live-room/roomData";
+import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function GoLivePanel() {
@@ -12,12 +13,35 @@ export default function GoLivePanel() {
   const [selectedTag, setSelectedTag] = useState("All");
   const [starting, setStarting] = useState(false);
 
-  const handleStart = () => {
+  const handleStart = async () => {
+    if (!title.trim()) {
+      toast({ title: "Please enter a room title", variant: "destructive" });
+      return;
+    }
     setStarting(true);
-    setTimeout(() => {
+    try {
+      const room = await base44.entities.PartyRoom.create({
+        name: title.trim(),
+        description: announcement.trim(),
+        category: selectedTag,
+        status: "live",
+        viewers: 1,
+        members: 1,
+        cover: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=400&h=200&fit=crop",
+        host: { name: "You", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop", vip: "VIP 1" },
+        language: "English",
+        country: "🌍",
+        country_name: "Global",
+        trending: false,
+        recommended: false,
+        rank: 0,
+      });
       toast({ title: "Going Live! 🎉" });
-      navigate("/live-room");
-    }, 600);
+      navigate(`/live-room/${room.id}`);
+    } catch (err) {
+      toast({ title: "Failed to go live", description: err.message, variant: "destructive" });
+      setStarting(false);
+    }
   };
 
   return (

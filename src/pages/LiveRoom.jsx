@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLiveRoomApi } from "@/hooks/useLiveRoomApi";
+import { useLiveRoomData } from "@/hooks/useLiveRoomData";
 import { ArrowLeft, MoreVertical, Users, Lock, Settings, X, AlertTriangle, Trophy } from "lucide-react";
 import SeatArea from "@/components/live-room/SeatArea";
 import SettingsPanel from "@/components/live-room/SettingsPanel";
@@ -20,6 +21,7 @@ export default function LiveRoom() {
   const [sessionId] = useState(() => urlRoomId || (crypto?.randomUUID?.() || `room-${Date.now()}-${Math.random().toString(36).slice(2)}`));
   const roomId = sessionId;
   const { joined, joining, error: joinError, recommendations, aiStats, giftStats, roomScore, audioAction, publishEvent, archiveRoom, backupRoom, requestMic, verifyPayment, runScheduler } = useLiveRoomApi(roomId);
+  const { room: liveRoom, chat: supabaseChat, sendChatMessage } = useLiveRoomData(roomId);
   const [themeIndex, setThemeIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
@@ -34,6 +36,17 @@ export default function LiveRoom() {
   const [animations, setAnimations] = useState([]);
   const [seatEffects, setSeatEffects] = useState([]);
   const [chat, setChat] = useState(CHAT_MESSAGES);
+
+  // Sync Supabase chat messages into local chat state
+  useEffect(() => {
+    if (supabaseChat.length > 0) {
+      setChat(supabaseChat);
+    }
+  }, [supabaseChat]);
+
+  // Room display data from Supabase, with fallback
+  const roomTitle = liveRoom?.name || "Arabian Nights Live";
+  const viewerCount = liveRoom?.viewers || 12450;
 
   const theme = ROOM_THEMES[themeIndex];
   const currentUserSeatId = 0; // Host
@@ -80,7 +93,10 @@ export default function LiveRoom() {
       text: `sent ${gift.icon} ${gift.name} ×1 to ${receiver.name}`, time: "now", isGift: true, gift: gift.icon,
     }]);
 
-    if (roomId) publishEvent("gift_sent", { gift: gift.name, target: receiver.name });
+    if (roomId) {
+      publishEvent("gift_sent", { gift: gift.name, target: receiver.name });
+      sendChatMessage(`${gift.icon} ${gift.name} ×1 to ${receiver.name}`, sender.name);
+    }
   };
 
   // Send emoji from sender to target
@@ -109,7 +125,10 @@ export default function LiveRoom() {
       text: `sent ${emojiObj.emoji} ${emojiObj.name} to ${receiver.name}`, time: "now",
     }]);
 
-    if (roomId) publishEvent("emoji_sent", { emoji: emojiObj.emoji, target: receiver.name });
+    if (roomId) {
+      publishEvent("emoji_sent", { emoji: emojiObj.emoji, target: receiver.name });
+      sendChatMessage(`${emojiObj.emoji} ${emojiObj.name} to ${receiver.name}`, sender.name);
+    }
   };
 
   // Handle gift send from panel
@@ -161,7 +180,13 @@ export default function LiveRoom() {
       }
       toast({ title: newMuted ? "Mic Muted" : "Mic ON" });
     } },
-    { icon: "💬", label: "Chat", color: "#3B82F6", action: () => toast({ title: "Chat" }) },
+    { icon: "💬", label: "Chat", color: "#3B82F6", action: async () => {
+      const text = window.prompt("Send a message:");
+      if (text && text.trim()) {
+        await sendChatMessage(text.trim());
+        toast({ title: "Message sent" });
+      }
+    } },
     { icon: "😀", label: "Emoji", color: "#F59E0B", action: () => { setPanelType("emoji"); setPanelTargetId(null); } },
     { icon: "🏆", label: "Ranks", color: COLORS.purple, action: () => setShowLeaderboard(true) },
     { icon: "📤", label: "Share", color: "#0EA5E9", action: () => toast({ title: "Share Room" }) },
@@ -180,7 +205,7 @@ export default function LiveRoom() {
           </button>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <h1 className="text-sm font-bold text-white truncate">Arabian Nights Live</h1>
+              <h1 className="text-sm font-bold text-white truncate">{roomTitle}</h1>
               <span className="text-[8px] font-bold text-white px-1.5 py-0.5 rounded-full" style={{ background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldDark})` }}>LV.42</span>
             </div>
           </div>
@@ -189,7 +214,7 @@ export default function LiveRoom() {
           </button>
           <div className="flex items-center gap-1 px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <Users size={12} className="text-white" />
-            <span className="text-[10px] font-bold text-white">12,450</span>
+            <span className="text-[10px] font-bold text-white">{viewerCount.toLocaleString()}</span>
           </div>
           <button onClick={() => setShowSettings(true)} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <Settings size={16} style={{ color: COLORS.gold }} />
