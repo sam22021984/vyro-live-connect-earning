@@ -56,8 +56,19 @@ Deno.serve(async (req) => {
         extraHeaders['Authorization'] = `Bearer ${access_token}`;
         break;
       case 'oauth-url': {
-        const origin = new URL(req.url).origin;
-        const redirect = redirect_to || `${origin}/`;
+        // Use the app's origin from the referer header, not the function's URL
+        const referer = req.headers.get('referer') || req.headers.get('origin') || '';
+        let appOrigin = '';
+        try {
+          if (referer) appOrigin = new URL(referer).origin;
+        } catch {}
+        // redirect_to from frontend may be a path like "/" — prepend the app origin
+        let redirect = redirect_to || '/';
+        if (redirect.startsWith('/') && appOrigin) {
+          redirect = appOrigin + redirect;
+        } else if (!redirect.startsWith('http') && appOrigin) {
+          redirect = appOrigin + '/' + redirect;
+        }
         const url = `${supabaseUrl}/auth/v1/authorize?provider=${encodeURIComponent(provider)}&redirect_to=${encodeURIComponent(redirect)}`;
         return Response.json({ data: { url }, ok: true, status: 200 });
       }
