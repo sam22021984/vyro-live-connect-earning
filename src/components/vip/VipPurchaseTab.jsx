@@ -1,86 +1,185 @@
 import React, { useState } from "react";
-import { Coins, CreditCard, Check } from "lucide-react";
+import { Loader2, Check, Coins, CreditCard } from "lucide-react";
+import { vipPricingTiers, durationPlans } from "@/components/vip/vipData";
+import { useVipProfile } from "@/hooks/useVipProfile";
+import { useToast } from "@/components/ui/use-toast";
 
-const paymentMethods = [
-  { name: "Credit Card", icon: "💳" },
-  { name: "Debit Card", icon: "💳" },
-  { name: "PayPal", icon: "🅿️" },
-  { name: "JazzCash", icon: "📱" },
-  { name: "EasyPaisa", icon: "📲" },
-  { name: "Bank Payment", icon: "🏦" },
-];
+function formatNum(n) {
+  return n.toLocaleString();
+}
 
-export default function VipPurchaseTab() {
-  const [method, setMethod] = useState("coins");
+export default function VipPurchaseTab({ selectedDurationId, onDurationSelected }) {
+  const { profile, loading, purchaseVip } = useVipProfile();
+  const { toast } = useToast();
+  const [selectedTierId, setSelectedTierId] = useState(null);
+  const [selectedDuration, setSelectedDuration] = useState(
+    durationPlans.find((d) => d.id === selectedDurationId) || durationPlans[1]
+  );
+  const [paymentMethod, setPaymentMethod] = useState("coins");
+  const [processing, setProcessing] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 animate-spin text-amber-400" />
+      </div>
+    );
+  }
+
+  const selectedTier = vipPricingTiers.find((t) => t.id === selectedTierId);
+  const tierCoins = selectedTier ? parseInt(selectedTier.coins.replace(/,/g, "")) : 0;
+  const tierCash = selectedTier ? parseFloat(selectedTier.cash.replace("$", "")) : 0;
+  const months = selectedDuration.months;
+  const discount = selectedDuration.discount;
+  const finalCoins = Math.round(tierCoins * months * (1 - discount / 100));
+  const finalCash = Math.round(tierCash * months * (1 - discount / 100) * 100) / 100;
+  const coinBalance = profile?.coins || 0;
+  const insufficientCoins = paymentMethod === "coins" && coinBalance < finalCoins;
+
+  const handlePurchase = async () => {
+    if (!selectedTier) {
+      toast({ title: "Select a VIP tier", variant: "destructive" });
+      return;
+    }
+    if (insufficientCoins) {
+      toast({ title: "Insufficient coins", description: `You need ${formatNum(finalCoins - coinBalance)} more coins`, variant: "destructive" });
+      return;
+    }
+    setProcessing(true);
+    try {
+      const result = await purchaseVip(
+        selectedTier.name, tierCoins, tierCash, months, discount, paymentMethod
+      );
+      toast({
+        title: `VIP ${selectedTier.name} Activated! 🎉`,
+        description: paymentMethod === "coins"
+          ? `${formatNum(result.coinsCost)} coins deducted`
+          : `Complete $${result.cashCost} payment to activate`,
+      });
+      if (onDurationSelected) onDurationSelected(null);
+    } catch (e) {
+      toast({ title: "Purchase failed", description: e.message, variant: "destructive" });
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <div className="p-4 space-y-4">
       <h2 className="text-base font-bold text-amber-300 text-center">💳 VIP Purchase Center</h2>
 
-      <div className="text-center py-2">
-        <div className="text-4xl mb-1">💳</div>
-        <h3 className="text-sm font-bold text-amber-300">Premium Payment Gateway</h3>
-        <p className="text-xs text-gray-400">Choose your payment method</p>
+      {/* Coin balance */}
+      <div className="rounded-2xl p-3 bg-white/5 border border-white/5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Coins size={16} className="text-amber-400" />
+          <span className="text-xs text-gray-300">Your Coins</span>
+        </div>
+        <span className="text-sm font-bold text-amber-300">{formatNum(coinBalance)}</span>
       </div>
 
-      {/* Payment method toggle */}
-      <div className="grid grid-cols-2 gap-2.5">
-        <button
-          onClick={() => setMethod("coins")}
-          className={`p-4 rounded-2xl border transition ${method === "coins" ? "bg-amber-500/20 border-amber-500/40" : "bg-white/5 border-white/10"}`}
-        >
-          <Coins size={24} className="text-amber-400 mx-auto mb-1" />
-          <p className="text-sm font-bold text-amber-300">Pay With Coins</p>
-        </button>
-        <button
-          onClick={() => setMethod("cash")}
-          className={`p-4 rounded-2xl border transition ${method === "cash" ? "bg-amber-500/20 border-amber-500/40" : "bg-white/5 border-white/10"}`}
-        >
-          <CreditCard size={24} className="text-amber-400 mx-auto mb-1" />
-          <p className="text-sm font-bold text-amber-300">Pay With Cash</p>
-        </button>
+      {/* Tier selection */}
+      <div>
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">Select VIP Tier</h3>
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+          {vipPricingTiers.map((tier) => {
+            const isSelected = selectedTierId === tier.id;
+            return (
+              <button
+                key={tier.id}
+                onClick={() => setSelectedTierId(tier.id)}
+                className={`flex-shrink-0 w-24 p-3 rounded-2xl border transition text-center ${isSelected ? "bg-amber-500/20 border-amber-500/50" : "bg-white/5 border-white/10"}`}
+                style={isSelected ? { boxShadow: `0 4px 16px ${tier.color}30` } : {}}
+              >
+                <div className="text-2xl mb-1">{tier.tierIcon}</div>
+                <p className="text-[10px] font-bold text-white truncate">{tier.name}</p>
+                <p className="text-[9px] text-gray-400 mt-0.5">{tier.cash}</p>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {method === "coins" ? (
-        <div className="rounded-2xl p-4 bg-white/5 border border-white/5 space-y-3">
-          <h3 className="text-sm font-bold text-gray-200">Coin Payment Process</h3>
-          {["Select VIP Level", "Select Duration", "Confirm Coins", "Activate VIP"].map((step, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-xs font-bold text-amber-400">{i + 1}</div>
-              <span className="text-xs text-gray-300">{step}</span>
-            </div>
-          ))}
-          <button className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-[#0A0118] text-sm font-bold active:scale-95 transition mt-2">
-            Continue with Coins
+      {/* Duration selection */}
+      <div>
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">Select Duration</h3>
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+          {durationPlans.map((plan) => {
+            const isSelected = selectedDuration.id === plan.id;
+            return (
+              <button
+                key={plan.id}
+                onClick={() => { setSelectedDuration(plan); if (onDurationSelected) onDurationSelected(plan.id); }}
+                className={`flex-shrink-0 px-3 py-2 rounded-xl border transition text-center ${isSelected ? "bg-amber-500/20 border-amber-500/50" : "bg-white/5 border-white/10"}`}
+              >
+                <span className="text-sm mr-1">{plan.icon}</span>
+                <span className="text-[10px] font-bold text-white">{plan.name}</span>
+                {plan.discount > 0 && (
+                  <span className="block text-[8px] font-bold text-green-400">{plan.discount}% OFF</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Payment method */}
+      <div>
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">Payment Method</h3>
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            onClick={() => setPaymentMethod("coins")}
+            className={`p-3 rounded-2xl border transition ${paymentMethod === "coins" ? "bg-amber-500/20 border-amber-500/40" : "bg-white/5 border-white/10"}`}
+          >
+            <Coins size={20} className="text-amber-400 mx-auto mb-1" />
+            <p className="text-xs font-bold text-amber-300">Coins</p>
+          </button>
+          <button
+            onClick={() => setPaymentMethod("cash")}
+            className={`p-3 rounded-2xl border transition ${paymentMethod === "cash" ? "bg-amber-500/20 border-amber-500/40" : "bg-white/5 border-white/10"}`}
+          >
+            <CreditCard size={20} className="text-amber-400 mx-auto mb-1" />
+            <p className="text-xs font-bold text-amber-300">Cash</p>
           </button>
         </div>
-      ) : (
-        <div className="rounded-2xl p-4 bg-white/5 border border-white/5">
-          <h3 className="text-sm font-bold text-gray-200 mb-3">Select Payment Method</h3>
-          <div className="grid grid-cols-3 gap-2.5 mb-4">
-            {paymentMethods.map((pm, i) => (
-              <button
-                key={i}
-                className="flex flex-col items-center gap-1 p-3 rounded-xl bg-white/5 border border-white/5 active:scale-95 transition hover:border-amber-500/20"
-              >
-                <span className="text-2xl">{pm.icon}</span>
-                <span className="text-[10px] text-gray-300 text-center">{pm.name}</span>
-              </button>
-            ))}
+      </div>
+
+      {/* Price summary */}
+      {selectedTier && (
+        <div className="rounded-2xl p-4 bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/20">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-gray-400">VIP Tier</span>
+            <span className="text-sm font-bold text-amber-300">{selectedTier.tierIcon} {selectedTier.name}</span>
           </div>
-          <div className="space-y-2 mb-4">
-            {["Select Payment Method", "Confirm Amount", "Payment Verification", "VIP Activated"].map((step, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-xs font-bold text-amber-400">{i + 1}</div>
-                <span className="text-xs text-gray-300">{step}</span>
-              </div>
-            ))}
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-gray-400">Duration</span>
+            <span className="text-sm font-bold text-white">{selectedDuration.name}</span>
           </div>
-          <button className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-[#0A0118] text-sm font-bold active:scale-95 transition">
-            Continue with Cash
-          </button>
+          {discount > 0 && (
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-gray-400">Discount</span>
+              <span className="text-sm font-bold text-green-400">{discount}% OFF</span>
+            </div>
+          )}
+          <div className="border-t border-white/10 mt-2 pt-2 flex items-center justify-between">
+            <span className="text-xs text-gray-300">Total ({paymentMethod === "coins" ? "Coins" : "USD"})</span>
+            <span className="text-lg font-bold text-amber-300">
+              {paymentMethod === "coins" ? `🪙 ${formatNum(finalCoins)}` : `$${finalCash}`}
+            </span>
+          </div>
+          {insufficientCoins && (
+            <p className="text-[10px] text-red-400 mt-2 text-center">Insufficient coins — you need {formatNum(finalCoins - coinBalance)} more</p>
+          )}
         </div>
       )}
+
+      <button
+        disabled={!selectedTier || processing || insufficientCoins}
+        onClick={handlePurchase}
+        className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-[#0A0118] text-sm font-bold active:scale-95 transition disabled:opacity-40 flex items-center justify-center gap-2"
+      >
+        {processing ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+        {selectedTier ? `Purchase ${selectedTier.name}` : "Select a Tier"}
+      </button>
     </div>
   );
 }
