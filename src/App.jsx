@@ -58,6 +58,7 @@ import FamilyCenter from '@/pages/FamilyCenter';
 import MessageCenter from '@/pages/MessageCenter';
 import MessageHub from '@/pages/MessageHub';
 import SupportCenter from '@/pages/SupportCenter';
+import TrustReputation from '@/pages/TrustReputation';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -135,6 +136,7 @@ const AuthenticatedApp = () => {
         <Route path="/message-center" element={<MessageCenter />} />
         <Route path="/message-hub" element={<MessageHub />} />
         <Route path="/support-center" element={<SupportCenter />} />
+        <Route path="/trust-reputation" element={<TrustReputation />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

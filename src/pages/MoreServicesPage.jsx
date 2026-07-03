@@ -54,6 +54,8 @@ export default function MoreServicesPage() {
       navigate("/creator-center");
     } else if (s.name === "Support") {
       navigate("/support-center");
+    } else if (s.name === "Trust & Reputation") {
+      navigate("/trust-reputation");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
