@@ -25,6 +25,17 @@ const dashboards = [
     badge: "SUPER ADMIN",
     modules: ["Dashboard Overview", "User Management", "Coin Management", "Coin Seller Management", "Offline Recharge", "Wallet Control Center", "Withdrawal Management", "Agency & Agent Management", "Host & Streaming", "Gift & Revenue", "Reports & Analytics", "Security Center", "Admin Control", "System Health", "SAM Profile"],
   },
+  {
+    id: "vip",
+    title: "VIP Manager Dashboard",
+    description: "Enterprise VIP membership management, premium user services, VIP rewards distribution, loyalty operations, VIP engagement monitoring, exclusive events, VIP revenue analysis, and premium customer experience control center",
+    icon: Crown,
+    path: "/vip-manager-dashboard",
+    gradient: "linear-gradient(135deg, #D4AF37, #F59E0B)",
+    color: "#D4AF37",
+    badge: "VIP MANAGER",
+    modules: ["Dashboard Home", "VIP Overview", "Member Management", "Level Management", "Rewards Center", "Event Management", "Host Engagement", "Revenue Center", "Retention Center", "Growth Center", "Communication", "Exclusive Benefits", "Partnerships", "Country Performance", "Top Rankings", "AI Intelligence", "Analytics", "Reports", "Team Management", "Settings", "Exclusive Tools"],
+  },
 ];
 
 export default function CreatorCenter() {
