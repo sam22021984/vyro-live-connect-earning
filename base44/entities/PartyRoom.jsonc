@@ -1,0 +1,82 @@
+{
+  "name": "PartyRoom",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "cover": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "country_name": {
+      "type": "string"
+    },
+    "host": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "vip": {
+          "type": "string"
+        }
+      }
+    },
+    "viewers": {
+      "type": "number",
+      "default": 0
+    },
+    "members": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "live",
+        "scheduled"
+      ],
+      "default": "live"
+    },
+    "rank": {
+      "type": "number",
+      "default": 0
+    },
+    "trending": {
+      "type": "boolean",
+      "default": false
+    },
+    "recommended": {
+      "type": "boolean",
+      "default": false
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "create": null,
+    "read": null,
+    "update": null,
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

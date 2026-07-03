@@ -1,10 +1,18 @@
 import React from "react";
-import { Trophy } from "lucide-react";
-import { COLORS, RANKINGS, formatNum } from "./partyData";
+import { Trophy, Loader2 } from "lucide-react";
+import { COLORS, formatNum } from "./partyData";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function PartyRankings() {
+export default function PartyRankings({ rankings = [], loading }) {
   const { toast } = useToast();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-6">
+        <Loader2 className="w-5 h-5 animate-spin" style={{ color: COLORS.royalBlue }} />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -12,7 +20,7 @@ export default function PartyRankings() {
         <Trophy size={14} style={{ color: COLORS.gold }} /> Party Rankings
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-        {RANKINGS.map((section, si) => (
+        {rankings.map((section, si) => (
           <div key={si} className="rounded-2xl p-3" style={{ background: "rgba(255,255,255,0.7)", border: `1px solid ${COLORS.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
             <p className="text-[10px] font-bold mb-2" style={{ color: COLORS.textSecondary }}>{section.type}</p>
             <div className="space-y-1.5">
@@ -27,7 +35,7 @@ export default function PartyRankings() {
                   <img src={room.cover} className="w-7 h-7 rounded-lg object-cover" alt="" />
                   <div className="flex-1 min-w-0 text-left">
                     <p className="text-[10px] font-bold truncate" style={{ color: COLORS.textPrimary }}>{room.name}</p>
-                    <p className="text-[8px]" style={{ color: COLORS.textSecondary }}>{room.host.name}</p>
+                    <p className="text-[8px]" style={{ color: COLORS.textSecondary }}>{room.host?.name}</p>
                   </div>
                   <span className="text-[8px] font-bold" style={{ color: COLORS.royalBlue }}>{formatNum(room.viewers)}</span>
                 </button>

@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
-import { COLORS, STATS, formatNum } from "./partyData";
+import { COLORS, formatNum } from "./partyData";
+
+const STATS_CONFIG = [
+  { key: "activeRooms", label: "Active Party Rooms", icon: "🎉", color: COLORS.royalBlue },
+  { key: "totalViewers", label: "Total Viewers", icon: "🟢", color: COLORS.emerald },
+  { key: "totalMembers", label: "Party Members", icon: "👥", color: COLORS.purple },
+  { key: "trendingCount", label: "Trending Rooms", icon: "📈", color: COLORS.crimson },
+  { key: "recommendedCount", label: "Recommended", icon: "✨", color: COLORS.gold },
+];
 
 function StatCard({ stat }) {
   const [count, setCount] = useState(0);
@@ -32,12 +40,14 @@ function StatCard({ stat }) {
   );
 }
 
-export default function PartyStats() {
+export default function PartyStats({ stats = {} }) {
+  const statsArray = STATS_CONFIG.map((c) => ({ ...c, value: stats[c.key] || 0 }));
+
   return (
     <div>
       <h3 className="text-xs font-bold mb-2 px-1" style={{ color: COLORS.textPrimary }}>📊 Dashboard Statistics</h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {STATS.map((s) => <StatCard key={s.label} stat={s} />)}
+        {statsArray.map((s) => <StatCard key={s.label} stat={s} />)}
       </div>
     </div>
   );

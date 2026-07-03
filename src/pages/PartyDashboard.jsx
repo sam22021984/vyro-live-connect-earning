@@ -10,21 +10,23 @@ import ExploreTab from "@/components/party/ExploreTab";
 import PartyRankings from "@/components/party/PartyRankings";
 import RoomDetailSheet from "@/components/party/RoomDetailSheet";
 import { COLORS, TABS } from "@/components/party/partyData";
+import { usePartyRooms } from "@/hooks/usePartyRooms";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function PartyDashboard() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("popular");
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const { rooms, loading, recommended, popular, trending, stats, rankings } = usePartyRooms();
 
   const renderTab = () => {
     switch (activeTab) {
-      case "popular": return <PopularTab onSelect={setSelectedRoom} />;
+      case "popular": return <PopularTab rooms={rooms} recommended={recommended} popular={popular} loading={loading} onSelect={setSelectedRoom} />;
       case "friends": return <FriendsTab />;
       case "following": return <FollowingTab />;
       case "recent": return <RecentTab />;
-      case "explore": return <ExploreTab onSelect={setSelectedRoom} />;
-      default: return <PopularTab onSelect={setSelectedRoom} />;
+      case "explore": return <ExploreTab rooms={rooms} loading={loading} onSelect={setSelectedRoom} />;
+      default: return <PopularTab rooms={rooms} recommended={recommended} popular={popular} loading={loading} onSelect={setSelectedRoom} />;
     }
   };
 
@@ -34,13 +36,10 @@ export default function PartyDashboard() {
         <PartyHeader onSearch={() => toast({ title: "Searching..." })} />
 
         <div className="p-4 space-y-4">
-          {/* Stats */}
-          <PartyStats />
+          <PartyStats stats={stats} />
 
-          {/* Featured banner */}
           <FeaturedBanner onJoin={() => toast({ title: "Joining Champion Cup Party Night..." })} />
 
-          {/* Quick nav tabs */}
           <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
             <div className="flex gap-2 min-w-max">
               {TABS.map((tab) => (
@@ -60,15 +59,12 @@ export default function PartyDashboard() {
             </div>
           </div>
 
-          {/* Tab content */}
           {renderTab()}
 
-          {/* Rankings - always visible */}
-          {activeTab === "popular" && <PartyRankings />}
+          {activeTab === "popular" && <PartyRankings rankings={rankings} loading={loading} />}
         </div>
       </div>
 
-      {/* Room detail sheet */}
       <RoomDetailSheet room={selectedRoom} onClose={() => setSelectedRoom(null)} />
     </div>
   );

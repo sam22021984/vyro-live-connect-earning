@@ -1,16 +1,16 @@
 import React from "react";
-import { COLORS, CATEGORIES, EXPLORE_COUNTRIES, PARTY_ROOMS } from "./partyData";
+import { Loader2 } from "lucide-react";
+import { COLORS, CATEGORIES, EXPLORE_COUNTRIES } from "./partyData";
 import PartyRoomCard from "./PartyRoomCard";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function ExploreTab({ onSelect }) {
+export default function ExploreTab({ rooms = [], loading, onSelect }) {
   const { toast } = useToast();
 
   return (
     <div className="space-y-4">
       <h3 className="text-xs font-bold px-1" style={{ color: COLORS.textPrimary }}>🧭 Explore Party Rooms</h3>
 
-      {/* By Country */}
       <div>
         <p className="text-[10px] font-bold mb-2 px-1" style={{ color: COLORS.textSecondary }}>🌍 By Country</p>
         <div className="grid grid-cols-4 gap-2">
@@ -29,7 +29,6 @@ export default function ExploreTab({ onSelect }) {
         </div>
       </div>
 
-      {/* Categories */}
       <div>
         <p className="text-[10px] font-bold mb-2 px-1" style={{ color: COLORS.textSecondary }}>📂 Party Categories</p>
         <div className="grid grid-cols-4 gap-2">
@@ -48,14 +47,21 @@ export default function ExploreTab({ onSelect }) {
         </div>
       </div>
 
-      {/* All rooms */}
       <div>
         <p className="text-[10px] font-bold mb-2 px-1" style={{ color: COLORS.textSecondary }}>🎉 All Party Rooms</p>
-        <div className="grid grid-cols-2 gap-2.5">
-          {PARTY_ROOMS.map((room) => (
-            <PartyRoomCard key={room.id} room={room} onSelect={onSelect} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin" style={{ color: COLORS.royalBlue }} />
+          </div>
+        ) : rooms.length === 0 ? (
+          <p className="text-center text-xs py-8" style={{ color: COLORS.textSecondary }}>No rooms available</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-2.5">
+            {rooms.map((room) => (
+              <PartyRoomCard key={room.id} room={room} onSelect={onSelect} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
