@@ -256,4 +256,14 @@ export const HOST_MODULES = [
       { label: "View Compliance Report", icon: "FileText", type: "secondary" },
     ],
   },
+  {
+    id: "host_policy",
+    title: "Policy",
+    icon: "FileText",
+    color: "#6B7280",
+    gradient: "linear-gradient(135deg, #4B5563, #6B7280)",
+    description: "Host policy, authority, responsibilities & terms",
+    features: [],
+    actions: [],
+  },
 ];

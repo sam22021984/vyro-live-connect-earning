@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { HOST_INFO, HOST_STATS, HOST_MODULES } from "@/components/host/hostData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import HostPolicyTab from "@/components/host/HostPolicyTab";
 
 const ICON_MAP = {
   ArrowLeft, User, BadgeCheck, Hash, Layers, Building2, Users, Heart,
@@ -302,6 +303,10 @@ function ModuleContent({ module }) {
         </div>
       </div>
     );
+  }
+
+  if (module.id === "host_policy") {
+    return <HostPolicyTab />;
   }
 
   if (module.id === "support_compliance") {
