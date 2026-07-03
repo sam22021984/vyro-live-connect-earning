@@ -12,6 +12,7 @@ import AchievementsGrid from "@/components/profile/AchievementsGrid";
 import SocialSection from "@/components/profile/SocialSection";
 import AboutMe from "@/components/profile/AboutMe";
 import MoreServices from "@/components/profile/MoreServices";
+import WelcomeBonusPopup from "@/components/home/WelcomeBonusPopup";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -126,6 +127,7 @@ export default function Home() {
         {/* Bottom safe area */}
         <div className="h-6" />
       </div>
+      <WelcomeBonusPopup />
     </div>
   );
 }

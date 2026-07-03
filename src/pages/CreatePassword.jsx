@@ -54,7 +54,7 @@ export default function CreatePassword() {
       });
 
       localStorage.removeItem("vyro_pending_phone");
-      window.location.href = "/";
+      window.location.href = "/profile-setup";
     } catch (e) {
       setError(e.message || "Failed to create account. Please try again.");
     } finally {

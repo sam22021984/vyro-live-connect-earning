@@ -84,6 +84,8 @@ import RegionSelection from '@/pages/RegionSelection';
 import PermissionsIntro from '@/pages/PermissionsIntro';
 import MobileRegistration from '@/pages/MobileRegistration';
 import CreatePassword from '@/pages/CreatePassword';
+import ProfileSetup from '@/pages/ProfileSetup';
+import WelcomeAnimation from '@/pages/WelcomeAnimation';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -120,6 +122,8 @@ const AuthenticatedApp = () => {
       <Route path="/permissions-intro" element={<PermissionsIntro />} />
       <Route path="/mobile-register" element={<MobileRegistration />} />
       <Route path="/create-password" element={<CreatePassword />} />
+      <Route path="/profile-setup" element={<ProfileSetup />} />
+      <Route path="/welcome-animation" element={<WelcomeAnimation />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/splash" replace />} />}>
         <Route path="/" element={<Home />} />
         <Route path="/settings" element={<Settings />} />

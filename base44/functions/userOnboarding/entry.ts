@@ -53,6 +53,24 @@ async function generateApplicationId(base44: any, countryCode: string): Promise<
   return { id: applicationId, serial: nextSerial };
 }
 
+function getZodiac(dateStr: string): string {
+  const date = new Date(dateStr);
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'Aquarius';
+  if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return 'Pisces';
+  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Aries';
+  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Taurus';
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gemini';
+  if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return 'Cancer';
+  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'Leo';
+  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'Virgo';
+  if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return 'Libra';
+  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return 'Scorpio';
+  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return 'Sagittarius';
+  return 'Capricorn';
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -207,6 +225,69 @@ Deno.serve(async (req) => {
           user_level: p.user_level,
         },
       });
+    }
+
+    // Check username availability
+    if (action === 'checkUsername') {
+      const { username: uname } = body;
+      if (!uname) return Response.json({ error: 'Username is required' }, { status: 400 });
+
+      const RESTRICTED = ['admin', 'official', 'vyro', 'support', 'moderator', 'staff', 'root', 'system', 'help', 'security'];
+      const lower = uname.toLowerCase();
+      if (RESTRICTED.some((w) => lower.includes(w))) {
+        return Response.json({ available: false, reason: 'restricted', suggestions: [] });
+      }
+
+      const existing = await base44.asServiceRole.entities.UserProfile.filter({ username: uname });
+      if (existing.length > 0) {
+        const suggestions = [`${uname}1`, `${uname}_live`, `${uname}_vyro`, `${uname}123`, `real_${uname}`].filter((s) => s !== uname);
+        return Response.json({ available: false, reason: 'taken', suggestions });
+      }
+
+      return Response.json({ available: true, suggestions: [] });
+    }
+
+    // Update profile with onboarding data
+    if (action === 'updateProfile') {
+      const { username, full_name, bio, birthday, gender, avatar_url, interests } = body;
+
+      let profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id: user.id });
+      if (profiles.length === 0) {
+        profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by_id: user.id });
+      }
+      if (profiles.length === 0) {
+        return Response.json({ error: 'Profile not found' }, { status: 404 });
+      }
+
+      const updates: any = {};
+      if (username) updates.username = username;
+      if (full_name) { updates.full_name = full_name; updates.title = full_name; }
+      if (bio !== undefined) updates.bio = bio;
+      if (birthday) { updates.birthday = birthday; updates.zodiac = getZodiac(birthday); }
+      if (gender) updates.gender = gender;
+      if (avatar_url) updates.avatar_url = avatar_url;
+      if (interests) updates.interests = interests;
+
+      const updated = await base44.asServiceRole.entities.UserProfile.update(profiles[0].id, updates);
+      return Response.json({ profile: updated });
+    }
+
+    // Claim welcome bonus
+    if (action === 'claimWelcomeBonus') {
+      let profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id: user.id });
+      if (profiles.length === 0) {
+        profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by_id: user.id });
+      }
+      if (profiles.length === 0) return Response.json({ error: 'Profile not found' }, { status: 404 });
+
+      const p = profiles[0];
+      if (p.welcome_bonus_claimed) return Response.json({ error: 'Already claimed' }, { status: 400 });
+
+      const updated = await base44.asServiceRole.entities.UserProfile.update(p.id, {
+        coins: (p.coins || 0) + 500,
+        welcome_bonus_claimed: true,
+      });
+      return Response.json({ profile: updated, bonus: 500 });
     }
 
     return Response.json({ error: 'Invalid action' }, { status: 400 });

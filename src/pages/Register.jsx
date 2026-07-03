@@ -54,7 +54,7 @@ export default function Register() {
     setLoading(true);
     try {
       await supabaseAuth.verifyOtp(email, otpCode, password);
-      window.location.href = "/";
+      window.location.href = "/profile-setup";
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {
@@ -123,7 +123,7 @@ export default function Register() {
           </div>
 
           <button
-            onClick={() => window.location.href = "/"}
+            onClick={() => window.location.href = "/profile-setup"}
             className="w-full rounded-2xl bg-gradient-to-r from-[#6F35E0] to-[#C135E0] text-white font-bold text-sm shadow-lg shadow-purple-200 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
             style={{ height: "52px" }}
           >

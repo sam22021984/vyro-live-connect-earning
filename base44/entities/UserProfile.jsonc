@@ -5,6 +5,9 @@
     "username": {
       "type": "string"
     },
+    "full_name": {
+      "type": "string"
+    },
     "title": {
       "type": "string"
     },
@@ -40,6 +43,13 @@
         "Other"
       ]
     },
+    "interests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
     "signature": {
       "type": "string"
     },
@@ -48,6 +58,10 @@
     },
     "global_id": {
       "type": "string"
+    },
+    "welcome_bonus_claimed": {
+      "type": "boolean",
+      "default": false
     },
     "is_online": {
       "type": "boolean",
