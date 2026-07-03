@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift } from "lucide-react";
 
 const dashboards = [
   {
@@ -57,6 +57,17 @@ const dashboards = [
     color: "#475569",
     badge: "SUPER ADMIN",
     modules: ["Dashboard Home", "Agency Management", "Agent Management", "Host Management", "Admin Management", "Application Management", "Performance Monitoring", "Revenue Monitoring", "Event Monitoring", "PK Monitoring", "Reports & Violations", "Security Monitoring", "Communication Center", "Analytics Center", "Audit Log Center", "Operation Settings"],
+  },
+  {
+    id: "reward",
+    title: "Reward Manager Dashboard",
+    description: "Central reward management, achievement tracking, incentive distribution, bonus campaigns, loyalty rewards, milestone rewards, event rewards, performance rewards, engagement rewards, and recognition program control center",
+    icon: Gift,
+    path: "/reward-manager-dashboard",
+    gradient: "linear-gradient(135deg, #F59E0B, #D97706)",
+    color: "#F59E0B",
+    badge: "REWARD MANAGER",
+    modules: ["Dashboard Home", "Reward Overview", "Reward Management", "Achievement Rewards", "Event Rewards", "VIP Rewards", "Agent Rewards", "Agency Rewards", "Host Rewards", "User Rewards", "Loyalty Program", "Bonus Management", "Coin Rewards", "Country Performance", "Top Earners", "AI Intelligence", "Analytics", "Reports", "Team Management", "Settings", "Exclusive Tools"],
   },
 ];
 
