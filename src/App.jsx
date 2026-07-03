@@ -55,6 +55,7 @@ import CountryManagerDashboard from '@/pages/CountryManagerDashboard';
 import BusinessManagerDashboard from '@/pages/BusinessManagerDashboard';
 import BusinessDeveloperDashboard from '@/pages/BusinessDeveloperDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
+import SellerDashboard from '@/pages/SellerDashboard';
 import FamilyCenter from '@/pages/FamilyCenter';
 import MessageCenter from '@/pages/MessageCenter';
 import MessageHub from '@/pages/MessageHub';
@@ -134,6 +135,7 @@ const AuthenticatedApp = () => {
         <Route path="/business-manager-dashboard" element={<BusinessManagerDashboard />} />
         <Route path="/business-developer-dashboard" element={<BusinessDeveloperDashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/seller-dashboard" element={<SellerDashboard />} />
         <Route path="/family-center" element={<FamilyCenter />} />
         <Route path="/message-center" element={<MessageCenter />} />
         <Route path="/message-hub" element={<MessageHub />} />

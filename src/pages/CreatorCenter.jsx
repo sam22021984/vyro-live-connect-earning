@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog, Store } from "lucide-react";
 
 const dashboards = [
   {
@@ -145,6 +145,17 @@ const dashboards = [
     color: "#3B82F6",
     badge: "BIZ DEVELOPER",
     modules: ["Business Overview", "Host Recruitment", "Talent Agent Recruitment", "Agency Development", "Lead Management", "Market Expansion", "Partnership Management", "Campaign Management", "Revenue Growth", "Regional Performance", "Application Management", "Communication Center", "Event Development", "Performance Tracking", "Business Intelligence", "Task Management", "Document Center", "Analytics Center", "Business Settings", "Exclusive Tools"],
+  },
+  {
+    id: "seller",
+    title: "Offline Coins Seller Dashboard",
+    description: "Complete offline coins seller system — premium seller management, manual recharge, customer management, seller levels, packages, rewards, rankings, security, wallet, and admin controls with dark luxury glassmorphism UI",
+    icon: Store,
+    path: "/seller-dashboard",
+    gradient: "linear-gradient(135deg, #FFD700, #22D3EE)",
+    color: "#FFD700",
+    badge: "SELLER SYSTEM",
+    modules: ["Seller Panel", "Manual Recharge", "Recharge History", "Recharge Analytics", "Customer Management", "Seller Earnings", "Monthly Reports", "Daily Reports", "Seller Wallet", "Withdraw Requests", "Bonus Control", "Starter Packages", "Medium Packages", "VIP Packages", "Bronze Seller", "Silver Seller", "Gold Seller", "Diamond Seller", "Seller Rewards", "Top Rankings", "Country Rankings", "Security Center", "Admin Controls", "Recharge Process", "Notifications"],
   },
   {
     id: "admin",
