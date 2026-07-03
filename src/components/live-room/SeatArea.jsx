@@ -14,19 +14,18 @@ function generateSeats(count) {
   return seats;
 }
 
-// VYRO LIVE CONNECT grid layouts
+// VYRO LIVE CONNECT grid layouts — columns per row
 const SEAT_LAYOUTS = {
-  2: [2],        // 1 × 2 — center aligned
-  3: [3],        // 1 × 3 — center aligned
-  8: [4, 4],     // 4 × 2
-  10: [5, 5],    // 5 × 2
-  15: [5, 5, 5], // 5 × 3
-  20: [5, 5, 5, 5], // 5 × 4
+  2: [2],
+  3: [3],
+  8: [4, 4],
+  10: [5, 5],
+  15: [5, 5, 5],
+  20: [5, 5, 5, 5],
 };
 
 function getLayout(count) {
   if (SEAT_LAYOUTS[count]) return SEAT_LAYOUTS[count];
-  // Fallback: dynamic grid with max 5 per row
   const rows = [];
   let remaining = count;
   while (remaining > 0) {
@@ -51,25 +50,30 @@ export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10
     return rowSeats;
   });
 
-  // 16dp seat-to-seat spacing, centered alignment
+  const maxCols = Math.max(...layout);
+
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center" style={{ gap: "16px" }}>
-      {rows.map((rowSeats, rowIdx) => (
-        <div
-          key={rowIdx}
-          className="flex justify-center items-center w-full"
-          style={{ gap: "16px" }}
-        >
-          {rowSeats.map((seat) => (
-            <Seat
-              key={seat.id}
-              seat={seat}
-              onClick={onSeatClick}
-              effects={getSeatEffects(seat.id)}
-            />
-          ))}
-        </div>
-      ))}
+    <div
+      className="w-full h-full grid"
+      style={{
+        gridTemplateColumns: `repeat(${maxCols}, 1fr)`,
+        gridTemplateRows: `repeat(${rows.length}, 1fr)`,
+        gap: "12px",
+        justifyItems: "center",
+        alignItems: "center",
+        padding: "4px",
+      }}
+    >
+      {rows.flatMap((rowSeats, rowIdx) =>
+        rowSeats.map((seat) => (
+          <Seat
+            key={seat.id}
+            seat={seat}
+            onClick={onSeatClick}
+            effects={getSeatEffects(seat.id)}
+          />
+        ))
+      )}
     </div>
   );
 }
