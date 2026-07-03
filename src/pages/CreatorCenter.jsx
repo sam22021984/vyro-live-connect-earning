@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy } from "lucide-react";
 
 const dashboards = [
   {
@@ -35,6 +35,17 @@ const dashboards = [
     color: "#D4AF37",
     badge: "VIP MANAGER",
     modules: ["Dashboard Home", "VIP Overview", "Member Management", "Level Management", "Rewards Center", "Event Management", "Host Engagement", "Revenue Center", "Retention Center", "Growth Center", "Communication", "Exclusive Benefits", "Partnerships", "Country Performance", "Top Rankings", "AI Intelligence", "Analytics", "Reports", "Team Management", "Settings", "Exclusive Tools"],
+  },
+  {
+    id: "support",
+    title: "Support Manager Dashboard",
+    description: "Central customer support, complaint resolution, ticket management, dispute handling, user assistance, account recovery, fraud reporting, and service quality monitoring control center",
+    icon: LifeBuoy,
+    path: "/support-manager-dashboard",
+    gradient: "linear-gradient(135deg, #2F80ED, #56CCF2)",
+    color: "#2F80ED",
+    badge: "SUPPORT MANAGER",
+    modules: ["Dashboard Home", "Support Overview", "Ticket Management", "User Support", "Host Support", "Agent Support", "Agency Support", "VIP Support", "Account Recovery", "Appeals Management", "Fraud Reports", "Payment Support", "Withdrawal Support", "Live Stream Support", "Technical Support", "Knowledge Base", "Communication", "Reports", "Staff Management", "Analytics", "Exclusive Tools"],
   },
 ];
 

@@ -43,6 +43,7 @@ import SamDashboard from '@/pages/SamDashboard';
 import CreatorCenter from '@/pages/CreatorCenter';
 import OwnerDashboard from '@/pages/OwnerDashboard';
 import VipManagerDashboard from '@/pages/VipManagerDashboard';
+import SupportManagerDashboard from '@/pages/SupportManagerDashboard';
 import FamilyCenter from '@/pages/FamilyCenter';
 import MessageCenter from '@/pages/MessageCenter';
 import FloatingNavigation from '@/components/FloatingNavigation';
@@ -107,6 +108,7 @@ const AuthenticatedApp = () => {
         <Route path="/creator-center" element={<CreatorCenter />} />
         <Route path="/owner-dashboard" element={<OwnerDashboard />} />
         <Route path="/vip-manager-dashboard" element={<VipManagerDashboard />} />
+        <Route path="/support-manager-dashboard" element={<SupportManagerDashboard />} />
         <Route path="/family-center" element={<FamilyCenter />} />
         <Route path="/message-center" element={<MessageCenter />} />
       </Route>
