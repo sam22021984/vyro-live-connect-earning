@@ -286,8 +286,8 @@ export default function LiveRoom() {
       {/* Animation layer */}
       <AnimationLayer animations={animations} seatEffects={seatEffects} />
 
-      {/* Seat area — fills space between header and bottom panel */}
-      <div className="absolute left-0 right-0 flex items-stretch justify-center px-3" style={{ top: "52px", bottom: "96px" }}>
+      {/* Seat area — fills space between header (56-64dp) and bottom panel (80-120dp), 16dp side padding */}
+      <div className="absolute left-0 right-0 flex items-stretch justify-center" style={{ top: "64px", bottom: "120px", paddingLeft: "16px", paddingRight: "16px" }}>
         <SeatArea onSeatClick={handleSeatClick} seatEffects={seatEffects} seatCount={seatCount} />
       </div>
 

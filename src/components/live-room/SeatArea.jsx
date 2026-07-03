@@ -14,17 +14,19 @@ function generateSeats(count) {
   return seats;
 }
 
+// VYRO LIVE CONNECT grid layouts
 const SEAT_LAYOUTS = {
-  4: [1, 3],
-  6: [3, 3],
-  10: [2, 4, 4],
-  15: [5, 5, 5],
-  20: [5, 5, 5, 5],
+  2: [2],        // 1 × 2 — center aligned
+  3: [3],        // 1 × 3 — center aligned
+  8: [4, 4],     // 4 × 2
+  10: [5, 5],    // 5 × 2
+  15: [5, 5, 5], // 5 × 3
+  20: [5, 5, 5, 5], // 5 × 4
 };
 
 function getLayout(count) {
   if (SEAT_LAYOUTS[count]) return SEAT_LAYOUTS[count];
-  if (count <= 4) return [1, 3];
+  // Fallback: dynamic grid with max 5 per row
   const rows = [];
   let remaining = count;
   while (remaining > 0) {
@@ -36,7 +38,7 @@ function getLayout(count) {
 }
 
 export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10 }) {
-  const count = Math.max(4, seatCount);
+  const count = Math.max(2, seatCount);
   const seats = generateSeats(count);
   const layout = getLayout(count);
 
@@ -49,19 +51,19 @@ export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10
     return rowSeats;
   });
 
+  // 16dp seat-to-seat spacing, centered alignment
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center" style={{ gap: "0.6rem" }}>
+    <div className="w-full h-full flex flex-col justify-center items-center" style={{ gap: "16px" }}>
       {rows.map((rowSeats, rowIdx) => (
         <div
           key={rowIdx}
           className="flex justify-center items-center w-full"
-          style={{ gap: "0.5rem" }}
+          style={{ gap: "16px" }}
         >
           {rowSeats.map((seat) => (
             <Seat
               key={seat.id}
               seat={seat}
-              size={50}
               onClick={onSeatClick}
               effects={getSeatEffects(seat.id)}
             />
