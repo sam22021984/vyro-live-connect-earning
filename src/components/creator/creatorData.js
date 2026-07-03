@@ -167,4 +167,16 @@ export const dashboards = [
     requiredRole: "admin",
     modules: ["Agency Management", "Talent Agent Management", "Host Management", "Application Management", "Verification Center", "Support Center", "Reports & Compliance", "Event Support", "PK Support", "Communication Center", "Reporting & Analytics", "Audit Log Center", "Admin Tools"],
   },
+  {
+    id: "seller",
+    title: "Coin Seller Dashboard",
+    description: "Official Coin Sellers manage offline recharges, coin packages, customer history, earnings, levels, rankings, policy, and reports",
+    icon: "Store",
+    path: "/seller-dashboard",
+    gradient: "linear-gradient(135deg, #10B981, #047857)",
+    color: "#10B981",
+    badge: "COIN SELLER",
+    requiredRole: "user",
+    modules: ["Overview", "Recharge Center", "Coin Packages", "Customers", "Seller Levels", "Rewards", "Rankings", "Security", "OCS Policy", "Reports"],
+  },
 ];

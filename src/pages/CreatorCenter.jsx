@@ -12,7 +12,7 @@ import { useBackNav } from "@/hooks/useBackNav";
 
 const ICON_MAP = {
   Crown, Shield, LifeBuoy, Gift, Swords, Megaphone, DollarSign, PartyPopper,
-  Globe, Briefcase, Compass, UserCog, Store,
+  Globe, Briefcase, Compass, UserCog, Store, Rocket,
 };
 
 import { getRoleLevel, getCreatorCenterDashboards } from "@/lib/roleUtils";
