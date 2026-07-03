@@ -157,6 +157,12 @@ Deno.serve(async (req) => {
         return Response.json({ profile: existing, isNew: false, global_id: existing.global_id });
       }
 
+      // Check if this is the first real user — if so, assign owner role
+      const allProfiles = await base44.asServiceRole.entities.UserProfile.list('-created_date', 500);
+      const isFirstUser = allProfiles.length === 0;
+      const assignedRole = isFirstUser ? 'owner' : (role || 'user');
+      const isAppOwner = isFirstUser;
+
       // Generate unique Application ID
       const { id: applicationId, serial } = await generateApplicationId(base44, countryCode);
       const finalUsername = username || user.full_name || user.email?.split('@')[0] || 'VYRO User';
@@ -191,9 +197,9 @@ Deno.serve(async (req) => {
         title: 'VYRO User',
         user_id: user.id,
         global_id: applicationId,
-        role: role,
+        role: assignedRole,
         country: countryConfig.name,
-        is_app_owner: false,
+        is_app_owner: isAppOwner,
         is_verified: false,
         is_official: false,
         is_vip: false,

@@ -15,15 +15,7 @@ const ICON_MAP = {
   Globe, Briefcase, Compass, UserCog, Store,
 };
 
-const ROLE_HIERARCHY = {
-  user: 0, host: 1, agent: 2, agency: 3, admin: 4, owner: 5,
-};
-
-const DASHBOARD_ROLE_LEVEL = {
-  owner: 5, sam: 5, vip: 4, support: 4, superadmin: 4, reward: 4,
-  pkmanager: 4, marketing: 4, finance: 4, event: 4, country: 4,
-  business: 4, bdev: 4, admin: 4,
-};
+import { getRoleLevel, getCreatorCenterDashboards } from "@/lib/roleUtils";
 
 export default function CreatorCenter() {
   const navigate = useNavigate();
@@ -31,10 +23,7 @@ export default function CreatorCenter() {
   const { profile, stats, loading } = useCreatorCenter();
 
   const userRole = profile?.role || "user";
-  const userLevel = ROLE_HIERARCHY[userRole] ?? 0;
-
-  const visibleDashboards = dashboards.filter((d) => userLevel >= (DASHBOARD_ROLE_LEVEL[d.id] ?? 4));
-  const lockedDashboards = dashboards.filter((d) => userLevel < (DASHBOARD_ROLE_LEVEL[d.id] ?? 4));
+  const { visible: visibleDashboards, locked: lockedDashboards } = getCreatorCenterDashboards(dashboards, userRole);
 
   const handleNavigate = (d) => {
     try {
