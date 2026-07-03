@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabaseAuth } from "@/lib/supabaseAuth";
+import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
-import { Mail, Lock, Eye, EyeOff, ArrowLeft, Loader2, ArrowRight } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowLeft, Loader2, ArrowRight, CheckCircle2, Fingerprint, Sparkles } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import SocialButtons from "@/components/SocialButtons";
+import GlobalIdBadge from "@/components/auth/GlobalIdBadge";
 import { toast } from "@/components/ui/use-toast";
 
 export default function Register() {
@@ -17,6 +19,7 @@ export default function Register() {
   const [showOtp, setShowOtp] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [onboarding, setOnboarding] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +31,14 @@ export default function Register() {
     setLoading(true);
     try {
       await supabaseAuth.signUp(email, password);
-      window.location.href = "/";
+      // Initialize profile with Global ID
+      const res = await base44.functions.invoke("userOnboarding", {
+        action: "initProfile",
+        role: "user",
+        username: email.split("@")[0],
+      });
+      const { profile, global_id, isNew } = res.data;
+      setOnboarding({ profile, globalId: global_id, isNew });
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {
@@ -66,6 +76,60 @@ export default function Register() {
       setError(`${provider === "whatsapp" ? "WhatsApp" : "Mobile"} sign up is coming soon!`);
     }
   };
+
+  // Success screen after signup — shows generated Global ID
+  if (onboarding) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#F7F4FF] to-white flex flex-col items-center justify-center px-6">
+        <div className="w-full max-w-sm text-center">
+          <div className="relative inline-flex mb-6">
+            <div className="absolute inset-0 bg-purple-200/50 blur-2xl rounded-full" />
+            <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg shadow-green-200">
+              <CheckCircle2 size={40} className="text-white" />
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-800 mb-1">Welcome to VYRO!</h2>
+          <p className="text-sm text-gray-400 mb-6">
+            Your account has been created successfully. Here is your unique Global ID.
+          </p>
+
+          <div className="bg-white rounded-3xl shadow-xl border border-purple-50 p-6 mb-6">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-200">
+                <Fingerprint size={28} className="text-white" />
+              </div>
+            </div>
+
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Your Global ID</p>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-2xl font-mono font-extrabold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                {onboarding.globalId}
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 text-purple-600 text-xs font-medium mb-4">
+              <Sparkles size={12} />
+              {onboarding.isNew ? "New account created" : "Account linked"}
+            </div>
+
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Save this ID — it's your unique identity on VYRO. Others can find you by searching this ID.
+            </p>
+          </div>
+
+          <button
+            onClick={() => window.location.href = "/"}
+            className="w-full rounded-2xl bg-gradient-to-r from-[#6F35E0] to-[#C135E0] text-white font-bold text-sm shadow-lg shadow-purple-200 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
+            style={{ height: "52px" }}
+          >
+            Enter VYRO
+            <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // OTP verification screen
   if (showOtp) {

@@ -28,40 +28,13 @@ export default function Home() {
       try {
         const me = await base44.auth.me();
         setUser(me);
-        // Look up profile by user_id first, then by created_by_id
-        let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
-        if (profiles.length === 0) {
-          profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
-        }
-        let currentProfile;
-        if (profiles.length > 0) {
-          currentProfile = profiles[0];
-        } else {
-          // Create a generic user profile — NOT an owner profile
-          currentProfile = await base44.entities.UserProfile.create({
-            username: me.full_name || me.email?.split("@")[0] || "VYRO User",
-            title: "VYRO User",
-            user_id: me.id,
-            is_app_owner: false,
-            is_verified: false,
-            is_official: false,
-            is_vip: false,
-            is_agency: false,
-            role: "user",
-            verification_status: "unverified",
-            safety_status: "high",
-            user_level: 1,
-            host_level: 1,
-            gifting_level: 1,
-            streaming_level: 1,
-            trust_score: 50,
-            reputation_rating: 0,
-            profile_completion: 20,
-            activity_score: 0,
-            coins: 0,
-          });
-        }
-        setProfile(currentProfile);
+        // Use onboarding function — ensures global_id exists, creates profile if needed
+        const res = await base44.functions.invoke("userOnboarding", {
+          action: "initProfile",
+          role: "user",
+          username: me.full_name || me.email?.split("@")[0] || "VYRO User",
+        });
+        setProfile(res.data.profile);
 
         // Load real data from backend in parallel
         const [fanRecords, badgeRecords, achRecords] = await Promise.all([

@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabaseAuth } from "@/lib/supabaseAuth";
+import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
-import { Mail, Lock, Eye, EyeOff, ArrowLeft, Loader2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowLeft, Loader2, Fingerprint, Sparkles } from "lucide-react";
 import SocialButtons from "@/components/SocialButtons";
+import GlobalIdBadge from "@/components/auth/GlobalIdBadge";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -12,6 +14,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [welcomeData, setWelcomeData] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +22,17 @@ export default function Login() {
     setLoading(true);
     try {
       await supabaseAuth.signIn(email, password);
-      window.location.href = "/";
+      // Fetch profile + global_id
+      try {
+        const res = await base44.functions.invoke("userOnboarding", { action: "getProfile" });
+        if (res.data?.profile?.global_id) {
+          setWelcomeData({ globalId: res.data.profile.global_id, username: res.data.profile.username, role: res.data.profile.role });
+        } else {
+          window.location.href = "/";
+        }
+      } catch {
+        window.location.href = "/";
+      }
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {
@@ -34,6 +47,51 @@ export default function Login() {
       setError(`${provider === "whatsapp" ? "WhatsApp" : "Mobile"} login is coming soon!`);
     }
   };
+
+  useEffect(() => {
+    if (welcomeData) {
+      const timer = setTimeout(() => { window.location.href = "/"; }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [welcomeData]);
+
+  // Welcome back screen — shows Global ID briefly before redirect
+  if (welcomeData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#1A0B2E] to-[#2D1B4E] flex flex-col items-center justify-center px-6">
+        <div className="w-full max-w-sm text-center">
+          <div className="relative inline-flex mb-6">
+            <div className="absolute inset-0 bg-purple-500/30 blur-3xl rounded-full" />
+            <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-2xl shadow-purple-500/50">
+              <Sparkles size={36} className="text-white" />
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-bold text-white mb-1">Welcome back!</h2>
+          <p className="text-sm text-white/50 mb-6">{welcomeData.username}</p>
+
+          <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/10 p-6 mb-6">
+            <div className="flex justify-center mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center shadow-lg">
+                <Fingerprint size={24} className="text-white" />
+              </div>
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2">Your Global ID</p>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-xl font-mono font-extrabold bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
+                {welcomeData.globalId}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center gap-2 text-white/60">
+            <Loader2 size={16} className="animate-spin" />
+            <span className="text-sm">Loading your dashboard...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative flex flex-col bg-[#1A0B2E]">

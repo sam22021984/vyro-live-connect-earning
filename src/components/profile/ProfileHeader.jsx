@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Search, Menu, Shield, CheckCircle, Star } from "lucide-react";
 import SearchOverlay from "@/components/profile/SearchOverlay";
 import FriendsMenu from "@/components/profile/FriendsMenu";
+import GlobalIdBadge from "@/components/auth/GlobalIdBadge";
 
 export default function ProfileHeader({ profile }) {
   const [showSearch, setShowSearch] = useState(false);
@@ -82,7 +83,7 @@ export default function ProfileHeader({ profile }) {
 
           {/* Tag badges row */}
           <div className="flex flex-wrap items-center justify-center gap-1.5 mb-2">
-            {tagBadges.map((b, i) => (
+            {tagBadges.filter(b => !b.label?.startsWith("ID:")).map((b, i) => (
               <span key={i} className={`${b.color} text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full`}>
                 {b.label}
               </span>
@@ -99,11 +100,12 @@ export default function ProfileHeader({ profile }) {
             ))}
           </div>
 
-          {/* ID */}
-          <div className="mt-2 flex items-center gap-2">
-            <span className="text-white/70 text-[11px]">🇵🇰 {profile?.country || "Pakistan"}</span>
-            <span className="text-white/50">•</span>
-            <span className="text-white/70 text-[11px]">ID: {profile?.user_id || "VY-000001"}</span>
+          {/* Global ID + Country */}
+          <div className="mt-3 flex flex-col items-center gap-2">
+            {profile?.global_id && <GlobalIdBadge globalId={profile.global_id} role={profile?.role} size="sm" />}
+            <div className="flex items-center gap-2">
+              <span className="text-white/70 text-[11px]">🇵🇰 {profile?.country || "Pakistan"}</span>
+            </div>
           </div>
         </div>
       </div>
