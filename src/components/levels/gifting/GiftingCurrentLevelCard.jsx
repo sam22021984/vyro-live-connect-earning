@@ -1,9 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Zap, Coins, Crown, Eye, Gift, TrendingUp } from "lucide-react";
-import { currentGifterUser, giftingTiers, giftingConfig } from "@/components/levels/gifting/giftingData";
+import { giftingTiers, giftingConfig } from "@/components/levels/gifting/giftingData";
+import { base44 } from "@/api/base44Client";
 
 export default function GiftingCurrentLevelCard() {
-  const u = currentGifterUser;
+  const [profile, setProfile] = useState(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const me = await base44.auth.me();
+        let p = await base44.entities.UserProfile.filter({ user_id: me.id });
+        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        if (p.length > 0) setProfile(p[0]);
+      } catch (e) {}
+    })();
+  }, []);
+  const u = {
+    level: profile?.gifting_level || 1,
+    username: profile?.username || "User",
+    xp: profile?.gifting_xp || 0,
+    xpMax: profile?.gifting_xp_max || 10000,
+    progress: profile?.gifting_xp_max > 0 ? Math.round(((profile?.gifting_xp || 0) / profile?.gifting_xp_max) * 100) : 0,
+    totalCoinsSent: (profile?.gifts_sent || 0).toLocaleString(),
+    monthlyTarget: "—",
+    ranking: "—",
+  };
   const c = giftingConfig;
   const formatNum = (n) => n.toLocaleString();
   const currentTier = giftingTiers.find((t) => {

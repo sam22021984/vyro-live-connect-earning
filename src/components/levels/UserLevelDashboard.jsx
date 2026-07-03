@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { userLevelTiers, currentUserLevel, collectionConfig } from "@/components/levels/userLevelTiers";
+import React, { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import { userLevelTiers, collectionConfig } from "@/components/levels/userLevelTiers";
 import { dashboardTabs } from "@/components/levels/dashboardData";
 import ProfileHeader from "@/components/levels/dashboard/ProfileHeader";
 import CurrentLevelCard from "@/components/levels/dashboard/CurrentLevelCard";
@@ -14,7 +15,34 @@ import BottomActionBar from "@/components/levels/dashboard/BottomActionBar";
 
 export default function UserLevelDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
-  const u = currentUserLevel;
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const me = await base44.auth.me();
+        let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
+        if (profiles.length === 0) {
+          profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        }
+        if (profiles.length > 0) setProfile(profiles[0]);
+      } catch (e) { /* ignore */ }
+    };
+    load();
+  }, []);
+
+  const u = {
+    level: profile?.user_level || 1,
+    username: profile?.username || "User",
+    tierName: profile?.vip_tier || "User",
+    badge: "—",
+    progress: profile?.user_xp_max > 0 ? Math.round(((profile?.user_xp || 0) / profile?.user_xp_max) * 100) : 0,
+    xp: profile?.user_xp || 0,
+    xpMax: profile?.user_xp_max || 10000,
+    coins: profile?.coins || 0,
+    rank: "—",
+    avatar: profile?.avatar_url || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200&h=200&fit=crop",
+  };
   const formatNum = (n) => n.toLocaleString();
 
   const currentTier = userLevelTiers.find((t) => {

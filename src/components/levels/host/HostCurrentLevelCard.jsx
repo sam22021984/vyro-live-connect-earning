@@ -1,9 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Zap, Coins, Crown, Eye, Gift, TrendingUp } from "lucide-react";
-import { currentHostUser, hostTiers, hostConfig } from "@/components/levels/host/hostData";
+import { hostTiers, hostConfig } from "@/components/levels/host/hostData";
+import { base44 } from "@/api/base44Client";
 
 export default function HostCurrentLevelCard() {
-  const u = currentHostUser;
+  const [profile, setProfile] = useState(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const me = await base44.auth.me();
+        let p = await base44.entities.UserProfile.filter({ user_id: me.id });
+        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        if (p.length > 0) setProfile(p[0]);
+      } catch (e) {}
+    })();
+  }, []);
+  const u = {
+    level: profile?.host_level || 1,
+    username: profile?.username || "User",
+    xp: profile?.host_xp || 0,
+    xpMax: profile?.host_xp_max || 10000,
+    progress: profile?.host_xp_max > 0 ? Math.round(((profile?.host_xp || 0) / profile?.host_xp_max) * 100) : 0,
+    totalHostCoins: (profile?.coins || 0).toLocaleString(),
+    monthlyTarget: "—",
+    ranking: "—",
+  };
   const c = hostConfig;
   const formatNum = (n) => n.toLocaleString();
   const currentTier = hostTiers.find((t) => { const parts = t.levels.replace("LV","").split("–"); const min = parseInt(parts[0]); const max = parseInt(parts[parts.length-1]); return u.level >= min && u.level <= max; }) || hostTiers[1];

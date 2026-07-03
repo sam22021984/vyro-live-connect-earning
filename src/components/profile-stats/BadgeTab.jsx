@@ -1,14 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { X, Calendar, Gift } from "lucide-react";
-import { badgeCategories, badges, COLORS } from "./profileStatsData";
+import { X, Calendar } from "lucide-react";
+import { badgeCategories, COLORS } from "./profileStatsData";
 import BadgeCard from "./BadgeCard";
 
-export default function BadgeTab() {
+const defaultBadges = [
+  { id: "d1", name: "No Badges Yet", level: "—", icon: "🏅", description: "Complete tasks and activities to earn badges", unlock_date: "Locked", status: "locked", color: "#9CA3AF" },
+];
+
+export default function BadgeTab({ badges: propBadges }) {
   const [cat, setCat] = useState("vip");
-  const [badgeList, setBadgeList] = useState(badges);
   const [detail, setDetail] = useState(null);
   const { toast } = useToast();
+
+  // Map backend Badge records to the display format, grouped by category
+  const buildBadgeMap = (records) => {
+    const map = {};
+    badgeCategories.forEach((c) => { map[c.key] = []; });
+    for (const r of (records || [])) {
+      const cat = r.category || "special";
+      if (!map[cat]) map[cat] = [];
+      map[cat].push({
+        id: r.id,
+        name: r.name,
+        level: r.category || "Special",
+        icon: r.icon || "🏅",
+        description: r.description || "",
+        unlock_date: r.created_date ? new Date(r.created_date).toLocaleDateString() : "—",
+        status: "unlocked",
+        color: r.color || "#3B82F6",
+      });
+    }
+    // Fill empty categories with placeholder
+    for (const key of Object.keys(map)) {
+      if (map[key].length === 0) {
+        map[key] = defaultBadges;
+      }
+    }
+    return map;
+  };
+
+  const [badgeList, setBadgeList] = useState(() => buildBadgeMap(propBadges));
+
+  // Rebuild when propBadges changes
+  useEffect(() => {
+    setBadgeList(buildBadgeMap(propBadges));
+  }, [propBadges]);
 
   const handleEquip = (badge) => {
     setBadgeList((prev) => ({
@@ -43,7 +80,7 @@ export default function BadgeTab() {
       </div>
 
       <div className="grid grid-cols-2 gap-2.5">
-        {badgeList[cat].map((b) => (
+        {badgeList[cat]?.map((b) => (
           <BadgeCard key={b.id} badge={b} onView={setDetail} onEquip={handleEquip} onRemove={handleRemove} onShare={handleShare} />
         ))}
       </div>

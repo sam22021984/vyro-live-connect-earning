@@ -1,37 +1,58 @@
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { X, Download, Filter } from "lucide-react";
-import { historyTypes, historyFilters, historyRecords, COLORS } from "./profileStatsData";
+import { X, Download } from "lucide-react";
+import { historyTypes, historyFilters, COLORS } from "./profileStatsData";
 
 const statusColors = {
   Success: COLORS.success, Completed: COLORS.success, Sent: COLORS.primary, Received: COLORS.success,
   Claimed: COLORS.success, Victory: COLORS.success, "Processing": COLORS.gold, Ended: COLORS.muted,
-  Failed: COLORS.danger, Blocked: COLORS.danger, Defeat: COLORS.danger,
+  Failed: COLORS.danger, Blocked: COLORS.danger, Defeat: COLORS.danger, pending: COLORS.gold,
 };
 
-export default function HistoryTab() {
-  const [type, setType] = useState("login");
+const typeIcons = {
+  recharge: "💳", withdraw: "💸", reward: "🎁",
+};
+
+function formatTxn(txn) {
+  const isRecharge = txn.type === "recharge";
+  return {
+    id: txn.id,
+    activity: txn.description || (isRecharge ? "Coin Recharge" : "Withdrawal"),
+    amount: isRecharge ? `+${(txn.coins || 0).toLocaleString()} 🪙` : `-${(txn.coins || 0).toLocaleString()} 🪙`,
+    status: txn.status || "pending",
+    date: txn.created_date ? new Date(txn.created_date).toLocaleString() : "—",
+    icon: typeIcons[txn.type] || "📋",
+    amount_usd: txn.amount_usd || 0,
+  };
+}
+
+export default function HistoryTab({ transactions = [] }) {
   const [filter, setFilter] = useState("today");
   const [detail, setDetail] = useState(null);
   const { toast } = useToast();
 
+  // Filter transactions by date
+  const now = new Date();
+  let filtered = transactions;
+  if (filter === "today") {
+    const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+    filtered = transactions.filter((t) => new Date(t.created_date) >= todayStart);
+  } else if (filter === "7days") {
+    const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    filtered = transactions.filter((t) => new Date(t.created_date) >= weekStart);
+  } else if (filter === "30days") {
+    const monthStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    filtered = transactions.filter((t) => new Date(t.created_date) >= monthStart);
+  }
+
+  const records = filtered.map(formatTxn);
+
   const handleExport = () => {
-    toast({ title: "📄 Report Exported!", description: `${historyTypes.find(t => t.key === type)?.label} history PDF generated.` });
+    toast({ title: "📄 Report Exported!", description: `${records.length} records exported.` });
   };
 
   return (
     <div>
-      {/* History type tabs */}
-      <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide">
-        {historyTypes.map((t) => (
-          <button key={t.key} onClick={() => setType(t.key)}
-            className={`py-2 px-3.5 rounded-xl text-xs font-bold whitespace-nowrap active:scale-95 transition flex items-center gap-1.5 ${type === t.key ? "text-white" : ""}`}
-            style={type === t.key ? { background: COLORS.primary } : { background: COLORS.cardBg, color: COLORS.muted, border: "1px solid #EEF0F4" }}>
-            <span>{t.icon}</span> {t.label}
-          </button>
-        ))}
-      </div>
-
       {/* Filter + Export */}
       <div className="flex items-center justify-between mb-3 gap-2">
         <div className="flex gap-1.5 overflow-x-auto scrollbar-hide flex-1">
@@ -49,22 +70,30 @@ export default function HistoryTab() {
       </div>
 
       {/* Records */}
-      <div className="space-y-2.5">
-        {historyRecords[type].map((r) => (
-          <button key={r.id} onClick={() => setDetail(r)} className="w-full text-left rounded-2xl p-3 flex items-center gap-3 active:scale-[0.98] transition"
-            style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ background: COLORS.white }}>{r.icon}</div>
-            <div className="flex-1 min-w-0">
-              <h4 className="text-xs font-bold truncate" style={{ color: COLORS.navy }}>{r.activity}</h4>
-              <p className="text-[9px]" style={{ color: COLORS.muted }}>{r.date}</p>
-            </div>
-            <div className="text-right flex-shrink-0">
-              <p className="text-xs font-bold" style={{ color: COLORS.navy }}>{r.amount}</p>
-              <span className="text-[9px] font-bold" style={{ color: statusColors[r.status] || COLORS.muted }}>{r.status}</span>
-            </div>
-          </button>
-        ))}
-      </div>
+      {records.length === 0 ? (
+        <div className="rounded-2xl p-8 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <span className="text-3xl block mb-2">📋</span>
+          <p className="text-xs font-bold" style={{ color: COLORS.navy }}>No History Yet</p>
+          <p className="text-[10px] mt-1" style={{ color: COLORS.muted }}>Your transaction history will appear here</p>
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {records.map((r) => (
+            <button key={r.id} onClick={() => setDetail(r)} className="w-full text-left rounded-2xl p-3 flex items-center gap-3 active:scale-[0.98] transition"
+              style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ background: COLORS.white }}>{r.icon}</div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-xs font-bold truncate" style={{ color: COLORS.navy }}>{r.activity}</h4>
+                <p className="text-[9px]" style={{ color: COLORS.muted }}>{r.date}</p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="text-xs font-bold" style={{ color: COLORS.navy }}>{r.amount}</p>
+                <span className="text-[9px] font-bold capitalize" style={{ color: statusColors[r.status] || COLORS.muted }}>{r.status}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
 
       {detail && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
@@ -93,9 +122,15 @@ export default function HistoryTab() {
                   <span className="text-[11px]" style={{ color: COLORS.muted }}>Amount</span>
                   <span className="text-[11px] font-bold" style={{ color: COLORS.navy }}>{detail.amount}</span>
                 </div>
+                {detail.amount_usd > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px]" style={{ color: COLORS.muted }}>USD</span>
+                    <span className="text-[11px] font-bold" style={{ color: COLORS.navy }}>${detail.amount_usd}</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span className="text-[11px]" style={{ color: COLORS.muted }}>Status</span>
-                  <span className="text-[11px] font-bold" style={{ color: statusColors[detail.status] || COLORS.muted }}>{detail.status}</span>
+                  <span className="text-[11px] font-bold capitalize" style={{ color: statusColors[detail.status] || COLORS.muted }}>{detail.status}</span>
                 </div>
               </div>
             </div>

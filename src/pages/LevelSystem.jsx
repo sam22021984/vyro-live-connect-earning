@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, X, Check, Coins, TrendingUp, BookOpen, ChevronRight } from "lucide-react";
-import { levelSystems } from "@/components/levels/levelData";
+import { levelSystems as staticLevelSystems } from "@/components/levels/levelData";
+import { base44 } from "@/api/base44Client";
 import UserLevelDashboard from "@/components/levels/UserLevelDashboard";
 import StreamingLevelDashboard from "@/components/levels/StreamingLevelDashboard";
 import HostLevelDashboard from "@/components/levels/HostLevelDashboard";
@@ -11,6 +12,43 @@ export default function LevelSystem() {
   const navigate = useNavigate();
   const [activeLevel, setActiveLevel] = useState(null);
   const [activeView, setActiveView] = useState("overview");
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const me = await base44.auth.me();
+        let p = await base44.entities.UserProfile.filter({ user_id: me.id });
+        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        if (p.length > 0) setProfile(p[0]);
+      } catch (e) {}
+    })();
+  }, []);
+
+  // Merge static config with real profile data
+  const levelSystems = staticLevelSystems.map((sys) => {
+    if (sys.id === "user") {
+      const xp = profile?.user_xp || 0;
+      const xpMax = profile?.user_xp_max || 10000;
+      return { ...sys, level: profile?.user_level || 1, progress: xpMax > 0 ? Math.round((xp / xpMax) * 100) : 0, remainingXp: Math.max(xpMax - xp, 0), nextLevel: (profile?.user_level || 1) + 1 };
+    }
+    if (sys.id === "host") {
+      const xp = profile?.host_xp || 0;
+      const xpMax = profile?.host_xp_max || 10000;
+      return { ...sys, level: profile?.host_level || 1, progress: xpMax > 0 ? Math.round((xp / xpMax) * 100) : 0, remainingXp: Math.max(xpMax - xp, 0), nextLevel: (profile?.host_level || 1) + 1 };
+    }
+    if (sys.id === "gifting") {
+      const xp = profile?.gifting_xp || 0;
+      const xpMax = profile?.gifting_xp_max || 10000;
+      return { ...sys, level: profile?.gifting_level || 1, progress: xpMax > 0 ? Math.round((xp / xpMax) * 100) : 0, remainingXp: Math.max(xpMax - xp, 0), nextLevel: (profile?.gifting_level || 1) + 1 };
+    }
+    if (sys.id === "streaming") {
+      const xp = profile?.streaming_xp || 0;
+      const xpMax = profile?.streaming_xp_max || 10000;
+      return { ...sys, level: profile?.streaming_level || 1, progress: xpMax > 0 ? Math.round((xp / xpMax) * 100) : 0, remainingXp: Math.max(xpMax - xp, 0), nextLevel: (profile?.streaming_level || 1) + 1 };
+    }
+    return sys;
+  });
 
   const formatNum = (n) => n.toLocaleString();
 

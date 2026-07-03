@@ -1,9 +1,29 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Zap, Coins, Crown, Eye, Gift } from "lucide-react";
-import { currentStreamUser, streamingTiers, streamingConfig } from "@/components/levels/streaming/streamingData";
+import { streamingTiers, streamingConfig } from "@/components/levels/streaming/streamingData";
+import { base44 } from "@/api/base44Client";
 
 export default function StreamCurrentLevelCard() {
-  const u = currentStreamUser;
+  const [profile, setProfile] = useState(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const me = await base44.auth.me();
+        let p = await base44.entities.UserProfile.filter({ user_id: me.id });
+        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        if (p.length > 0) setProfile(p[0]);
+      } catch (e) {}
+    })();
+  }, []);
+  const u = {
+    level: profile?.streaming_level || 1,
+    username: profile?.username || "User",
+    xp: profile?.streaming_xp || 0,
+    xpMax: profile?.streaming_xp_max || 10000,
+    progress: profile?.streaming_xp_max > 0 ? Math.round(((profile?.streaming_xp || 0) / profile?.streaming_xp_max) * 100) : 0,
+    totalStreamCoins: (profile?.coins || 0).toLocaleString(),
+    popularityRank: "—",
+  };
   const c = streamingConfig;
   const formatNum = (n) => n.toLocaleString();
   const currentTier = streamingTiers.find((t) => { const parts = t.levels.replace("LV","").split("–"); const min = parseInt(parts[0]); const max = parseInt(parts[parts.length-1]); return u.level >= min && u.level <= max; }) || streamingTiers[2];

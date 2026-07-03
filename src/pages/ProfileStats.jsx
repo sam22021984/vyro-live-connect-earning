@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { COLORS, profileStats, achievementStats } from "@/components/profile-stats/profileStatsData";
+import { COLORS } from "@/components/profile-stats/profileStatsData";
+import { useProfileStats } from "@/hooks/useProfileStats";
 import BadgeTab from "@/components/profile-stats/BadgeTab";
 import MedalTab from "@/components/profile-stats/MedalTab";
 import LevelXPTab from "@/components/profile-stats/LevelXPTab";
@@ -19,6 +20,35 @@ const tabs = [
 export default function ProfileStats() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("badges");
+  const { profile, user, badges, achievements, transactions, leaderboard, loading } = useProfileStats();
+
+  const profileStats = [
+    { label: "Followers", value: profile?.followers || 0, icon: "👥", color: "#3B82F6" },
+    { label: "Following", value: profile?.following || 0, icon: "➡️", color: "#10B981" },
+    { label: "Friends", value: profile?.friends || 0, icon: "🤝", color: "#8B5CF6" },
+    { label: "Visitors", value: profile?.visitors || 0, icon: "👀", color: "#EC4899" },
+    { label: "Gifts Received", value: profile?.gifts_received || 0, icon: "🎁", color: "#F59E0B" },
+    { label: "Gifts Sent", value: profile?.gifts_sent || 0, icon: "💝", color: "#EF4444" },
+    { label: "Coins", value: profile?.coins || 0, icon: "💰", color: "#FFC83D" },
+    { label: "Total XP", value: profile?.total_xp || 0, icon: "⚡", color: "#6366F1" },
+  ];
+
+  const achievementStats = [
+    { label: "Achievements", value: achievements.length, icon: "🏆", color: "#FFC83D" },
+    { label: "Badges", value: badges.length, icon: "🏅", color: "#3B82F6" },
+    { label: "User Level", value: profile?.user_level || 1, icon: "📈", color: "#8B5CF6" },
+    { label: "Host Level", value: profile?.host_level || 1, icon: "🎤", color: "#EF4444" },
+    { label: "Gifting Level", value: profile?.gifting_level || 1, icon: "💝", color: "#F59E0B" },
+    { label: "Streaming Lv", value: profile?.streaming_level || 1, icon: "📺", color: "#06B6D4" },
+  ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: COLORS.white }}>
+        <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ background: COLORS.white }}>
@@ -85,11 +115,11 @@ export default function ProfileStats() {
 
         {/* Content */}
         <div className="p-4">
-          {activeTab === "badges" && <BadgeTab />}
+          {activeTab === "badges" && <BadgeTab badges={badges} />}
           {activeTab === "medals" && <MedalTab />}
-          {activeTab === "level" && <LevelXPTab />}
-          {activeTab === "history" && <HistoryTab />}
-          {activeTab === "leaderboard" && <LeaderboardTab />}
+          {activeTab === "level" && <LevelXPTab profile={profile} />}
+          {activeTab === "history" && <HistoryTab transactions={transactions} />}
+          {activeTab === "leaderboard" && <LeaderboardTab leaderboard={leaderboard} currentUserId={user?.id} />}
         </div>
       </div>
     </div>

@@ -2,17 +2,17 @@ import React from "react";
 import { Globe, MapPin, Calendar, Sparkles, User, PenTool } from "lucide-react";
 
 export default function AboutMe({ profile }) {
-  const bio = profile?.bio || "Live music, PK battles, and real connections. Join my room for an unforgettable experience! 🎵✨";
+  const bio = profile?.bio || "No bio added yet. Edit your profile to add a bio.";
 
   const details = [
-    { icon: Globe, label: "Language", value: profile?.language || "🇵🇰 Urdu • 🇬🇧 English" },
-    { icon: MapPin, label: "Country", value: `🇵🇰 ${profile?.country || "Pakistan"}` },
-    { icon: Calendar, label: "Birthday", value: profile?.birthday || "April 15" },
-    { icon: Sparkles, label: "Zodiac", value: profile?.zodiac || "Aries" },
-    { icon: User, label: "Gender", value: `♂ ${profile?.gender || "Male"}` },
+    { icon: Globe, label: "Language", value: profile?.language || "Not set" },
+    { icon: MapPin, label: "Country", value: profile?.country || "Not set" },
+    { icon: Calendar, label: "Birthday", value: profile?.birthday || "Not set" },
+    { icon: Sparkles, label: "Zodiac", value: profile?.zodiac || "Not set" },
+    { icon: User, label: "Gender", value: profile?.gender || "Not set" },
   ];
 
-  const signature = profile?.signature || '"Music is the language of the soul 🎵"';
+  const signature = profile?.signature || "No signature set";
 
   return (
     <div className="px-4 mb-4">

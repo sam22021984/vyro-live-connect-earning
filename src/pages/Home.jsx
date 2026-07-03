@@ -19,48 +19,59 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
+  const [fans, setFans] = useState([]);
+  const [badges, setBadges] = useState([]);
+  const [achievements, setAchievements] = useState([]);
+
   useEffect(() => {
     const load = async () => {
       try {
         const me = await base44.auth.me();
         setUser(me);
-        const profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        // Look up profile by user_id first, then by created_by_id
+        let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
+        if (profiles.length === 0) {
+          profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        }
+        let currentProfile;
         if (profiles.length > 0) {
-          setProfile(profiles[0]);
+          currentProfile = profiles[0];
         } else {
-          // Create default profile
-          const newProfile = await base44.entities.UserProfile.create({
-            username: me.full_name || "VYRO User",
-            title: "APPLICATION OWNER",
-            country: "Pakistan",
-            language: "Urdu • English",
-            birthday: "April 15",
-            zodiac: "Aries",
-            gender: "Male",
-            bio: "Live music, PK battles, and real connections. Join my room for an unforgettable experience! 🎵✨",
-            signature: "Music is the language of the soul 🎵",
-            user_id: "VY-" + String(Math.floor(Math.random() * 999999)).padStart(6, "0"),
-            is_app_owner: true,
-            is_verified: true,
-            is_official: true,
-            is_vip: true,
-            is_agency: true,
-            role: "owner",
-            vip_tier: "Elite",
-            vip_expiry: "Apr 2025",
+          // Create a generic user profile — NOT an owner profile
+          currentProfile = await base44.entities.UserProfile.create({
+            username: me.full_name || me.email?.split("@")[0] || "VYRO User",
+            title: "VYRO User",
+            user_id: me.id,
+            is_app_owner: false,
+            is_verified: false,
+            is_official: false,
+            is_vip: false,
+            is_agency: false,
+            role: "user",
+            verification_status: "unverified",
+            safety_status: "high",
             user_level: 1,
             host_level: 1,
             gifting_level: 1,
             streaming_level: 1,
-            trust_score: 94,
-            reputation_rating: 4.8,
-            profile_completion: 88,
-            verification_status: "verified",
-            safety_status: "high",
-            activity_score: 76,
+            trust_score: 50,
+            reputation_rating: 0,
+            profile_completion: 20,
+            activity_score: 0,
+            coins: 0,
           });
-          setProfile(newProfile);
         }
+        setProfile(currentProfile);
+
+        // Load real data from backend in parallel
+        const [fanRecords, badgeRecords, achRecords] = await Promise.all([
+          base44.entities.TopFan.filter({ profile_id: me.id }, "-score", 5).catch(() => []),
+          base44.entities.Badge.list().catch(() => []),
+          base44.entities.Achievement.filter({ created_by_id: me.id }).catch(() => []),
+        ]);
+        setFans(fanRecords);
+        setBadges(badgeRecords);
+        setAchievements(achRecords);
       } catch (e) {
         console.error(e);
       } finally {
@@ -109,12 +120,12 @@ export default function Home() {
 
         {activeTab === "profile" && (
           <div className="animate-fadeIn">
-            <VipCard profile={profile} />
+            {profile?.is_vip && <VipCard profile={profile} />}
             <LevelCards profile={profile} />
-            <TopFansSection />
-            <SpecialBadges />
+            <TopFansSection fans={fans} />
+            <SpecialBadges badges={badges} />
             <TrustReputation profile={profile} />
-            <AchievementsGrid />
+            <AchievementsGrid achievements={achievements} />
             <SocialSection profile={profile} />
             <AboutMe profile={profile} />
             <MoreServices />

@@ -16,10 +16,10 @@ export default function ProfileHeader({ profile }) {
   ].filter(Boolean);
 
   const tagBadges = [
-    { label: "Online", color: "bg-green-500" },
-    { label: "Verified", color: "bg-blue-500" },
-    { label: "ID: VYRO", color: "bg-purple-500" },
-  ];
+    profile?.is_online && { label: "Online", color: "bg-green-500" },
+    profile?.is_verified && { label: "Verified", color: "bg-blue-500" },
+    { label: `ID: ${profile?.user_id || "VY-000000"}`, color: "bg-purple-500" },
+  ].filter(Boolean);
 
   return (
     <div className="relative overflow-hidden rounded-b-[30px]">

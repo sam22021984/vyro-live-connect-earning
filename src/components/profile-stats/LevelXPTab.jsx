@@ -1,17 +1,21 @@
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { X, TrendingUp, Gift, Crown, History } from "lucide-react";
-import { levelData, levelBenefits, xpHistory, COLORS } from "./profileStatsData";
+import { Gift, Crown, History } from "lucide-react";
+import { levelBenefits, COLORS } from "./profileStatsData";
 
-export default function LevelXPTab() {
+export default function LevelXPTab({ profile }) {
   const [view, setView] = useState("overview");
   const { toast } = useToast();
-  const pct = Math.round((levelData.current_xp / levelData.required_xp) * 100);
+
+  const currentLevel = profile?.user_level || 1;
+  const currentXp = profile?.user_xp || 0;
+  const requiredXp = profile?.user_xp_max || 10000;
+  const pct = requiredXp > 0 ? Math.round((currentXp / requiredXp) * 100) : 0;
 
   const xpStats = [
-    { label: "XP Today", value: levelData.xp_today, icon: "📅", color: COLORS.primary },
-    { label: "XP This Week", value: levelData.xp_week, icon: "📆", color: COLORS.success },
-    { label: "XP This Month", value: levelData.xp_month, icon: "🗓️", color: COLORS.gold },
+    { label: "Total XP", value: profile?.total_xp || 0, icon: "⚡", color: COLORS.primary },
+    { label: "Host XP", value: profile?.host_xp || 0, icon: "🎤", color: COLORS.success },
+    { label: "Gifting XP", value: profile?.gifting_xp || 0, icon: "💝", color: COLORS.gold },
   ];
 
   return (
@@ -24,8 +28,6 @@ export default function LevelXPTab() {
           style={view === "rewards" ? { background: COLORS.primary } : { background: COLORS.cardBg, color: COLORS.muted, border: "1px solid #EEF0F4" }}><Gift size={12} /> Rewards</button>
         <button onClick={() => setView("benefits")} className={`py-2 px-4 rounded-xl text-xs font-bold whitespace-nowrap active:scale-95 transition flex items-center gap-1.5 ${view === "benefits" ? "text-white" : ""}`}
           style={view === "benefits" ? { background: COLORS.primary } : { background: COLORS.cardBg, color: COLORS.muted, border: "1px solid #EEF0F4" }}><Crown size={12} /> Benefits</button>
-        <button onClick={() => setView("history")} className={`py-2 px-4 rounded-xl text-xs font-bold whitespace-nowrap active:scale-95 transition flex items-center gap-1.5 ${view === "history" ? "text-white" : ""}`}
-          style={view === "history" ? { background: COLORS.primary } : { background: COLORS.cardBg, color: COLORS.muted, border: "1px solid #EEF0F4" }}><History size={12} /> XP History</button>
       </div>
 
       {view === "overview" && (
@@ -35,20 +37,20 @@ export default function LevelXPTab() {
             <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="text-xs text-white/70">Current Level</p>
-                <p className="text-3xl font-bold">LV.{levelData.current_level}</p>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block" style={{ background: "rgba(255,200,61,0.25)", color: COLORS.gold }}>{levelData.rank} Rank</span>
+                <p className="text-3xl font-bold">LV.{currentLevel}</p>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block" style={{ background: "rgba(255,200,61,0.25)", color: COLORS.gold }}>{profile?.vip_tier || "User"} Rank</span>
               </div>
               <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl" style={{ background: "rgba(255,255,255,0.15)", border: "2px solid rgba(255,200,61,0.4)" }}>📈</div>
             </div>
             <div className="mb-2">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[10px] text-white/70">XP Progress</span>
-                <span className="text-[10px] font-bold">{levelData.current_xp.toLocaleString()} / {levelData.required_xp.toLocaleString()}</span>
+                <span className="text-[10px] font-bold">{currentXp.toLocaleString()} / {requiredXp.toLocaleString()}</span>
               </div>
               <div className="w-full h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.2)" }}>
                 <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: `linear-gradient(to right, ${COLORS.gold}, #FFD966)` }} />
               </div>
-              <p className="text-[10px] text-white/70 mt-1.5 text-center">{(levelData.required_xp - levelData.current_xp).toLocaleString()} XP to LV.{levelData.current_level + 1}</p>
+              <p className="text-[10px] text-white/70 mt-1.5 text-center">{(requiredXp - currentXp).toLocaleString()} XP to LV.{currentLevel + 1}</p>
             </div>
           </div>
 
@@ -62,28 +64,33 @@ export default function LevelXPTab() {
               </div>
             ))}
           </div>
-        </>
-      )}
 
-      {view === "rewards" && (
-        <div className="space-y-2.5">
-          <div className="rounded-2xl p-3 mb-2" style={{ background: `${COLORS.gold}10`, border: `1px solid ${COLORS.gold}30` }}>
-            <div className="flex items-center gap-2">
-              <Gift size={16} style={{ color: COLORS.gold }} />
-              <p className="text-xs font-bold" style={{ color: COLORS.gold }}>Next Level Rewards (LV.{levelData.current_level + 1})</p>
+          {/* All levels overview */}
+          <div className="rounded-2xl p-3 mb-3" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+            <h4 className="text-xs font-bold mb-2.5" style={{ color: COLORS.navy }}>All Levels</h4>
+            <div className="space-y-2">
+              {[
+                { label: "User Level", level: profile?.user_level || 1, xp: profile?.user_xp || 0, max: profile?.user_xp_max || 10000, icon: "👤", color: COLORS.primary },
+                { label: "Host Level", level: profile?.host_level || 1, xp: profile?.host_xp || 0, max: profile?.host_xp_max || 10000, icon: "🎤", color: COLORS.danger },
+                { label: "Gifting Level", level: profile?.gifting_level || 1, xp: profile?.gifting_xp || 0, max: profile?.gifting_xp_max || 10000, icon: "💝", color: COLORS.gold },
+                { label: "Streaming Level", level: profile?.streaming_level || 1, xp: profile?.streaming_xp || 0, max: profile?.streaming_xp_max || 10000, icon: "📺", color: COLORS.success },
+              ].map((lv) => {
+                const lvPct = lv.max > 0 ? Math.min((lv.xp / lv.max) * 100, 100) : 0;
+                return (
+                  <div key={lv.label}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[11px] font-semibold" style={{ color: COLORS.navy }}>{lv.icon} {lv.label}</span>
+                      <span className="text-[10px] font-bold" style={{ color: lv.color }}>Lv.{lv.level}</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "#E5E7EB" }}>
+                      <div className="h-full rounded-full" style={{ width: `${lvPct}%`, background: lv.color }} />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-          {levelData.next_level_rewards.map((r, i) => (
-            <div key={i} className="rounded-2xl p-3 flex items-center gap-3" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl" style={{ background: `${COLORS.gold}15`, border: `1px solid ${COLORS.gold}30` }}>{r.icon}</div>
-              <div className="flex-1">
-                <h4 className="text-sm font-bold" style={{ color: COLORS.navy }}>{r.type}</h4>
-                <p className="text-[10px]" style={{ color: COLORS.muted }}>Reward Amount</p>
-              </div>
-              <span className="text-sm font-bold" style={{ color: COLORS.gold }}>{r.amount}</span>
-            </div>
-          ))}
-        </div>
+        </>
       )}
 
       {view === "benefits" && (
@@ -98,18 +105,11 @@ export default function LevelXPTab() {
         </div>
       )}
 
-      {view === "history" && (
-        <div className="space-y-2.5">
-          {xpHistory.map((h) => (
-            <div key={h.id} className="rounded-2xl p-3 flex items-center gap-3" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ background: `${COLORS.primary}15` }}>{h.icon}</div>
-              <div className="flex-1">
-                <h4 className="text-xs font-bold" style={{ color: COLORS.navy }}>{h.activity}</h4>
-                <p className="text-[9px]" style={{ color: COLORS.muted }}>{h.date}</p>
-              </div>
-              <span className="text-sm font-bold" style={{ color: COLORS.success }}>+{h.amount} XP</span>
-            </div>
-          ))}
+      {view === "rewards" && (
+        <div className="rounded-2xl p-4 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <Gift size={32} style={{ color: COLORS.gold }} className="mx-auto mb-2" />
+          <p className="text-xs font-bold" style={{ color: COLORS.navy }}>Level up to unlock rewards</p>
+          <p className="text-[10px] mt-1" style={{ color: COLORS.muted }}>Reach LV.{currentLevel + 1} to earn coins, badges, and exclusive frames</p>
         </div>
       )}
     </div>

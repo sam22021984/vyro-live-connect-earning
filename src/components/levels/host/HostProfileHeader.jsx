@@ -1,9 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { CheckCircle, Crown, Share2, Eye, Mic } from "lucide-react";
-import { currentHostUser, hostConfig } from "@/components/levels/host/hostData";
+import { hostConfig } from "@/components/levels/host/hostData";
+import { base44 } from "@/api/base44Client";
 
 export default function HostProfileHeader() {
-  const u = currentHostUser;
+  const [profile, setProfile] = useState(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const me = await base44.auth.me();
+        let p = await base44.entities.UserProfile.filter({ user_id: me.id });
+        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        if (p.length > 0) setProfile(p[0]);
+      } catch (e) {}
+    })();
+  }, []);
+  const u = {
+    level: profile?.host_level || 1,
+    username: profile?.username || "User",
+    hostId: profile?.user_id || "—",
+    tierName: profile?.vip_tier || "User",
+    badge: "—",
+    crown: "—",
+    agencyStatus: profile?.is_agency ? "Agency Member" : "—",
+    hostStatus: profile?.is_host ? "Active Host" : "Not a Host",
+    totalHostCoins: (profile?.coins || 0).toLocaleString(),
+    monthlyTarget: "—",
+    xp: profile?.host_xp || 0,
+    xpMax: profile?.host_xp_max || 10000,
+    progress: profile?.host_xp_max > 0 ? Math.round(((profile?.host_xp || 0) / profile?.host_xp_max) * 100) : 0,
+    ranking: "—",
+    avatar: profile?.avatar_url || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200&h=200&fit=crop",
+  };
   const c = hostConfig;
   return (
     <div className="relative rounded-3xl overflow-hidden p-5" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #F5F7FA 100%)", border: "1px solid rgba(255,255,255,0.9)", boxShadow: `0 16px 48px ${c.glow}, inset 0 1px 0 rgba(255,255,255,0.95)` }}>

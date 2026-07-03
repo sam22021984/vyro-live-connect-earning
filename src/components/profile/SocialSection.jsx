@@ -3,11 +3,11 @@ import { Heart, MessageCircle, Share2, Bookmark, ThumbsUp } from "lucide-react";
 
 export default function SocialSection({ profile }) {
   const socials = [
-    { icon: Heart, label: "Likes", value: 0, color: "text-red-500", bg: "bg-red-50" },
-    { icon: MessageCircle, label: "Comments", value: 0, color: "text-blue-500", bg: "bg-blue-50" },
-    { icon: Share2, label: "Shares", value: 0, color: "text-green-500", bg: "bg-green-50" },
-    { icon: Bookmark, label: "Saved", value: 0, color: "text-purple-500", bg: "bg-purple-50" },
-    { icon: ThumbsUp, label: "Reactions", value: 0, color: "text-yellow-500", bg: "bg-yellow-50" },
+    { icon: Heart, label: "Likes", value: profile?.gifts_received || 0, color: "text-red-500", bg: "bg-red-50" },
+    { icon: MessageCircle, label: "Comments", value: profile?.friends || 0, color: "text-blue-500", bg: "bg-blue-50" },
+    { icon: Share2, label: "Shares", value: profile?.following || 0, color: "text-green-500", bg: "bg-green-50" },
+    { icon: Bookmark, label: "Saved", value: profile?.followers || 0, color: "text-purple-500", bg: "bg-purple-50" },
+    { icon: ThumbsUp, label: "Reactions", value: profile?.activity_score || 0, color: "text-yellow-500", bg: "bg-yellow-50" },
   ];
 
   return (

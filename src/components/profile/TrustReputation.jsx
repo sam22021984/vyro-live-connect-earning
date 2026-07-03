@@ -5,7 +5,7 @@ export default function TrustReputation({ profile }) {
   const items = [
     {
       label: "Trust Score",
-      value: profile?.trust_score || 94,
+      value: profile?.trust_score || 0,
       max: 100,
       color: "bg-green-500",
       icon: ShieldCheck,
@@ -14,7 +14,7 @@ export default function TrustReputation({ profile }) {
     },
     {
       label: "Reputation",
-      value: profile?.reputation_rating || 4.8,
+      value: profile?.reputation_rating || 0,
       max: 5,
       displayStars: true,
       icon: Star,
@@ -22,7 +22,7 @@ export default function TrustReputation({ profile }) {
     },
     {
       label: "Profile Completion",
-      value: profile?.profile_completion || 88,
+      value: profile?.profile_completion || 0,
       max: 100,
       color: "bg-blue-500",
       icon: CheckCircle,
@@ -31,7 +31,7 @@ export default function TrustReputation({ profile }) {
     },
     {
       label: "Verification",
-      status: profile?.verification_status || "verified",
+      status: profile?.verification_status || "unverified",
       icon: Lock,
       iconColor: "text-purple-500",
     },
@@ -43,7 +43,7 @@ export default function TrustReputation({ profile }) {
     },
     {
       label: "Activity",
-      value: profile?.activity_score || 76,
+      value: profile?.activity_score || 0,
       max: 100,
       color: "bg-orange-500",
       icon: Activity,
