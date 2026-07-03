@@ -86,6 +86,7 @@ import MobileRegistration from '@/pages/MobileRegistration';
 import CreatePassword from '@/pages/CreatePassword';
 import ProfileSetup from '@/pages/ProfileSetup';
 import WelcomeAnimation from '@/pages/WelcomeAnimation';
+import ProfileDashboard from '@/pages/ProfileDashboard';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -124,6 +125,7 @@ const AuthenticatedApp = () => {
       <Route path="/create-password" element={<CreatePassword />} />
       <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="/welcome-animation" element={<WelcomeAnimation />} />
+      <Route path="/profile-dashboard" element={<ProfileDashboard />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/splash" replace />} />}>
         <Route path="/" element={<Home />} />
         <Route path="/settings" element={<Settings />} />

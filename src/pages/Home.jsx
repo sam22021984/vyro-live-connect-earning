@@ -1,132 +1,155 @@
-import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
-import ProfileHeader from "@/components/profile/ProfileHeader";
-import ProfileTabs from "@/components/profile/ProfileTabs";
-import StatsGrid from "@/components/profile/StatsGrid";
-import LevelCards from "@/components/profile/LevelCards";
-import VipCard from "@/components/profile/VipCard";
-import TopFansSection from "@/components/profile/TopFansSection";
-import SpecialBadges from "@/components/profile/SpecialBadges";
-import TrustReputation from "@/components/profile/TrustReputation";
-import AchievementsGrid from "@/components/profile/AchievementsGrid";
-import SocialSection from "@/components/profile/SocialSection";
-import AboutMe from "@/components/profile/AboutMe";
-import MoreServices from "@/components/profile/MoreServices";
+import React, { useState, useRef, useCallback } from "react";
+import { useHomeFeed } from "@/hooks/useHomeFeed";
+import HomeHeader from "@/components/home/HomeHeader";
+import HomeSearchOverlay from "@/components/home/HomeSearchOverlay";
+import HomeTabs from "@/components/home/HomeTabs";
+import PromoBanner from "@/components/home/PromoBanner";
+import LiveFeed from "@/components/home/LiveFeed";
+import { AudioRoomFeed, PartyRoomFeed } from "@/components/home/RoomFeeds";
+import { CreatorSuggestions, FriendSuggestions } from "@/components/home/PeopleSuggestions";
+import { TrendingHashtags, TrendingEvents } from "@/components/home/TrendingSection";
+import { ContinueWatching, RecentlyVisited } from "@/components/home/ContinueSection";
+import DailyRewardWidget from "@/components/home/DailyRewardWidget";
+import { HomeSkeleton, EmptyState, ErrorState } from "@/components/home/HomeStates";
 import WelcomeBonusPopup from "@/components/home/WelcomeBonusPopup";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("profile");
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const { liveRooms, partyRooms, creators, friendSuggestions, loading, error, refreshing, refresh } = useHomeFeed();
+  const [showSearch, setShowSearch] = useState(false);
+  const [activeTab, setActiveTab] = useState("Recommended");
+  const [country, setCountry] = useState("ALL");
+  const [pullDistance, setPullDistance] = useState(0);
+  const touchStartY = useRef(0);
+  const scrollRef = useRef(null);
 
-  const [fans, setFans] = useState([]);
-  const [badges, setBadges] = useState([]);
-  const [achievements, setAchievements] = useState([]);
+  // Filter content based on active tab + country
+  const filterContent = useCallback((items, countryField = "country") => {
+    let filtered = items;
+    if (country !== "ALL") {
+      filtered = filtered.filter((item) => {
+        const itemCountry = item[countryField] || item.country_name || "";
+        return !itemCountry || itemCountry.toLowerCase().includes(country.toLowerCase());
+      });
+    }
+    return filtered;
+  }, [country]);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const me = await base44.auth.me();
-        setUser(me);
-        // Use onboarding function — ensures global_id exists, creates profile if needed
-        const res = await base44.functions.invoke("userOnboarding", {
-          action: "initProfile",
-          role: "user",
-          username: me.full_name || me.email?.split("@")[0] || "VYRO User",
-        });
-        setProfile(res.data.profile);
+  const getSortedRooms = () => {
+    let rooms = [...liveRooms];
+    switch (activeTab) {
+      case "Trending":
+      case "Popular":
+        rooms.sort((a, b) => (b.current_viewers || 0) - (a.current_viewers || 0));
+        break;
+      case "New":
+        rooms.sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0));
+        break;
+      case "Video Live":
+        return filterContent(rooms);
+      default:
+        break;
+    }
+    return filterContent(rooms);
+  };
 
-        // Load real data from backend in parallel
-        const [fanRecords, badgeRecords, achRecords] = await Promise.all([
-          base44.entities.TopFan.filter({ profile_id: me.id }, "-score", 5).catch(() => []),
-          base44.entities.Badge.list().catch(() => []),
-          base44.entities.Achievement.filter({ created_by_id: me.id }).catch(() => []),
-        ]);
-        setFans(fanRecords);
-        setBadges(badgeRecords);
-        setAchievements(achRecords);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
+  const getSortedPartyRooms = () => {
+    if (activeTab === "Audio Live") {
+      return filterContent(partyRooms.filter((r) => r.category?.toLowerCase?.().includes("audio") || r.category?.toLowerCase?.().includes("music")));
+    }
+    if (activeTab === "Party Rooms") {
+      return filterContent(partyRooms.filter((r) => !r.category?.toLowerCase?.().includes("audio") && !r.category?.toLowerCase?.().includes("music")));
+    }
+    return filterContent(partyRooms);
+  };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F8F9FC] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-500 rounded-full animate-spin" />
-          <p className="text-sm text-gray-400 font-medium">Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
+  // Pull to refresh
+  const handleTouchStart = (e) => {
+    if (window.scrollY === 0) touchStartY.current = e.touches[0].clientY;
+  };
+  const handleTouchMove = (e) => {
+    if (touchStartY.current > 0) {
+      const diff = e.touches[0].clientY - touchStartY.current;
+      if (diff > 0 && window.scrollY === 0) setPullDistance(Math.min(diff * 0.5, 80));
+    }
+  };
+  const handleTouchEnd = () => {
+    if (pullDistance > 60) refresh();
+    setPullDistance(0);
+    touchStartY.current = 0;
+  };
 
-  return (
+  if (loading) return <HomeSkeleton />;
+  if (error) return (
     <div className="min-h-screen bg-[#F8F9FC]">
       <div className="max-w-md mx-auto">
-        <ProfileHeader profile={profile} />
-        
-        {/* Quick Stats Row */}
-        <div className="px-4 -mt-1 relative z-10">
-          <div className="bg-white rounded-[18px] grid grid-cols-4 divide-x divide-gray-100 shadow-sm border border-gray-50">
-            {[
-              { label: "Followers", value: profile?.followers || 0 },
-              { label: "Following", value: profile?.following || 0 },
-              { label: "Friends", value: profile?.friends || 0 },
-              { label: "Visitors", value: profile?.visitors || 0 },
-            ].map((s, i) => (
-              <div key={i} className="flex flex-col items-center py-3">
-                <span className="text-base font-bold text-gray-800">{s.value}</span>
-                <span className="text-[10px] text-gray-400 font-medium">{s.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative z-10">
-          <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
-        </div>
-
-        {activeTab === "profile" && (
-          <div className="animate-fadeIn">
-            {profile?.is_vip && <VipCard profile={profile} />}
-            <LevelCards profile={profile} />
-            <TopFansSection fans={fans} />
-            <SpecialBadges badges={badges} />
-            <TrustReputation profile={profile} />
-            <AchievementsGrid achievements={achievements} />
-            <SocialSection profile={profile} />
-            <AboutMe profile={profile} />
-            <MoreServices />
-          </div>
-        )}
-
-        {activeTab === "stats" && (
-          <div className="animate-fadeIn">
-            <StatsGrid profile={profile} />
-            <LevelCards profile={profile} />
-            <TrustReputation profile={profile} />
-          </div>
-        )}
-
-        {activeTab === "history" && (
-          <div className="animate-fadeIn px-4 mb-4">
-            <div className="bg-white rounded-[20px] p-8 shadow-sm border border-gray-50 flex flex-col items-center">
-              <span className="text-4xl mb-3">📜</span>
-              <h3 className="text-sm font-bold text-gray-700 mb-1">Activity History</h3>
-              <p className="text-xs text-gray-400 text-center">Your recent activities will appear here</p>
-            </div>
-          </div>
-        )}
-
-        {/* Bottom safe area */}
-        <div className="h-6" />
+        <HomeHeader country={country} onCountryChange={setCountry} onRefresh={refresh} refreshing={refreshing} onSearch={() => setShowSearch(true)} />
+        <ErrorState onRetry={refresh} />
       </div>
+    </div>
+  );
+
+  const sortedLive = getSortedRooms();
+  const sortedParty = getSortedPartyRooms();
+  const hasContent = sortedLive.length > 0 || sortedParty.length > 0 || creators.length > 0;
+
+  return (
+    <div
+      className="min-h-screen bg-[#F8F9FC]"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull to refresh indicator */}
+      {pullDistance > 0 && (
+        <div className="fixed top-0 left-0 right-0 flex justify-center z-50 pointer-events-none" style={{ height: pullDistance }}>
+          <div className="mt-2 w-7 h-7 border-2 border-purple-200 border-t-purple-500 rounded-full animate-spin" />
+        </div>
+      )}
+
+      <div className="max-w-md mx-auto pb-20" ref={scrollRef}>
+        <HomeHeader
+          country={country}
+          onCountryChange={setCountry}
+          onRefresh={refresh}
+          refreshing={refreshing}
+          onSearch={() => setShowSearch(true)}
+        />
+
+        <HomeTabs active={activeTab} onChange={setActiveTab} />
+
+        <PromoBanner />
+
+        <DailyRewardWidget />
+
+        {!hasContent ? (
+          <EmptyState onRefresh={refresh} />
+        ) : (
+          <>
+            <LiveFeed rooms={sortedLive} />
+
+            <AudioRoomFeed rooms={sortedParty} />
+
+            <PartyRoomFeed rooms={sortedParty} />
+
+            <CreatorSuggestions creators={filterContent(creators)} />
+
+            <TrendingHashtags />
+
+            <TrendingEvents />
+
+            <FriendSuggestions friends={filterContent(friendSuggestions)} />
+
+            <ContinueWatching />
+
+            <RecentlyVisited />
+          </>
+        )}
+
+        <div className="h-4" />
+      </div>
+
+      {showSearch && <HomeSearchOverlay onClose={() => setShowSearch(false)} />}
+
       <WelcomeBonusPopup />
     </div>
   );

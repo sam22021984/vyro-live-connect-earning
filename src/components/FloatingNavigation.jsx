@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Mic, ImagePlay, Video, MessageCircle, User } from "lucide-react";
+import { Mic, ImagePlay, Video, MessageCircle, User, Home } from "lucide-react";
 
 const HIDE_DELAY = 4000;
 const AUTH_PATHS = ["/login", "/register", "/forgot-password", "/reset-password"];
@@ -46,12 +46,13 @@ export default function FloatingNavigation() {
   };
 
   const sideButtons = [
+    { icon: Home, label: "Home", path: "/", color: "#8B5CF6" },
     { icon: Mic, label: "Party", path: "/party-dashboard", color: "#EF4444" },
     { icon: ImagePlay, label: "Community", path: "/community-dashboard", color: "#EC4899" },
   ];
   const rightButtons = [
     { icon: MessageCircle, label: "Messages", path: "/messages", color: "#3B82F6", badge: 3 },
-    { icon: User, label: "Me", path: "/", color: "#F59E0B" },
+    { icon: User, label: "Me", path: "/profile-dashboard", color: "#F59E0B" },
   ];
 
   const renderSideButton = (btn) => (
