@@ -125,4 +125,26 @@ export const SOCIAL_MODULES = [
     ],
     actions: ["Add Friend", "Accept", "Decline", "Cancel", "Remove", "Block", "Report", "Message", "Voice Call", "Video Call", "Invite to Party", "Invite to Live", "Send Gift", "Send Coins", "Share", "Pin Friend", "Mute", "Favorite"],
   },
+  {
+    id: "relationship",
+    title: "Relationship",
+    subtitle: "Find Your Special Someone",
+    description: "Send relationship requests, manage your connections, and find your special someone. One active relationship per user — be genuine and committed.",
+    icon: "Heart",
+    color: "#EC4899",
+    gradient: "linear-gradient(135deg, #EC4899, #A855F7)",
+    path: "/relationship-center",
+    stats: [
+      { label: "Sent", value: "3", color: "#EC4899" },
+      { label: "Received", value: "5", color: "#A855F7" },
+      { label: "Active", value: "1", color: "#27AE60" },
+      { label: "History", value: "12", color: "#F59E0B" },
+    ],
+    features: [
+      "Discover Users", "Send Request", "Accept Request", "Pending Requests",
+      "My Relationship", "Relationship History", "Safety Center", "Report User",
+      "Block User", "Community Standards", "Verified Profiles",
+    ],
+    actions: ["Open Relationship Center", "Discover", "Requests", "History", "Safety"],
+  },
 ];

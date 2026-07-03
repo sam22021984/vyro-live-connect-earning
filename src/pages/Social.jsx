@@ -84,7 +84,7 @@ export default function Social() {
             return (
               <button
                 key={mod.id}
-                onClick={() => setActiveModule(mod.id)}
+                onClick={() => mod.path ? navigate(mod.path) : setActiveModule(mod.id)}
                 className="w-full text-left rounded-2xl p-4 active:scale-[0.98] transition relative overflow-hidden"
                 style={{ background: WHITE, border: "1px solid #F0F1F5", boxShadow: "0 8px 24px rgba(0,0,0,0.06)" }}
               >
