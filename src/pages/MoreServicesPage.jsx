@@ -16,7 +16,7 @@ const services = [
   { name: "Finance", icon: "💰", gradient: "from-amber-400 to-yellow-500", path: "/finance" },
   { name: "Tasks & Rewards", icon: "🎁", gradient: "from-teal-400 to-green-500", path: "/tasks-rewards" },
   { name: "Social", icon: "🤝", gradient: "from-purple-400 to-violet-500", path: "/social" },
-  { name: "Official Coin Seller", icon: "🏦", gradient: "from-emerald-400 to-green-500", path: "/official-coin-seller-policy" },
+  { name: "VIP Membership", icon: "👑", gradient: "from-yellow-400 to-amber-500", path: "/vip-membership", highlight: true },
 ];
 
 export default function MoreServicesPage() {
