@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Shield, Circle, LayoutDashboard, Users, Coins, Store, Smartphone, Wallet, ArrowDownCircle, Building2, Mic, Gift, BarChart3, ShieldCheck, Crown, Server, UserCog } from "lucide-react";
+import { ArrowLeft, Shield, Circle, LayoutDashboard, Users, Coins, Store, Smartphone, Wallet, ArrowDownCircle, Building2, Mic, Gift, BarChart3, ShieldCheck, Crown, Server, UserCog, ClipboardList } from "lucide-react";
 import { SAM_MODULES } from "@/components/sam-dashboard/samData";
 import OverviewModule from "@/components/sam-dashboard/OverviewModule";
 import UserManagementModule from "@/components/sam-dashboard/UserManagementModule";
@@ -17,6 +17,7 @@ import SecurityModule from "@/components/sam-dashboard/SecurityModule";
 import AdminControlModule from "@/components/sam-dashboard/AdminControlModule";
 import SystemHealthModule from "@/components/sam-dashboard/SystemHealthModule";
 import SamProfileModule from "@/components/sam-dashboard/SamProfileModule";
+import OcsReportCenterModule from "@/components/sam-dashboard/OcsReportCenterModule";
 import ReportToSection from "@/components/shared/ReportToSection";
 
 const DARK_BG = "linear-gradient(160deg, #0A0F1E 0%, #131A2E 40%, #1A1240 100%)";
@@ -26,7 +27,7 @@ const GLASS = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(25
 
 const ICON_MAP = {
   LayoutDashboard, Users, Coins, Store, Smartphone, Wallet, ArrowDownCircle,
-  Building2, Mic, Gift, BarChart3, ShieldCheck, Crown, Server, UserCog,
+  Building2, Mic, Gift, BarChart3, ShieldCheck, Crown, Server, UserCog, ClipboardList,
 };
 
 function ModuleContent({ moduleId }) {
@@ -46,6 +47,7 @@ function ModuleContent({ moduleId }) {
     case "admin_control": return <AdminControlModule />;
     case "system_health": return <SystemHealthModule />;
     case "sam_profile": return <SamProfileModule />;
+    case "ocs_report_center": return <OcsReportCenterModule />;
     default: return null;
   }
 }

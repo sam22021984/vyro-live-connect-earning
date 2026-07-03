@@ -72,7 +72,6 @@ export default function OcsReportDashboard() {
               { id: "overview", label: "Overview", icon: "📊" },
               { id: "reports", label: "Reports", icon: "📋" },
               { id: "actions", label: "Actions", icon: "⚡" },
-              { id: "sam", label: "SAM Center", icon: "🛡️" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -326,57 +325,6 @@ export default function OcsReportDashboard() {
             </div>
           )}
 
-          {/* SAM CENTER */}
-          {activeView === "sam" && (
-            <div className="space-y-4 animate-fadeIn">
-              <div className="rounded-2xl p-4 text-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(255,215,0,0.12), rgba(34,211,238,0.08))", border: "1px solid rgba(255,215,0,0.2)" }}>
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10" style={{ background: `radial-gradient(circle, ${GOLD}, transparent 70%)`, transform: "translate(30%, -30%)" }} />
-                <div className="relative">
-                  <div className="text-3xl mb-1">🛡️</div>
-                  <h3 className="text-sm font-bold text-white">Super Admin Manager</h3>
-                  <p className="text-[10px]" style={{ color: TEAL }}>Report Center</p>
-                  <p className="text-[9px] text-white/40 mt-1">SAM Dashboard Additional Features</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2.5">
-                {OCS_REPORT.samCenter.map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleAction(s.label)}
-                    className="rounded-xl p-3 flex flex-col items-center gap-2 active:scale-95 transition"
-                    style={{ background: CARD_BG, border: "1px solid rgba(255,255,255,0.06)" }}
-                  >
-                    <span className="text-2xl">{s.icon}</span>
-                    <span className="text-[10px] font-semibold text-white/60 text-center leading-tight">{s.label}</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Approval History */}
-              <div className="rounded-2xl p-4" style={{ background: CARD_BG, border: "1px solid rgba(255,255,255,0.06)" }}>
-                <h3 className="text-xs font-bold text-white mb-3 flex items-center gap-1.5">
-                  <Clock size={12} style={{ color: GOLD }} /> Approval History (RPT-2847)
-                </h3>
-                <div className="space-y-2">
-                  {OCS_REPORT.approvalHistory.map((h, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0" style={{ background: i === OCS_REPORT.approvalHistory.length - 1 ? "#10B981" : `${GOLD}30` }}>
-                          {i === OCS_REPORT.approvalHistory.length - 1 ? <Check size={12} /> : i + 1}
-                        </div>
-                        {i < OCS_REPORT.approvalHistory.length - 1 && <div className="w-0.5 h-6" style={{ background: `${GOLD}30` }} />}
-                      </div>
-                      <div className="flex-1 pb-2">
-                        <p className="text-xs font-bold text-white">{h.action}</p>
-                        <p className="text-[9px] text-white/40">{h.by} ({h.role}) • {h.date} {h.time}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

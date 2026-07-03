@@ -29,6 +29,7 @@ export const SAM_MODULES = [
   { id: "admin_control", title: "Admin Control", icon: "Crown", color: "#8B5CF6", gradient: "linear-gradient(135deg, #7C3AED, #8B5CF6)", description: "Manage admins, super admins, permissions, and audit logs" },
   { id: "system_health", title: "System Health", icon: "Server", color: "#10B981", gradient: "linear-gradient(135deg, #059669, #10B981)", description: "Wallet health, payment status, error logs, auto-repair" },
   { id: "sam_profile", title: "SAM Profile & Authority", icon: "UserCog", color: "#D4AF37", gradient: "linear-gradient(135deg, #B8941E, #D4AF37)", description: "SAM ID, role, permissions, and activity history" },
+  { id: "ocs_report_center", title: "OCS Report Center", icon: "ClipboardList", color: "#22D3EE", gradient: "linear-gradient(135deg, #FFD700, #22D3EE)", description: "Review, approve & manage Offline Coin Seller reports" },
 ];
 
 export const SAM_PERMISSIONS = [
