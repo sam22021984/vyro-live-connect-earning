@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper } from "lucide-react";
 
 const dashboards = [
   {
@@ -101,6 +101,17 @@ const dashboards = [
     color: "#F59E0B",
     badge: "FINANCE MGR",
     modules: ["Dashboard Home", "Finance Overview", "Revenue Management", "Withdrawal Management", "Payment Management", "Wallet Management", "Coin Economy", "Gift Revenue", "Commissions", "Profit & Loss", "Financial Reports", "Transaction Audit", "Fraud Detection", "Revenue Analytics", "Country Revenue", "Top Earners", "AI Intelligence", "Communication", "Team Management", "Settings", "Exclusive Tools"],
+  },
+  {
+    id: "event",
+    title: "Event Manager Dashboard",
+    description: "Central event planning, event operations, competition management, seasonal campaign management, reward event administration, participation monitoring, event analytics, engagement tracking, and global event ecosystem control center",
+    icon: PartyPopper,
+    path: "/event-manager-dashboard",
+    gradient: "linear-gradient(135deg, #EC4899, #BE185D)",
+    color: "#EC4899",
+    badge: "EVENT MGR",
+    modules: ["Dashboard Home", "Event Overview", "Event Management", "Competition Management", "Event Rewards", "Participation Management", "Global Monitoring", "Host Events", "Agency Events", "VIP Events", "Event Revenue", "Event Rankings", "Communication", "Festival & Seasonal", "Country Performance", "AI Intelligence", "Event Analytics", "Report Management", "Team Management", "Settings", "Exclusive Tools"],
   },
 ];
 
