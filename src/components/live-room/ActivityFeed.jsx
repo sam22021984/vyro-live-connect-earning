@@ -1,6 +1,13 @@
 import React from "react";
 import { Gift, LogIn, Crown } from "lucide-react";
-import { COLORS, ACTIVITY_FEED } from "./roomData";
+import { COLORS, CHAT_MESSAGES } from "./roomData";
+
+const ACTIVITY_FEED = CHAT_MESSAGES.slice(0, 4).map((m) => ({
+  user: m.user,
+  avatar: `https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop`,
+  type: m.isSystem ? "join" : m.isGift ? "gift" : "join",
+  text: m.text,
+}));
 
 const TYPE_CONFIG = {
   join: { icon: LogIn, color: COLORS.emerald, bg: `${COLORS.emerald}20` },

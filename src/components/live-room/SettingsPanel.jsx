@@ -1,9 +1,10 @@
 import React from "react";
 import { X } from "lucide-react";
 import { COLORS, FUNCTION_ITEMS, ENTERTAINMENT_ITEMS } from "./roomData";
+import SeatManagementSection from "./SeatManagementSection";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function SettingsPanel({ onClose, onArchive, onBackup, onScheduler, giftStats, roomScore, aiStats }) {
+export default function SettingsPanel({ onClose, onArchive, onBackup, onScheduler, giftStats, roomScore, aiStats, seatCount, onSeatCountChange }) {
   const { toast } = useToast();
 
   const isFailed = (res) => res?.success === false || (!!res?.error && !res?.success);
@@ -50,6 +51,9 @@ export default function SettingsPanel({ onClose, onArchive, onBackup, onSchedule
         </div>
 
         <div className="px-4 pb-6 space-y-4">
+          {/* Seat Management */}
+          <SeatManagementSection seatCount={seatCount || 10} onSeatCountChange={onSeatCountChange || (() => {})} />
+
           {/* Entertainment quick actions */}
           <div>
             <p className="text-[10px] font-bold mb-2" style={{ color: COLORS.gold }}>🎉 Entertainment</p>

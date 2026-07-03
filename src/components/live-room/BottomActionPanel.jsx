@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { COLORS, ROOM_TOOLS, QUICK_GIFTS } from "./roomData";
+import { COLORS, GIFT_CATALOG } from "./roomData";
+
+const ROOM_TOOLS = [
+  { icon: "🎁", label: "Gift", color: COLORS.gold },
+  { icon: "🎤", label: "Mic", color: COLORS.gold },
+  { icon: "💬", label: "Chat", color: "#3B82F6" },
+  { icon: "😀", label: "Emoji", color: "#F59E0B" },
+  { icon: "🏆", label: "Ranks", color: COLORS.purple },
+  { icon: "📤", label: "Share", color: "#0EA5E9" },
+];
+const QUICK_GIFTS = GIFT_CATALOG.slice(0, 6);
 import { useToast } from "@/components/ui/use-toast";
 
 export default function BottomActionPanel({ roomTitle }) {

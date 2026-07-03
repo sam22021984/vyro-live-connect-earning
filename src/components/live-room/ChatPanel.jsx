@@ -31,7 +31,7 @@ export default function ChatPanel({ messages }) {
               className="rounded-2xl px-2.5 py-1.5 max-w-[75%]"
               style={{
                 background: msg.isSystem
-                  ? `linear-gradient(135deg, ${COLORS.gold}20, ${COLORS.amber}20)`
+                  ? `linear-gradient(135deg, ${COLORS.gold}20, ${COLORS.goldLight}20)`
                   : msg.isGift
                   ? `linear-gradient(135deg, ${COLORS.crimson}20, ${COLORS.gold}20)`
                   : "rgba(255,255,255,0.08)",

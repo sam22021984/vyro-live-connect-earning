@@ -17,6 +17,8 @@ export const COLORS = {
 
 // Grid seat layouts - host at top center, speakers in rows below
 export const GRID_LAYOUTS = {
+  4: { cols: 4, rows: 1, label: "4 Seats" },
+  6: { cols: 3, rows: 2, label: "6 Seats" },
   8: { cols: 4, rows: 2, label: "8 Seats" },
   10: { cols: 5, rows: 2, label: "10 Seats" },
   15: { cols: 5, rows: 3, label: "15 Seats" },
