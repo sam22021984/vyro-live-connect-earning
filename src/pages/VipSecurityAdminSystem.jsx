@@ -85,7 +85,7 @@ export default function VipSecurityAdminSystem({ embedded }) {
               <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-white/5 border border-white/5">
                 <Lock size={16} className="text-gray-600" />
                 <span className="text-[9px] text-gray-400 font-medium text-center">
-                  {Object.values(features).filter(!Boolean).length} Inactive
+                  {Object.values(features).filter((v) => !v).length} Inactive
                 </span>
               </div>
               <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-white/5 border border-white/5">
