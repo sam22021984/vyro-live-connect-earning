@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, Upload, Search, ChevronRight, Loader2, FileText, X } from "lucide-react";
 import { applicationTypes } from "@/components/apply/applyData";
@@ -19,6 +19,32 @@ export default function ApplicationDetail() {
   const [documents, setDocuments] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+
+  // Fetch real agencies/agents when in search mode
+  useEffect(() => {
+    if (agencyMode !== "search") return;
+    let cancelled = false;
+    const fetchAgenciesAgents = async () => {
+      setSearching(true);
+      try {
+        const res = await base44.functions.invoke("roleApplications", {
+          action: "searchAgenciesAgents",
+          query: "",
+        });
+        if (!cancelled && res.data?.results) {
+          setSearchResults(res.data.results);
+        }
+      } catch {
+        // fallback to empty
+      } finally {
+        if (!cancelled) setSearching(false);
+      }
+    };
+    fetchAgenciesAgents();
+    return () => { cancelled = true; };
+  }, [agencyMode]);
 
   if (!app) {
     return (
@@ -39,11 +65,20 @@ export default function ApplicationDetail() {
     try {
       const uploaded = [];
       for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await base44.integrations.Core.UploadFile({ file });
-        if (res.data?.file_url) {
-          uploaded.push({ name: file.name, url: res.data.file_url });
+        const file_base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        const res = await base44.functions.invoke("uploadFile", {
+          file_base64,
+          filename: file.name,
+          content_type: file.type,
+        });
+        const file_url = res.data?.file_url;
+        if (file_url) {
+          uploaded.push({ name: file.name, url: file_url });
         }
       }
       setDocuments((prev) => [...prev, ...uploaded]);
@@ -63,24 +98,18 @@ export default function ApplicationDetail() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const me = await base44.auth.me();
-      const appType = id;
-      const appName = app.name;
-
-      const created = await base44.entities.RoleApplication.create({
-        user_id: me.id,
-        application_type: appType,
-        application_type_name: appName,
-        status: "pending",
+      const res = await base44.functions.invoke("roleApplications", {
+        action: "submit",
+        application_type: id,
+        application_type_name: app.name,
         form_data: formData,
         document_urls: documents.map((d) => d.url),
         agency_id: agencyId || undefined,
         agent_id: agentId || undefined,
         reviewing_authority: app.route,
-        submitted_date: new Date().toISOString(),
       });
-
-      setSubmittedAppId(created.id);
+      const appId = res.data?.application?.id || "";
+      setSubmittedAppId(appId);
       setSubmitted(true);
     } catch (err) {
       toast({ title: "Submission failed", description: err.message, variant: "destructive" });
@@ -265,17 +294,42 @@ export default function ApplicationDetail() {
                 ) : (
                   <div className="relative">
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" placeholder="Search approved agencies & agents..." className="w-full text-xs rounded-xl border border-gray-200 pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-400" />
+                    <input
+                      type="text"
+                      placeholder="Search approved agencies & agents..."
+                      className="w-full text-xs rounded-xl border border-gray-200 pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-400"
+                      onChange={(e) => {
+                        const q = e.target.value;
+                        const filtered = searchResults.filter(r =>
+                          r.name.toLowerCase().includes(q.toLowerCase()) ||
+                          r.global_id.toLowerCase().includes(q.toLowerCase())
+                        );
+                        setSearchResults(filtered);
+                      }}
+                    />
                     <div className="mt-2 space-y-1.5">
-                      {["Elite Agency (AG-001)", "Prime Agency (AG-002)", "Agent Khan (AGT-101)", "Agent Ahmed (AGT-102)"].map((item) => (
-                        <button key={item} type="button" onClick={() => {
-                          const match = item.match(/\(([^)]+)\)/);
-                          if (match) setAgencyId(match[1]);
-                        }} className="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-50 hover:bg-indigo-50 transition">
-                          <span className="text-xs text-gray-600">{item}</span>
-                          <ChevronRight size={14} className="text-gray-400" />
-                        </button>
-                      ))}
+                      {searching ? (
+                        <div className="flex items-center justify-center py-3">
+                          <Loader2 size={14} className="text-indigo-400 animate-spin" />
+                        </div>
+                      ) : searchResults.length === 0 ? (
+                        <p className="text-[10px] text-gray-400 text-center py-2">No approved agencies or agents found</p>
+                      ) : (
+                        searchResults.map((item) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => {
+                              if (item.role === 'agency') setAgencyId(item.global_id);
+                              else setAgentId(item.global_id);
+                            }}
+                            className="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-50 hover:bg-indigo-50 transition"
+                          >
+                            <span className="text-xs text-gray-600">{item.name} ({item.global_id})</span>
+                            <ChevronRight size={14} className="text-gray-400" />
+                          </button>
+                        ))
+                      )}
                     </div>
                   </div>
                 )}

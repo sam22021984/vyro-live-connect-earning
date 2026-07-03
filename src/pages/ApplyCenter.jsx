@@ -14,14 +14,8 @@ export default function ApplyCenter() {
   useEffect(() => {
     const load = async () => {
       try {
-        const me = await base44.auth.me();
-        if (!me?.id) { setLoading(false); return; }
-        const apps = await base44.entities.RoleApplication.filter(
-          { user_id: me.id },
-          "-created_date",
-          50
-        );
-        setApplications(apps);
+        const res = await base44.functions.invoke("roleApplications", { action: "list" });
+        setApplications(res.data?.applications || []);
       } catch (e) {
         console.error("Failed to load applications:", e);
       } finally {
