@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowLeft, Shield, CheckCircle, Star, UserPlus, MessageCircle, Gift } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function PublicProfileHeader({ profile }) {
   const navigate = useNavigate();
-  const [following, setFollowing] = React.useState(false);
+  const [following, setFollowing] = useState(false);
 
   const roleBadges = [
     profile?.is_app_owner && { label: "App Owner", color: "bg-purple-600" },

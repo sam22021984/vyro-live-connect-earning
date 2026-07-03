@@ -2,39 +2,36 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { X, Target, Gift, Clock, TrendingUp } from "lucide-react";
-import { taskCategories, tasks, COLORS } from "./tasksData";
+import { taskCategories, COLORS } from "./tasksData";
+import { useUserTasks } from "@/hooks/useUserTasks";
 import TaskCard from "./TaskCard";
 
 export default function TaskCenterTab() {
   const [cat, setCat] = useState("daily");
-  const [taskList, setTaskList] = useState(tasks);
   const [detailTask, setDetailTask] = useState(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { getMergedTasks, saveTask, claimReward } = useUserTasks();
 
-  const handleAction = (task) => {
-    setTaskList((prev) => ({
-      ...prev,
-      [cat]: prev[cat].map((t) => {
-        if (t.id !== task.id) return t;
-        if (t.status === "not_started") {
-          toast({ title: "📋 Task Started!", description: t.title });
-          return { ...t, status: "in_progress", progress: t.progress > 0 ? t.progress : 1 };
-        }
-        if (t.status === "in_progress") {
-          if (task.action_path && task.action_path !== "/") navigate(task.action_path);
-          return t;
-        }
-        if (t.status === "completed") {
-          toast({ title: "🎉 Reward Claimed!", description: `${t.reward_amount} ${t.reward_type} added to your wallet.` });
-          return { ...t, status: "claimed" };
-        }
-        return t;
-      }),
-    }));
+  const handleAction = async (task) => {
+    const updated = { ...task };
+    if (task.status === "not_started") {
+      updated.status = "in_progress";
+      updated.progress = task.progress > 0 ? task.progress : 1;
+      toast({ title: "📋 Task Started!", description: task.title });
+      await saveTask(updated, cat);
+    } else if (task.status === "in_progress") {
+      if (task.action_path && task.action_path !== "/") navigate(task.action_path);
+      return;
+    } else if (task.status === "completed") {
+      toast({ title: "🎉 Reward Claimed!", description: `${task.reward_amount} ${task.reward_type} added to your wallet.` });
+      await claimReward(updated, cat);
+    }
   };
 
   const handleView = (task) => setDetailTask(task);
+
+  const taskList = getMergedTasks(cat);
 
   return (
     <div>
@@ -48,7 +45,7 @@ export default function TaskCenterTab() {
         ))}
       </div>
 
-      {taskList[cat].map((t) => (
+      {taskList.map((t) => (
         <TaskCard key={t.id} task={t} onAction={handleAction} onView={handleView} />
       ))}
 

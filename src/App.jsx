@@ -64,6 +64,8 @@ import MessageCenter from '@/pages/MessageCenter';
 import MessageHub from '@/pages/MessageHub';
 import SupportCenter from '@/pages/SupportCenter';
 import TrustReputation from '@/pages/TrustReputation';
+import PublicProfile from '@/pages/PublicProfile';
+import EditProfile from '@/pages/EditProfile';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -148,6 +150,8 @@ const AuthenticatedApp = () => {
         <Route path="/message-hub" element={<MessageHub />} />
         <Route path="/support-center" element={<SupportCenter />} />
         <Route path="/trust-reputation" element={<TrustReputation />} />
+        <Route path="/profile/:id" element={<PublicProfile />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
