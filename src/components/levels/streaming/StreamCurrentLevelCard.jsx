@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Zap, Coins, Crown, Eye, Gift } from "lucide-react";
 import { streamingTiers, streamingConfig } from "@/components/levels/streaming/streamingData";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 
 export default function StreamCurrentLevelCard() {
   const [profile, setProfile] = useState(null);
   useEffect(() => {
     (async () => {
       try {
-        const me = await base44.auth.me();
+        const me = await getCurrentUser();
         let p = await base44.entities.UserProfile.filter({ user_id: me.id });
         if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: me.id });
         if (p.length > 0) setProfile(p[0]);

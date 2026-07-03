@@ -1,5 +1,29 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+// Decode Supabase JWT from request to get user identity
+// (Base44's built-in auth.me() doesn't recognize Supabase tokens)
+function getSupabaseUser(req: Request): { id: string; email: string; full_name?: string } | null {
+  try {
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+    if (!authHeader) return null;
+    const token = authHeader.replace('Bearer ', '').trim();
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    // JWT payload is base64url — convert to base64, pad, decode
+    let b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const payload = JSON.parse(atob(b64));
+    if (!payload.sub) return null;
+    return {
+      id: payload.sub,
+      email: payload.email || '',
+      full_name: payload.user_metadata?.full_name || payload.user_metadata?.name || undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
 const COUNTRY_CONFIG: Record<string, { name: string; calling_code: string }> = {
   PAK: { name: 'Pakistan', calling_code: '92' },
   UAE: { name: 'United Arab Emirates', calling_code: '971' },
@@ -74,7 +98,7 @@ function getZodiac(dateStr: string): string {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
+    const user = getSupabaseUser(req);
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();

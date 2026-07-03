@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import MyProfileHeader from "@/components/my-profile/MyProfileHeader";
 import MyStatsDashboard from "@/components/my-profile/MyStatsDashboard";
 import QuickActions from "@/components/my-profile/QuickActions";
@@ -24,11 +25,12 @@ export default function ProfileDashboard() {
   const [loading, setLoading] = useState(true);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [achievements, setAchievements] = useState([]);
+  const { user: me } = useAuth();
 
   useEffect(() => {
+    if (!me?.id) return;
     const load = async () => {
       try {
-        const me = await base44.auth.me();
         const res = await base44.functions.invoke("userOnboarding", {
           action: "initProfile",
           role: "user",
@@ -41,7 +43,6 @@ export default function ProfileDashboard() {
       } catch (e) {
         // fallback — try direct query
         try {
-          const me = await base44.auth.me();
           const profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
           if (profiles.length > 0) setProfile(profiles[0]);
         } catch {}
@@ -50,7 +51,7 @@ export default function ProfileDashboard() {
       }
     };
     load();
-  }, []);
+  }, [me?.id]);
 
   if (loading) {
     return (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 import OtherProfileHeader from "@/components/public-profile/OtherProfileHeader";
 import RelationshipSection from "@/components/public-profile/RelationshipSection";
 import OtherStatsGrid from "@/components/public-profile/OtherStatsGrid";
@@ -48,7 +49,7 @@ export default function PublicProfile() {
       setProfile(target);
 
       // Load my profile for coins + relationship
-      const me = await base44.auth.me();
+      const me = await getCurrentUser();
       let myProfiles = await base44.entities.UserProfile.filter({ user_id: me.id });
       setMyProfile(myProfiles[0]);
 

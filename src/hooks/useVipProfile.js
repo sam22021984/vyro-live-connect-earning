@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 
 export function useVipProfile() {
+  const { user: authUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -9,7 +11,8 @@ export function useVipProfile() {
 
   const loadProfile = useCallback(async () => {
     try {
-      const me = await base44.auth.me();
+      const me = authUser;
+      if (!me?.id) return null;
       setUser(me);
       let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
       if (profiles.length === 0) {
@@ -48,6 +51,7 @@ export function useVipProfile() {
   }, []);
 
   useEffect(() => {
+    if (!authUser?.id) return;
     const init = async () => {
       setLoading(true);
       const p = await loadProfile();
@@ -55,7 +59,7 @@ export function useVipProfile() {
       setLoading(false);
     };
     init();
-  }, []);
+  }, [authUser?.id]);
 
   const refresh = useCallback(async () => {
     const p = await loadProfile();

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, X, Check, Coins, TrendingUp, BookOpen, ChevronRight } from "lucide-react";
 import { levelSystems as staticLevelSystems } from "@/components/levels/levelData";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import UserLevelDashboard from "@/components/levels/UserLevelDashboard";
 import StreamingLevelDashboard from "@/components/levels/StreamingLevelDashboard";
 import HostLevelDashboard from "@/components/levels/HostLevelDashboard";
@@ -12,16 +13,17 @@ import { useBackNav } from "@/hooks/useBackNav";
 export default function LevelSystem() {
   const navigate = useNavigate();
   const handleBack = useBackNav("/more-services");
+  const { user: authUser } = useAuth();
   const [activeLevel, setActiveLevel] = useState(null);
   const [activeView, setActiveView] = useState("overview");
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
+    if (!authUser?.id) return;
     const loadProfile = async () => {
       try {
-        const me = await base44.auth.me();
-        let p = await base44.entities.UserProfile.filter({ user_id: me.id });
-        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        let p = await base44.entities.UserProfile.filter({ user_id: authUser.id });
+        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: authUser.id });
         if (p.length > 0) setProfile(p[0]);
       } catch (e) {}
     };
@@ -33,7 +35,7 @@ export default function LevelSystem() {
       unsub = base44.entities.UserProfile?.subscribe?.(() => loadProfile());
     } catch (e) { /* ignore */ }
     return () => { try { unsub?.(); } catch (e) {} };
-  }, []);
+  }, [authUser?.id]);
 
   // Merge static config with real profile data
   const levelSystems = staticLevelSystems.map((sys) => {

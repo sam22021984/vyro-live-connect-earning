@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, Flag, ShieldBan, BellOff, EyeOff, Ban, FileWarning, Link2, Copy, Star } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 
 const MENU_ITEMS = [
   { id: "share", label: "Share Profile", icon: Link2, color: "text-gray-600" },
@@ -56,7 +57,7 @@ export default function MoreMenu({ profile, onClose }) {
 
   const handleBlock = async () => {
     try {
-      const me = await base44.auth.me();
+      const me = await getCurrentUser();
       let settings = await base44.entities.PrivacySetting.filter({ user_id: me.id });
       if (settings.length > 0) {
         const blocked = settings[0].blocked_users || [];
@@ -75,7 +76,7 @@ export default function MoreMenu({ profile, onClose }) {
   const handleSubmitReport = async () => {
     if (!selectedReport) return;
     try {
-      const me = await base44.auth.me();
+      const me = await getCurrentUser();
       await base44.entities.SupportTicket.create({
         user_id: me.id,
         username: me.full_name || me.email,

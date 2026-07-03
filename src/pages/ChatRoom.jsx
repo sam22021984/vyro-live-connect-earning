@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 import ChatHeader from "@/components/chat/ChatHeader";
 import MessageBubble from "@/components/chat/MessageBubble";
 import MessageComposer from "@/components/chat/MessageComposer";
@@ -42,7 +43,7 @@ export default function ChatRoom() {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    base44.auth.me().then((me) => setCurrentUserId(me.id)).catch(() => {});
+    getCurrentUser().then((me) => { if (me?.id) setCurrentUserId(me.id); }).catch(() => {});
   }, []);
 
   useEffect(() => {

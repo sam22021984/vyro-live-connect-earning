@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserPlus, UserCheck, MessageCircle, Phone, Video, Gift, Users, ChevronDown, Bell, Star } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function ActionButtons({ profile, isFollowing, onFollowChange, onSendGift, myCoins }) {
@@ -19,7 +20,7 @@ export default function ActionButtons({ profile, isFollowing, onFollowChange, on
     try {
       if (newState) {
         await base44.entities.FriendRequest.create({
-          sender_id: (await base44.auth.me()).id,
+          sender_id: (await getCurrentUser()).id,
           receiver_id: profile.user_id || profile.id,
           sender_name: "You",
           receiver_name: profile.username,

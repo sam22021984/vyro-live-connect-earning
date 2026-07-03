@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 
 export function useCreatorCenter() {
+  const { user: authUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
@@ -9,7 +11,8 @@ export function useCreatorCenter() {
 
   const loadProfile = useCallback(async () => {
     try {
-      const me = await base44.auth.me();
+      const me = authUser;
+      if (!me?.id) return null;
       setUser(me);
       let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
       if (profiles.length === 0) {
@@ -88,6 +91,7 @@ export function useCreatorCenter() {
   }, []);
 
   useEffect(() => {
+    if (!authUser?.id) return;
     const init = async () => {
       setLoading(true);
       await loadProfile();
@@ -96,7 +100,7 @@ export function useCreatorCenter() {
       setLoading(false);
     };
     init();
-  }, [loadProfile, loadStats]);
+  }, [authUser?.id, loadProfile, loadStats]);
 
   const refresh = useCallback(async () => {
     const s = await loadStats();

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Search, Inbox, HeartCrack, History, Shield } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 import DiscoverTab from "@/components/relationship/DiscoverTab";
 import RequestsTab from "@/components/relationship/RequestsTab";
 import MyRelationshipTab from "@/components/relationship/MyRelationshipTab";
@@ -60,7 +61,7 @@ export default function RelationshipCenter() {
 
     setSending(true);
     try {
-      const me = await base44.auth.me();
+      const me = await getCurrentUser();
       await base44.entities.Relationship.create({
         sender_name: me.full_name || "You",
         sender_avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop",

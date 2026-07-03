@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 
 export function useProfileStats() {
+  const { user: authUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [user, setUser] = useState(null);
   const [badges, setBadges] = useState([]);
@@ -12,7 +14,8 @@ export function useProfileStats() {
 
   const load = useCallback(async () => {
     try {
-      const me = await base44.auth.me();
+      const me = authUser;
+      if (!me?.id) return;
       setUser(me);
 
       let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
@@ -40,8 +43,8 @@ export function useProfileStats() {
   }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    if (authUser?.id) load();
+  }, [load, authUser?.id]);
 
   return { profile, user, badges, achievements, transactions, leaderboard, loading, reload: load };
 }

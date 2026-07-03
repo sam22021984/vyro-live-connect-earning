@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { X, Coins, Check, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 import { useToast } from "@/components/ui/use-toast";
 
 const GIFT_CATEGORIES = [
@@ -61,7 +62,7 @@ export default function GiftPanel({ profile, myCoins, onClose }) {
     }
     setSending(true);
     try {
-      const me = await base44.auth.me();
+      const me = await getCurrentUser();
       // Deduct coins from sender
       let myProfiles = await base44.entities.UserProfile.filter({ user_id: me.id });
       if (myProfiles.length > 0) {

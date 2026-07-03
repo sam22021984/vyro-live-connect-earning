@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 import { userLevelTiers, collectionConfig } from "@/components/levels/userLevelTiers";
 import { dashboardTabs } from "@/components/levels/dashboardData";
 import ProfileHeader from "@/components/levels/dashboard/ProfileHeader";
@@ -20,7 +21,7 @@ export default function UserLevelDashboard() {
   useEffect(() => {
     const load = async () => {
       try {
-        const me = await base44.auth.me();
+        const me = await getCurrentUser();
         let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
         if (profiles.length === 0) {
           profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });

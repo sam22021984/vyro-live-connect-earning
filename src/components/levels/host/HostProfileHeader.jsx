@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { CheckCircle, Crown, Share2, Eye, Mic } from "lucide-react";
 import { hostConfig } from "@/components/levels/host/hostData";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 
 export default function HostProfileHeader() {
   const [profile, setProfile] = useState(null);
   useEffect(() => {
     (async () => {
       try {
-        const me = await base44.auth.me();
+        const me = await getCurrentUser();
         let p = await base44.entities.UserProfile.filter({ user_id: me.id });
         if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: me.id });
         if (p.length > 0) setProfile(p[0]);

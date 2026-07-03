@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Gift, Flame, Coins, Check } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 
 const DAILY_REWARDS = [50, 100, 150, 200, 300, 500, 1000];
 
@@ -30,7 +31,7 @@ export default function DailyRewardWidget() {
 
       // Credit coins
       try {
-        const me = await base44.auth.me();
+        const me = await getCurrentUser();
         let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
         if (profiles.length > 0) {
           await base44.entities.UserProfile.update(profiles[0].id, {
