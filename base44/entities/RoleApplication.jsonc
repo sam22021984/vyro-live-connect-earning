@@ -1,0 +1,116 @@
+{
+  "name": "RoleApplication",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "application_type": {
+      "type": "string",
+      "enum": [
+        "host",
+        "agency",
+        "agent",
+        "admin",
+        "super_admin",
+        "business_manager",
+        "business_developer",
+        "country_manager",
+        "reward_manager",
+        "vip_manager",
+        "finance_manager",
+        "support_manager"
+      ]
+    },
+    "application_type_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "verification",
+        "approved",
+        "rejected",
+        "delayed",
+        "resubmission"
+      ],
+      "default": "pending"
+    },
+    "form_data": {
+      "type": "object"
+    },
+    "document_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "agency_id": {
+      "type": "string"
+    },
+    "agent_id": {
+      "type": "string"
+    },
+    "reviewing_authority": {
+      "type": "string"
+    },
+    "reviewer_id": {
+      "type": "string"
+    },
+    "reviewer_notes": {
+      "type": "string"
+    },
+    "submitted_date": {
+      "type": "string"
+    },
+    "reviewed_date": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "application_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

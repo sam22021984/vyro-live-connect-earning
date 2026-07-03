@@ -1,14 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, FileText, Clock, CheckCircle, XCircle, Search } from "lucide-react";
-import { applicationTypes, statusTypes, myApplications } from "@/components/apply/applyData";
+import { ArrowLeft, FileText, Clock, CheckCircle, XCircle, Search, Loader2 } from "lucide-react";
+import { applicationTypes, statusTypes } from "@/components/apply/applyData";
+import { base44 } from "@/api/base44Client";
 
 export default function ApplyCenter() {
   const navigate = useNavigate();
   const [view, setView] = useState("home");
   const [searchQuery, setSearchQuery] = useState("");
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const getStatus = (key) => statusTypes.find((s) => s.key === key);
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const me = await base44.auth.me();
+        if (!me?.id) { setLoading(false); return; }
+        const apps = await base44.entities.RoleApplication.filter(
+          { user_id: me.id },
+          "-created_date",
+          50
+        );
+        setApplications(apps);
+      } catch (e) {
+        console.error("Failed to load applications:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const getStatus = (key) => statusTypes.find((s) => s.key === key) || statusTypes[0];
+
+  const stats = {
+    pending: applications.filter((a) => a.status === "pending" || a.status === "verification").length,
+    approved: applications.filter((a) => a.status === "approved").length,
+    rejected: applications.filter((a) => a.status === "rejected").length,
+  };
 
   if (view === "status") {
     return (
@@ -37,32 +66,45 @@ export default function ApplyCenter() {
 
             {/* My applications */}
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider px-1 pt-2">My Applications</h3>
-            {myApplications.map((app) => {
-              const status = getStatus(app.status);
-              return (
-                <div key={app.id} className="bg-white rounded-2xl p-4 border border-gray-50 shadow-sm">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h4 className="text-sm font-bold text-gray-800">{app.typeName}</h4>
-                      <p className="text-[10px] text-gray-400 font-mono">{app.id}</p>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
+              </div>
+            ) : applications.length === 0 ? (
+              <div className="bg-white rounded-2xl p-8 border border-gray-50 shadow-sm text-center">
+                <FileText size={32} className="text-gray-300 mx-auto mb-2" />
+                <p className="text-xs text-gray-400">No applications yet</p>
+                <button onClick={() => setView("home")} className="mt-3 text-xs font-bold text-indigo-500">Browse Applications</button>
+              </div>
+            ) : (
+              applications.map((app) => {
+                const status = getStatus(app.status);
+                const date = app.submitted_date ? new Date(app.submitted_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
+                return (
+                  <div key={app.id} className="bg-white rounded-2xl p-4 border border-gray-50 shadow-sm">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="text-sm font-bold text-gray-800">{app.application_type_name}</h4>
+                        <p className="text-[10px] text-gray-400 font-mono">{app.id.slice(-8).toUpperCase()}</p>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${status.bg} ${status.color} border ${status.border} flex items-center gap-1`}>
+                        {status.icon} {status.label}
+                      </span>
                     </div>
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${status.bg} ${status.color} border ${status.border} flex items-center gap-1`}>
-                      {status.icon} {status.label}
-                    </span>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <p className="text-gray-400 text-[10px]">Submitted</p>
+                        <p className="text-gray-700 font-semibold">{date}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-[10px]">Reviewing Authority</p>
+                        <p className="text-gray-700 font-semibold">{app.reviewing_authority || "—"}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <p className="text-gray-400 text-[10px]">Submitted</p>
-                      <p className="text-gray-700 font-semibold">{app.date}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-[10px]">Reviewing Authority</p>
-                      <p className="text-gray-700 font-semibold">{app.authority}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       </div>
@@ -93,21 +135,21 @@ export default function ApplyCenter() {
             <p className="text-xs text-white/80">Apply for roles within the VYRO Live Connect ecosystem. Each application follows a structured approval workflow.</p>
           </div>
 
-          {/* Quick stats */}
+          {/* Quick stats — live */}
           <div className="grid grid-cols-3 gap-2.5">
             <div className="bg-white rounded-xl p-3 border border-gray-50 shadow-sm text-center">
               <Clock size={16} className="text-amber-500 mx-auto mb-1" />
-              <p className="text-lg font-bold text-gray-800">1</p>
+              <p className="text-lg font-bold text-gray-800">{loading ? "—" : stats.pending}</p>
               <p className="text-[10px] text-gray-400">Pending</p>
             </div>
             <div className="bg-white rounded-xl p-3 border border-gray-50 shadow-sm text-center">
               <CheckCircle size={16} className="text-green-500 mx-auto mb-1" />
-              <p className="text-lg font-bold text-gray-800">2</p>
+              <p className="text-lg font-bold text-gray-800">{loading ? "—" : stats.approved}</p>
               <p className="text-[10px] text-gray-400">Approved</p>
             </div>
             <div className="bg-white rounded-xl p-3 border border-gray-50 shadow-sm text-center">
               <XCircle size={16} className="text-red-500 mx-auto mb-1" />
-              <p className="text-lg font-bold text-gray-800">0</p>
+              <p className="text-lg font-bold text-gray-800">{loading ? "—" : stats.rejected}</p>
               <p className="text-[10px] text-gray-400">Rejected</p>
             </div>
           </div>

@@ -1,15 +1,24 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Check, Upload, Search, ChevronRight } from "lucide-react";
+import { ArrowLeft, Check, Upload, Search, ChevronRight, Loader2, FileText, X } from "lucide-react";
 import { applicationTypes } from "@/components/apply/applyData";
+import { base44 } from "@/api/base44Client";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function ApplicationDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { toast } = useToast();
   const app = applicationTypes.find((a) => a.id === id);
   const [submitted, setSubmitted] = useState(false);
+  const [submittedAppId, setSubmittedAppId] = useState("");
   const [formData, setFormData] = useState({});
   const [agencyMode, setAgencyMode] = useState("manual");
+  const [agencyId, setAgencyId] = useState("");
+  const [agentId, setAgentId] = useState("");
+  const [documents, setDocuments] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   if (!app) {
     return (
@@ -23,9 +32,61 @@ export default function ApplicationDetail() {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleFileUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      const uploaded = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await base44.integrations.Core.UploadFile({ file });
+        if (res.data?.file_url) {
+          uploaded.push({ name: file.name, url: res.data.file_url });
+        }
+      }
+      setDocuments((prev) => [...prev, ...uploaded]);
+      toast({ title: `${uploaded.length} file(s) uploaded` });
+    } catch (err) {
+      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeDocument = (idx) => {
+    setDocuments((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    try {
+      const me = await base44.auth.me();
+      const appType = id;
+      const appName = app.name;
+
+      const created = await base44.entities.RoleApplication.create({
+        user_id: me.id,
+        application_type: appType,
+        application_type_name: appName,
+        status: "pending",
+        form_data: formData,
+        document_urls: documents.map((d) => d.url),
+        agency_id: agencyId || undefined,
+        agent_id: agentId || undefined,
+        reviewing_authority: app.route,
+        submitted_date: new Date().toISOString(),
+      });
+
+      setSubmittedAppId(created.id);
+      setSubmitted(true);
+    } catch (err) {
+      toast({ title: "Submission failed", description: err.message, variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -50,7 +111,7 @@ export default function ApplicationDetail() {
               <div className="bg-gray-50 rounded-2xl p-4 text-left space-y-2 mb-4">
                 <div className="flex justify-between">
                   <span className="text-xs text-gray-400">Application ID</span>
-                  <span className="text-xs font-bold text-gray-700 font-mono">APP-{Date.now().toString().slice(-6)}</span>
+                  <span className="text-xs font-bold text-gray-700 font-mono">{submittedAppId.slice(-8).toUpperCase()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-xs text-gray-400">Status</span>
@@ -60,6 +121,12 @@ export default function ApplicationDetail() {
                   <span className="text-xs text-gray-400">Reviewing Authority</span>
                   <span className="text-xs font-bold text-gray-700">{app.route}</span>
                 </div>
+                {documents.length > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-xs text-gray-400">Documents</span>
+                    <span className="text-xs font-bold text-green-500">{documents.length} uploaded</span>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2 mb-6">
@@ -120,9 +187,35 @@ export default function ApplicationDetail() {
               <div key={field}>
                 <label className="text-xs font-semibold text-gray-600 mb-1 block">{field}</label>
                 {field.includes("Document") ? (
-                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center gap-1 cursor-pointer hover:border-indigo-300 transition">
-                    <Upload size={18} className="text-gray-400" />
-                    <span className="text-[10px] text-gray-400">Tap to upload document</span>
+                  <div>
+                    <label className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center gap-1 cursor-pointer hover:border-indigo-300 transition">
+                      {uploading ? (
+                        <>
+                          <Loader2 size={18} className="text-indigo-400 animate-spin" />
+                          <span className="text-[10px] text-indigo-400">Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={18} className="text-gray-400" />
+                          <span className="text-[10px] text-gray-400">Tap to upload document</span>
+                          <span className="text-[9px] text-gray-300">PDF, JPG, PNG — max 10MB</span>
+                        </>
+                      )}
+                      <input type="file" multiple accept="image/*,application/pdf" onChange={handleFileUpload} className="hidden" disabled={uploading} />
+                    </label>
+                    {documents.length > 0 && (
+                      <div className="mt-2 space-y-1.5">
+                        {documents.map((doc, idx) => (
+                          <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-green-50 border border-green-100">
+                            <FileText size={12} className="text-green-500 flex-shrink-0" />
+                            <span className="text-[10px] text-gray-600 flex-1 truncate">{doc.name}</span>
+                            <button type="button" onClick={() => removeDocument(idx)}>
+                              <X size={12} className="text-gray-400 hover:text-red-400" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : field.includes("Experience") ? (
                   <textarea
@@ -166,8 +259,8 @@ export default function ApplicationDetail() {
                 </div>
                 {agencyMode === "manual" ? (
                   <div className="space-y-2">
-                    <input type="text" placeholder="Enter Agency ID" className="w-full text-xs rounded-xl border border-gray-200 px-3 py-2.5 focus:outline-none focus:border-indigo-400" />
-                    <input type="text" placeholder="Enter Agent ID" className="w-full text-xs rounded-xl border border-gray-200 px-3 py-2.5 focus:outline-none focus:border-indigo-400" />
+                    <input type="text" value={agencyId} onChange={(e) => setAgencyId(e.target.value)} placeholder="Enter Agency ID" className="w-full text-xs rounded-xl border border-gray-200 px-3 py-2.5 focus:outline-none focus:border-indigo-400" />
+                    <input type="text" value={agentId} onChange={(e) => setAgentId(e.target.value)} placeholder="Enter Agent ID" className="w-full text-xs rounded-xl border border-gray-200 px-3 py-2.5 focus:outline-none focus:border-indigo-400" />
                   </div>
                 ) : (
                   <div className="relative">
@@ -175,7 +268,10 @@ export default function ApplicationDetail() {
                     <input type="text" placeholder="Search approved agencies & agents..." className="w-full text-xs rounded-xl border border-gray-200 pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-400" />
                     <div className="mt-2 space-y-1.5">
                       {["Elite Agency (AG-001)", "Prime Agency (AG-002)", "Agent Khan (AGT-101)", "Agent Ahmed (AGT-102)"].map((item) => (
-                        <button key={item} type="button" className="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-50 hover:bg-indigo-50 transition">
+                        <button key={item} type="button" onClick={() => {
+                          const match = item.match(/\(([^)]+)\)/);
+                          if (match) setAgencyId(match[1]);
+                        }} className="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-50 hover:bg-indigo-50 transition">
                           <span className="text-xs text-gray-600">{item}</span>
                           <ChevronRight size={14} className="text-gray-400" />
                         </button>
@@ -200,8 +296,9 @@ export default function ApplicationDetail() {
             </div>
           </div>
 
-          <button type="submit" className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold shadow-lg shadow-indigo-200 active:scale-95 transition">
-            Submit Application
+          <button type="submit" disabled={submitting} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold shadow-lg shadow-indigo-200 active:scale-95 transition disabled:opacity-50 flex items-center justify-center gap-2">
+            {submitting ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+            {submitting ? "Submitting..." : "Submit Application"}
           </button>
         </form>
       </div>

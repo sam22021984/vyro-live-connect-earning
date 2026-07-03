@@ -12,11 +12,12 @@ import {
   ArrowRightLeft, MapPin, Activity, Zap, Eye, Clock,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
 import OwnerGlobe from "@/components/owner-dashboard/OwnerGlobe";
 import GlobalSearch from "@/components/owner-dashboard/GlobalSearch";
 import BroadcastCenter from "@/components/owner-dashboard/BroadcastCenter";
 import {
-  OWNER_SECTIONS, SUMMARY_KPIS, REALTIME_COUNTERS, LIVE_DATA_STREAM,
+  OWNER_SECTIONS, LIVE_DATA_STREAM,
   COUNTRIES, ROLES, APPLICATIONS, REVENUE_BREAKDOWN, REVENUE_PERIODS,
   GIFT_STATS, COIN_STATS, RANKINGS, LIVE_STREAMS, AI_DETECTIONS,
   SECURITY_DATA, SECURITY_ACTIONS, FINANCE_DATA, FINANCE_ACTIONS,
@@ -76,20 +77,67 @@ function SectionHeader({ title, subtitle }) {
   );
 }
 
+function formatStat(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+  return String(n);
+}
+
 function HomeSection() {
+  const { stats, loading } = usePlatformStats();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="w-6 h-6 border-3 border-blue-200 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const s = stats || {};
+  const summaryKpis = [
+    { label: "Total Countries", value: formatStat(s.totalCountries || 0), change: "live", trend: "up", icon: "Globe", color: "#27AE60" },
+    { label: "Total Users", value: formatStat(s.totalUsers || 0), change: "live", trend: "up", icon: "Users", color: "#2F80ED" },
+    { label: "Total Hosts", value: formatStat(s.totalHosts || 0), change: "live", trend: "up", icon: "Mic", color: "#EB5757" },
+    { label: "Talent Agents", value: formatStat(s.totalAgents || 0), change: "live", trend: "up", icon: "UserCheck", color: "#A78BFA" },
+    { label: "Agencies", value: formatStat(s.totalAgencies || 0), change: "live", trend: "up", icon: "Building2", color: "#8B5CF6" },
+    { label: "Admins", value: formatStat(s.totalAdmins || 0), change: "live", trend: "flat", icon: "Shield", color: "#F2994A" },
+    { label: "Super Admins", value: formatStat(s.superAdmins || 0), change: "live", trend: "flat", icon: "Crown", color: "#D4AF37" },
+    { label: "Active Streams", value: formatStat(s.activeStreams || 0), change: "live", trend: "up", icon: "Radio", color: "#EB5757" },
+    { label: "Total Revenue", value: "$" + formatStat(s.totalRevenue || 0), change: "live", trend: "up", icon: "DollarSign", color: "#27AE60" },
+    { label: "Today's Revenue", value: "$" + formatStat(s.todayRevenue || 0), change: "live", trend: "up", icon: "TrendingUp", color: "#27AE60" },
+    { label: "Monthly Revenue", value: "$" + formatStat(s.monthlyRevenue || 0), change: "live", trend: "up", icon: "Calendar", color: "#27AE60" },
+    { label: "VIP Users", value: formatStat(s.vipUsers || 0), change: "live", trend: "up", icon: "Crown", color: "#D4AF37" },
+  ];
+
+  const realtimeCounters = [
+    { label: "Online Users", value: formatStat(s.onlineUsers || 0), icon: "Wifi", color: "#27AE60" },
+    { label: "Live Streams", value: formatStat(s.activeStreams || 0), icon: "Mic", color: "#EB5757" },
+    { label: "Party Rooms", value: formatStat(s.totalPartyRooms || 0), icon: "PartyPopper", color: "#A78BFA" },
+    { label: "Community Posts", value: formatStat(s.totalCommunityPosts || 0), icon: "FileText", color: "#2F80ED" },
+    { label: "Support Tickets", value: formatStat(s.pendingTickets || 0), icon: "LifeBuoy", color: "#F2994A" },
+    { label: "Total Gifts", value: formatStat(s.totalGifts || 0), icon: "Gift", color: "#EB5757" },
+    { label: "Verified Users", value: formatStat(s.verifiedUsers || 0), icon: "ShieldCheck", color: "#27AE60" },
+  ];
+
   return (
     <div className="space-y-4">
       <OwnerGlobe />
       <div>
-        <h4 className="text-xs font-bold mb-2 px-1" style={{ color: DARK }}>Platform Summary</h4>
+        <div className="flex items-center gap-2 mb-2 px-1">
+          <h4 className="text-xs font-bold" style={{ color: DARK }}>Platform Summary</h4>
+          <span className="text-[8px] px-1.5 py-0.5 rounded-full font-bold flex items-center gap-1" style={{ background: "#27AE6010", color: "#27AE60" }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#27AE60" }} /> LIVE
+          </span>
+        </div>
         <div className="grid grid-cols-2 gap-2">
-          {SUMMARY_KPIS.map((k, i) => <KpiCard key={i} kpi={k} />)}
+          {summaryKpis.map((k, i) => <KpiCard key={i} kpi={k} />)}
         </div>
       </div>
       <div>
         <h4 className="text-xs font-bold mb-2 px-1" style={{ color: DARK }}>Real-Time Counters</h4>
         <div className="grid grid-cols-2 gap-2">
-          {REALTIME_COUNTERS.map((c, i) => {
+          {realtimeCounters.map((c, i) => {
             const Icon = ICONS[c.icon] || Activity;
             return (
               <Card key={i}>
