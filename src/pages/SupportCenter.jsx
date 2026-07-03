@@ -12,6 +12,7 @@ import {
   SUPPORT_OPTIONS, SUPPORT_FAQS, SUPPORT_ANNOUNCEMENTS,
   SUPPORT_SECURITY_REPORTS, SUPPORT_NOTIFICATIONS,
 } from "@/components/support-center/supportCenterData";
+import { useServicesData } from "@/hooks/useServicesData";
 
 const ICONS = {
   Book, MessageCircle, Headset, Bell, Smartphone, Ban, Flag, AlertTriangle,
@@ -33,8 +34,32 @@ function Card({ children, className = "" }) {
 export default function SupportCenter() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { data, createSupportTicket } = useServicesData();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeOption, setActiveOption] = useState(null);
+  const [feedbackSubject, setFeedbackSubject] = useState("");
+  const [feedbackDesc, setFeedbackDesc] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const ticketStats = data?.support?.stats || { total: 0, open: 0, pending: 0, resolved: 0, closed: 0 };
+
+  const handleSubmitFeedback = async () => {
+    if (!feedbackSubject.trim() || !feedbackDesc.trim()) {
+      toast({ title: "Please fill in all fields", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await createSupportTicket(feedbackSubject, feedbackDesc, "feedback", "medium");
+      toast({ title: "✅ Feedback Submitted", description: "Our team will review your feedback." });
+      setFeedbackSubject("");
+      setFeedbackDesc("");
+      setActiveOption(null);
+    } catch (err) {
+      toast({ title: "Failed to submit", description: err.message, variant: "destructive" });
+    }
+    setSubmitting(false);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -258,13 +283,19 @@ export default function SupportCenter() {
           option={SUPPORT_OPTIONS.find(o => o.id === activeOption)}
           onClose={() => setActiveOption(null)}
           onAction={handleAction}
+          feedbackSubject={feedbackSubject}
+          setFeedbackSubject={setFeedbackSubject}
+          feedbackDesc={feedbackDesc}
+          setFeedbackDesc={setFeedbackDesc}
+          onSubmitFeedback={handleSubmitFeedback}
+          submitting={submitting}
         />
       )}
     </div>
   );
 }
 
-function OptionSheet({ option, onClose, onAction }) {
+function OptionSheet({ option, onClose, onAction, feedbackSubject, setFeedbackSubject, feedbackDesc, setFeedbackDesc, onSubmitFeedback, submitting }) {
   if (!option) return null;
   const Icon = ICONS[option.icon] || Book;
 
@@ -398,11 +429,11 @@ function OptionSheet({ option, onClose, onAction }) {
             <div className="space-y-3">
               <div>
                 <label className="text-[10px] font-bold mb-1 block" style={{ color: DARK }}>Subject</label>
-                <input type="text" placeholder="Brief description of your feedback" className="w-full rounded-xl px-3 py-2.5 text-xs outline-none" style={{ background: "#F7F9FC", border: "1px solid #E5E7EB", color: DARK }} />
+                <input type="text" value={feedbackSubject} onChange={(e) => setFeedbackSubject(e.target.value)} placeholder="Brief description of your feedback" className="w-full rounded-xl px-3 py-2.5 text-xs outline-none" style={{ background: "#F7F9FC", border: "1px solid #E5E7EB", color: DARK }} />
               </div>
               <div>
                 <label className="text-[10px] font-bold mb-1 block" style={{ color: DARK }}>Description</label>
-                <textarea rows={4} placeholder="Tell us more about your experience..." className="w-full rounded-xl px-3 py-2.5 text-xs outline-none resize-none" style={{ background: "#F7F9FC", border: "1px solid #E5E7EB", color: DARK }} />
+                <textarea rows={4} value={feedbackDesc} onChange={(e) => setFeedbackDesc(e.target.value)} placeholder="Tell us more about your experience..." className="w-full rounded-xl px-3 py-2.5 text-xs outline-none resize-none" style={{ background: "#F7F9FC", border: "1px solid #E5E7EB", color: DARK }} />
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => onAction("Attach Screenshot")} className="flex items-center gap-1.5 text-[10px] px-3 py-2 rounded-xl font-semibold" style={{ background: `${option.color}08`, color: option.color }}>
@@ -412,8 +443,8 @@ function OptionSheet({ option, onClose, onAction }) {
                   <Paperclip size={12} /> Recording
                 </button>
               </div>
-              <button onClick={() => onAction("Submit Feedback")} className="w-full py-2.5 rounded-xl text-white text-xs font-bold active:scale-95 transition" style={{ background: option.gradient }}>
-                Submit Feedback
+              <button onClick={onSubmitFeedback} disabled={submitting} className="w-full py-2.5 rounded-xl text-white text-xs font-bold active:scale-95 transition disabled:opacity-50" style={{ background: option.gradient }}>
+                {submitting ? "Submitting..." : "Submit Feedback"}
               </button>
             </div>
           )}

@@ -14,8 +14,8 @@ const WHITE = "#FFFFFF";
 const DARK = "#1F2937";
 const GRAY = "#6B7280";
 
-export default function OverviewTab({ onAction }) {
-  const o = TRUST_OVERVIEW;
+export default function OverviewTab({ onAction, realData }) {
+  const o = { ...TRUST_OVERVIEW, ...realData };
   const scoreColor = o.trustScore >= 85 ? "#10B981" : o.trustScore >= 60 ? "#F59E0B" : "#EF4444";
 
   return (
@@ -53,7 +53,14 @@ export default function OverviewTab({ onAction }) {
       <div>
         <h3 className="text-xs font-bold mb-2" style={{ color: DARK }}>Summary</h3>
         <div className="grid grid-cols-2 gap-2">
-          {o.summary.map((s, i) => {
+          {[
+            { label: "Verification", value: o.verificationStatus ? (o.verificationStatus.charAt(0).toUpperCase() + o.verificationStatus.slice(1)) : "Unverified", icon: "BadgeCheck", color: "#2F80ED" },
+            { label: "Safety Status", value: o.safetyStatus ? (o.safetyStatus.charAt(0).toUpperCase() + o.safetyStatus.slice(1)) : "Medium", icon: "ShieldCheck", color: "#10B981" },
+            { label: "Profile Completion", value: `${o.profileCompletion || 0}%`, icon: "TrendingUp", color: "#8B5CF6" },
+            { label: "Activity Score", value: String(o.activityScore || 0), icon: "Sparkles", color: "#F59E0B" },
+            { label: "Reputation Rating", value: (o.reputationRating || 0).toFixed(1), icon: "Star", color: "#F59E0B" },
+            { label: "Trust Tier", value: o.reputationLevel || "Bronze", icon: "Crown", color: "#D4AF37" },
+          ].map((s, i) => {
             const Icon = ICONS[s.icon] || Award;
             return (
               <div key={i} className="rounded-2xl p-3 flex items-center gap-2.5" style={{ background: WHITE, border: "1px solid #F0F1F5", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>

@@ -15,14 +15,22 @@ export default function LevelSystem() {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    (async () => {
+    const loadProfile = async () => {
       try {
         const me = await base44.auth.me();
         let p = await base44.entities.UserProfile.filter({ user_id: me.id });
         if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: me.id });
         if (p.length > 0) setProfile(p[0]);
       } catch (e) {}
-    })();
+    };
+    loadProfile();
+
+    // Real-time subscription — reload profile when it changes
+    let unsub;
+    try {
+      unsub = base44.entities.UserProfile?.subscribe?.(() => loadProfile());
+    } catch (e) { /* ignore */ }
+    return () => { try { unsub?.(); } catch (e) {} };
   }, []);
 
   // Merge static config with real profile data

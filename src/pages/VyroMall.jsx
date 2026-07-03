@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Coins, Sparkles, TrendingUp, Shield, Check } from "lucide-react";
 import { mallSections, rarityStyles } from "@/components/mall/mallData";
 import MallItemCard from "@/components/mall/MallItemCard";
+import { useServicesData } from "@/hooks/useServicesData";
 
 export default function VyroMall() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("home");
+  const { data } = useServicesData();
+  const userCoins = data?.mall?.coins || 0;
 
   const section = mallSections.find((s) => s.id === activeSection) || mallSections[0];
 
@@ -33,7 +36,7 @@ export default function VyroMall() {
             </div>
             <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/5 border border-white/10">
               <Coins size={13} className="text-amber-400" />
-              <span className="text-xs font-bold text-amber-300">125K</span>
+              <span className="text-xs font-bold text-amber-300">{userCoins.toLocaleString()}</span>
             </div>
           </div>
 

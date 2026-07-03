@@ -10,6 +10,7 @@ import OverviewTab from "@/components/trust-reputation/OverviewTab";
 import BadgesTab from "@/components/trust-reputation/BadgesTab";
 import LevelsTab from "@/components/trust-reputation/LevelsTab";
 import HistoryTab from "@/components/trust-reputation/HistoryTab";
+import { useServicesData } from "@/hooks/useServicesData";
 
 const ICONS = {
   LayoutDashboard, Award, TrendingUp, History: HistoryIcon,
@@ -24,7 +25,21 @@ const PRIMARY = "#2F80ED";
 export default function TrustReputation() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { data } = useServicesData();
   const [activeTab, setActiveTab] = useState("overview");
+
+  const trustData = data?.trust;
+  const realTrustOverview = trustData ? {
+    trustScore: trustData.trustScore,
+    trustScoreMax: trustData.trustScoreMax,
+    trustPercentage: trustData.trustPercentage,
+    reputationLevel: trustData.reputationLevel,
+    verificationStatus: trustData.verificationStatus,
+    safetyStatus: trustData.safetyStatus,
+    isVerified: trustData.isVerified,
+    profileCompletion: trustData.profileCompletion,
+    activityScore: trustData.activityScore,
+  } : null;
 
   const handleAction = (action) => {
     toast({ title: action, description: "This feature will be available soon." });
@@ -104,7 +119,7 @@ export default function TrustReputation() {
 
         {/* Tab Content */}
         <div className="px-4 pt-4">
-          {activeTab === "overview" && <OverviewTab onAction={handleAction} />}
+          {activeTab === "overview" && <OverviewTab onAction={handleAction} realData={realTrustOverview} />}
           {activeTab === "badges" && <BadgesTab onAction={handleAction} />}
           {activeTab === "levels" && <LevelsTab onAction={handleAction} />}
           {activeTab === "history" && <HistoryTab onAction={handleAction} />}
