@@ -21,7 +21,7 @@ export default function Register() {
   const [otpCode, setOtpCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [onboarding, setOnboarding] = useState(null);
-  const [country, setCountry] = useState("QAT");
+  const [country, setCountry] = useState(localStorage.getItem("vyro_onboarding_country") || "QAT");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,9 +75,10 @@ export default function Register() {
   const handleProvider = (provider) => {
     if (provider === "google") supabaseAuth.loginWithProvider("google", "/");
     else if (provider === "facebook") supabaseAuth.loginWithProvider("facebook", "/");
-    else if (provider === "whatsapp" || provider === "mobile") {
-      setError(`${provider === "whatsapp" ? "WhatsApp" : "Mobile"} sign up is coming soon!`);
-    }
+    else if (provider === "apple") supabaseAuth.loginWithProvider("apple", "/");
+    else if (provider === "twitter") supabaseAuth.loginWithProvider("twitter", "/");
+    else if (provider === "mobile") navigate("/mobile-register");
+    else if (provider === "whatsapp") setError("WhatsApp sign up is coming soon!");
   };
 
   // Success screen after signup — shows generated Global ID

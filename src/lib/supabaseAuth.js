@@ -82,6 +82,21 @@ export const supabaseAuth = {
     return data;
   },
 
+  async sendPhoneOtp(phone) {
+    const res = await invoke({ action: "phone-otp", phone });
+    const { data, ok } = res.data;
+    if (!ok) throw new Error(extractError(data));
+    return data;
+  },
+
+  async verifyPhoneOtp(phone, otp) {
+    const res = await invoke({ action: "verify-phone", phone, otp });
+    const { data, ok } = res.data;
+    if (!ok) throw new Error(extractError(data));
+    if (data.access_token) this.setToken(data.access_token, data.refresh_token);
+    return data;
+  },
+
   async requestPasswordReset(email) {
     const res = await invoke({ action: "recover", email });
     const { data, ok } = res.data;

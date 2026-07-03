@@ -77,6 +77,13 @@ import AiTools from '@/pages/AiTools';
 import RoomManagement from '@/pages/RoomManagement';
 import ApplicationIdSystem from '@/pages/ApplicationIdSystem';
 import LuckyIdStore from '@/pages/LuckyIdStore';
+import SplashScreen from '@/pages/SplashScreen';
+import WelcomeScreen from '@/pages/WelcomeScreen';
+import LanguageSelection from '@/pages/LanguageSelection';
+import RegionSelection from '@/pages/RegionSelection';
+import PermissionsIntro from '@/pages/PermissionsIntro';
+import MobileRegistration from '@/pages/MobileRegistration';
+import CreatePassword from '@/pages/CreatePassword';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -106,7 +113,14 @@ const AuthenticatedApp = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+      <Route path="/splash" element={<SplashScreen />} />
+      <Route path="/welcome" element={<WelcomeScreen />} />
+      <Route path="/language-selection" element={<LanguageSelection />} />
+      <Route path="/region-selection" element={<RegionSelection />} />
+      <Route path="/permissions-intro" element={<PermissionsIntro />} />
+      <Route path="/mobile-register" element={<MobileRegistration />} />
+      <Route path="/create-password" element={<CreatePassword />} />
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/splash" replace />} />}>
         <Route path="/" element={<Home />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/settings/:id" element={<SettingDetail />} />

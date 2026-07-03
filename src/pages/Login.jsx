@@ -43,6 +43,8 @@ export default function Login() {
   const handleProvider = (provider) => {
     if (provider === "google") supabaseAuth.loginWithProvider("google", "/");
     else if (provider === "facebook") supabaseAuth.loginWithProvider("facebook", "/");
+    else if (provider === "apple") supabaseAuth.loginWithProvider("apple", "/");
+    else if (provider === "twitter") supabaseAuth.loginWithProvider("twitter", "/");
     else if (provider === "whatsapp" || provider === "mobile") {
       setError(`${provider === "whatsapp" ? "WhatsApp" : "Mobile"} login is coming soon!`);
     }

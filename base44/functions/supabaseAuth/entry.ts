@@ -4,7 +4,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json();
-    const { action, email, password, otp, type, access_token, provider, redirect_to } = body;
+    const { action, email, password, otp, type, access_token, provider, redirect_to, phone } = body;
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')?.replace(/\/$/, '');
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
@@ -57,6 +57,32 @@ Deno.serve(async (req) => {
       else if (!redirect.startsWith('http') && appOrigin) redirect = appOrigin + '/' + redirect;
       const url = `${supabaseUrl}/auth/v1/authorize?provider=${encodeURIComponent(provider)}&redirect_to=${encodeURIComponent(redirect)}`;
       return Response.json({ data: { url }, ok: true, status: 200 });
+    }
+
+    // Phone OTP: send SMS code
+    if (action === 'phone-otp') {
+      const response = await fetch(`${supabaseUrl}/auth/v1/otp`, {
+        method: 'POST',
+        headers: baseHeaders,
+        body: JSON.stringify({ phone }),
+      });
+      const text = await response.text();
+      let data;
+      try { data = JSON.parse(text); } catch { data = { raw: text }; }
+      return Response.json({ data, ok: response.ok, status: response.status });
+    }
+
+    // Phone OTP: verify
+    if (action === 'verify-phone') {
+      const response = await fetch(`${supabaseUrl}/auth/v1/verify`, {
+        method: 'POST',
+        headers: baseHeaders,
+        body: JSON.stringify({ token: otp, type: 'sms', phone }),
+      });
+      const text = await response.text();
+      let data;
+      try { data = JSON.parse(text); } catch { data = { raw: text }; }
+      return Response.json({ data, ok: response.ok, status: response.status });
     }
 
     // Standard Supabase Auth endpoints for remaining actions

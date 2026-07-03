@@ -15,6 +15,9 @@ export default function ProtectedRoute({ fallback = <DefaultFallback />, unauthe
   }
 
   if (!isAuthenticated) {
+    if (localStorage.getItem("vyro_guest_mode") === "true") {
+      return <Outlet />;
+    }
     return unauthenticatedElement;
   }
 
