@@ -44,12 +44,14 @@ export default function LiveRoom() {
   const [showChatInput, setShowChatInput] = useState(false);
   const [tempProfileUser, setTempProfileUser] = useState(null);
 
-  // Sync Supabase chat messages into local chat state (preserve locally-sent messages)
+  // Merge Supabase chat messages into local chat — keep local seed messages, add new supabase ones
   useEffect(() => {
     if (supabaseChat.length > 0) {
       setChat((prev) => {
-        const myMessages = prev.filter((m) => m.user === "You");
-        return [...supabaseChat, ...myMessages];
+        const localIds = new Set(prev.map((m) => m.id));
+        const newMsgs = supabaseChat.filter((m) => !localIds.has(m.id));
+        if (newMsgs.length === 0) return prev;
+        return [...prev, ...newMsgs];
       });
     }
   }, [supabaseChat]);
