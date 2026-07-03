@@ -19,6 +19,7 @@ import {
   BIZ_EXCLUSIVE_TOOLS, BIZ_REPORTING_STRUCTURE,
 } from "@/components/business-manager/businessManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import BusinessManagerPolicyTab from "@/components/business-manager/BusinessManagerPolicyTab";
 
 const ICONS = {
   LayoutDashboard, Users, Mic, Handshake, Building2, TrendingUp, Target,
@@ -720,7 +721,7 @@ const SECTIONS = {
   applications: ApplicationsSection, communication: CommunicationSection,
   analytics: AnalyticsSection, ai: AISection, performance: PerformanceSection,
   reports: ReportsSection, documents: DocumentsSection, operations: OperationsSection,
-  notifications: NotificationsSection, exclusive: ExclusiveSection,
+  notifications: NotificationsSection, exclusive: ExclusiveSection, policy: BusinessManagerPolicyTab,
 };
 
 export default function BusinessManagerDashboard() {

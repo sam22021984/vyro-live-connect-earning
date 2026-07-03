@@ -22,6 +22,7 @@ export const BIZ_SECTIONS = [
   { id: "operations", label: "Operations", icon: "Settings", color: "#6B7280" },
   { id: "notifications", label: "Notifications", icon: "Bell", color: "#F2994A" },
   { id: "exclusive", label: "Exclusive Tools", icon: "Rocket", color: "#EC4899" },
+  { id: "policy", label: "Policy", icon: "FileText", color: "#F59E0B" },
 ];
 
 export const BIZ_KPIS = [
