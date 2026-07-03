@@ -62,6 +62,7 @@ export const AGENCY_MODULES = [
   { id: "compliance", title: "Compliance", icon: "🛡️", color: "#10B981", gradient: "linear-gradient(135deg, #10B981, #047857)" },
   { id: "settings", title: "Settings", icon: "⚙️", color: "#64748B", gradient: "linear-gradient(135deg, #64748B, #475569)" },
   { id: "support", title: "Support", icon: "📞", color: "#06B6D4", gradient: "linear-gradient(135deg, #06B6D4, #0E7490)" },
+  { id: "policy", title: "Policy", icon: "📜", color: "#D4AF37", gradient: "linear-gradient(135deg, #D4AF37, #B8941E)" },
 ];
 
 export const AGENTS_DATA = {

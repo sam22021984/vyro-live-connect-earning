@@ -18,13 +18,14 @@ import NotificationSection from "@/components/agency-dashboard/sections/Notifica
 import ComplianceSection from "@/components/agency-dashboard/sections/ComplianceSection";
 import SettingsSection from "@/components/agency-dashboard/sections/SettingsSection";
 import SupportSection from "@/components/agency-dashboard/sections/SupportSection";
+import AgencyPolicyTab from "@/components/agency-dashboard/AgencyPolicyTab";
 
 const SECTIONS = {
   home: HomeSection, profile: ProfileSection, agents: AgentsSection, hosts: HostsSection,
   finance: FinanceSection, analytics: AnalyticsSection, performance: PerformanceSection,
   events: EventSection, recruitment: RecruitmentSection, communication: CommunicationSection,
   reports: ReportsSection, notifications: NotificationSection, compliance: ComplianceSection,
-  settings: SettingsSection, support: SupportSection,
+  settings: SettingsSection, support: SupportSection, policy: AgencyPolicyTab,
 };
 
 export default function AgencyDashboard() {
