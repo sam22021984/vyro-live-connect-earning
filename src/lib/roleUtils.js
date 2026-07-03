@@ -72,6 +72,17 @@ export const CONTROL_CENTER_DASHBOARDS = [
     requiredLevel: 3,
     modules: ["Agency Overview", "Host Management", "Recruitment Center", "Revenue Management", "Performance Analytics", "Events & Campaigns", "Compliance Center", "Agency Leaderboard"],
   },
+  {
+    id: "seller",
+    title: "Coin Seller Dashboard",
+    description: "Official Coin Sellers manage offline recharges, coin packages, customer history, earnings, levels, rankings, policy, and reports",
+    icon: "store",
+    path: "/seller-dashboard",
+    gradient: "linear-gradient(135deg, #10B981, #047857)",
+    color: "#10B981",
+    requiredLevel: 0,
+    modules: ["Overview", "Recharge Center", "Coin Packages", "Customers", "Seller Levels", "Rewards", "Rankings", "Security", "OCS Policy", "Reports"],
+  },
 ];
 
 /**

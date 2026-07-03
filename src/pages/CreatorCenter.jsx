@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, ChevronRight, Rocket, Crown, Shield, LifeBuoy, Gift, Swords,
-  Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog, Store, Lock, Banknote
+  Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog, Store, Lock
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { dashboards } from "@/components/creator/creatorData";
@@ -87,24 +87,6 @@ export default function CreatorCenter() {
               )}
             </div>
           </div>
-        </div>
-
-        {/* Official Coin Seller quick link */}
-        <div className="px-4 pt-3">
-          <button
-            onClick={() => navigate("/official-coin-seller-policy")}
-            className="w-full rounded-2xl p-4 flex items-center gap-3 active:scale-[0.98] transition text-left"
-            style={{ background: "linear-gradient(135deg, #10B981, #047857)", boxShadow: "0 8px 24px rgba(16,185,129,0.2)" }}
-          >
-            <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
-              <Banknote size={22} className="text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-sm font-bold text-white">Official Coin Seller</h3>
-              <p className="text-[10px] text-white/80">Seller policy & OCS report dashboard</p>
-            </div>
-            <ChevronRight size={20} className="text-white/70" />
-          </button>
         </div>
 
         {/* Accessible Dashboard Cards */}

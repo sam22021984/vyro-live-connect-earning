@@ -177,7 +177,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/seller-dashboard" element={<SellerDashboard />} />
-        <Route path="/official-coin-seller-policy" element={<OfficialCoinSellerPolicy />} />
+        <Route path="/official-coin-seller-policy" element={<Navigate to="/seller-dashboard" replace />} />
         <Route path="/ocs-report-dashboard" element={<OcsReportDashboard />} />
         <Route path="/family-center" element={<FamilyCenter />} />
         <Route path="/message-center" element={<MessageCenter />} />

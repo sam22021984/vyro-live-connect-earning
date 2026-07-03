@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Building2, User, Radio, ChevronRight, Shield, Sparkles, Lock } from "lucide-react";
+import { ArrowLeft, Building2, User, Radio, ChevronRight, Shield, Sparkles, Lock, Store } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { getControlCenterDashboards } from "@/lib/roleUtils";
@@ -10,6 +10,7 @@ const ICON_MAP = {
   host: Radio,
   agent: User,
   agency: Building2,
+  store: Store,
 };
 
 export default function ControlCenter() {
