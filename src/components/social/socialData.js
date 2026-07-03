@@ -147,4 +147,27 @@ export const SOCIAL_MODULES = [
     ],
     actions: ["Open Relationship Center", "Discover", "Requests", "History", "Safety"],
   },
+  {
+    id: "family",
+    title: "Family",
+    subtitle: "Build Your Community Family",
+    description: "Create or join a Family to build community, compete in PK battles, earn rewards, and grow together. Families have levels, treasuries, missions, and rankings.",
+    icon: "Heart",
+    color: "#10B981",
+    gradient: "linear-gradient(135deg, #10B981, #047857)",
+    path: "/family-center",
+    stats: [
+      { label: "Members", value: "28", color: "#10B981" },
+      { label: "Level", value: "LV.8", color: "#F59E0B" },
+      { label: "Rank", value: "#12", color: "#2F80ED" },
+      { label: "Treasury", value: "8.4K", color: "#D4AF37" },
+    ],
+    features: [
+      "Family Creation", "Family Management", "Family Levels", "Family Rankings",
+      "Family PK Battles", "Family Treasury", "Family Contributions", "Family Missions",
+      "Family Rewards", "Family Achievements", "Family Invitations", "Family Events",
+      "Family Announcements", "Family Store", "Family Analytics",
+    ],
+    actions: ["Open Family Center", "Create Family", "Join Family", "View Rankings", "Family Treasury"],
+  },
 ];
