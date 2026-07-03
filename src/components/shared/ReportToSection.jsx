@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp, User, Check, ArrowRight } from "lucide-react";
-import { ROLE_HIERARCHY } from "@/components/shared/roleHierarchy";
+import { useRoleHierarchy } from "@/components/shared/roleHierarchy";
 
 export default function ReportToSection({ roleKey, theme = "light" }) {
   const [expanded, setExpanded] = useState(false);
-  const role = ROLE_HIERARCHY[roleKey];
+  const { roles } = useRoleHierarchy();
+  const role = roles[roleKey];
   if (!role) return null;
 
   const isDark = theme === "dark";

@@ -1,0 +1,81 @@
+{
+  "name": "EnterpriseRole",
+  "type": "object",
+  "properties": {
+    "role_key": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "short_code": {
+      "type": "string"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "reports_to": {
+      "type": "string"
+    },
+    "reports_to_label": {
+      "type": "string"
+    },
+    "position_level": {
+      "type": "string"
+    },
+    "responsibilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "authority": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "reports_received_from": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "hierarchy_order": {
+      "type": "number",
+      "default": 0
+    },
+    "dashboard_path": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "role_key",
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
