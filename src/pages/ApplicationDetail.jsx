@@ -19,7 +19,8 @@ export default function ApplicationDetail() {
   const [documents, setDocuments] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
+  const [allResults, setAllResults] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
 
   // Fetch real agencies/agents when in search mode
@@ -34,7 +35,7 @@ export default function ApplicationDetail() {
           query: "",
         });
         if (!cancelled && res.data?.results) {
-          setSearchResults(res.data.results);
+          setAllResults(res.data.results);
         }
       } catch {
         // fallback to empty
@@ -45,6 +46,14 @@ export default function ApplicationDetail() {
     fetchAgenciesAgents();
     return () => { cancelled = true; };
   }, [agencyMode]);
+
+  // Filter locally without destroying source data
+  const filteredResults = searchQuery
+    ? allResults.filter(r =>
+        r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (r.global_id || "").toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : allResults;
 
   if (!app) {
     return (
@@ -296,26 +305,20 @@ export default function ApplicationDetail() {
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="text"
+                      value={searchQuery}
                       placeholder="Search approved agencies & agents..."
                       className="w-full text-xs rounded-xl border border-gray-200 pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-400"
-                      onChange={(e) => {
-                        const q = e.target.value;
-                        const filtered = searchResults.filter(r =>
-                          r.name.toLowerCase().includes(q.toLowerCase()) ||
-                          r.global_id.toLowerCase().includes(q.toLowerCase())
-                        );
-                        setSearchResults(filtered);
-                      }}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <div className="mt-2 space-y-1.5">
                       {searching ? (
                         <div className="flex items-center justify-center py-3">
                           <Loader2 size={14} className="text-indigo-400 animate-spin" />
                         </div>
-                      ) : searchResults.length === 0 ? (
+                      ) : filteredResults.length === 0 ? (
                         <p className="text-[10px] text-gray-400 text-center py-2">No approved agencies or agents found</p>
                       ) : (
-                        searchResults.map((item) => (
+                        filteredResults.map((item) => (
                           <button
                             key={item.id}
                             type="button"
@@ -323,7 +326,7 @@ export default function ApplicationDetail() {
                               if (item.role === 'agency') setAgencyId(item.global_id);
                               else setAgentId(item.global_id);
                             }}
-                            className="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-50 hover:bg-indigo-50 transition"
+                            className={`w-full flex items-center justify-between p-2.5 rounded-xl transition ${(item.role === 'agency' ? agencyId : agentId) === item.global_id ? 'bg-indigo-100 border border-indigo-300' : 'bg-gray-50 hover:bg-indigo-50'}`}
                           >
                             <span className="text-xs text-gray-600">{item.name} ({item.global_id})</span>
                             <ChevronRight size={14} className="text-gray-400" />
