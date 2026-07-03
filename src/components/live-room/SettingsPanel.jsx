@@ -3,25 +3,27 @@ import { X } from "lucide-react";
 import { COLORS, FUNCTION_ITEMS, ENTERTAINMENT_ITEMS } from "./roomData";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function SettingsPanel({ onClose, onArchive, onBackup, onScheduler, giftStats, roomScore }) {
+export default function SettingsPanel({ onClose, onArchive, onBackup, onScheduler, giftStats, roomScore, aiStats }) {
   const { toast } = useToast();
+
+  const isFailed = (res) => res?.success === false || (!!res?.error && !res?.success);
 
   const handleArchive = async () => {
     toast({ title: "Archiving room…" });
     const res = onArchive ? await onArchive() : null;
-    toast({ title: res?.success === false ? "Archive failed" : "Room archived ✓" });
+    toast({ title: isFailed(res) ? `Archive failed: ${res?.error || ""}` : "Room archived ✓", variant: isFailed(res) ? "destructive" : "default" });
   };
 
   const handleBackup = async () => {
     toast({ title: "Backing up room data…" });
     const res = onBackup ? await onBackup() : null;
-    toast({ title: res?.success === false ? "Backup failed" : "Room backed up ✓" });
+    toast({ title: isFailed(res) ? `Backup failed: ${res?.error || ""}` : "Room backed up ✓", variant: isFailed(res) ? "destructive" : "default" });
   };
 
   const handleScheduler = async () => {
     toast({ title: "Running scheduler…" });
     const res = onScheduler ? await onScheduler() : null;
-    toast({ title: res?.success === false ? "Scheduler failed" : `Scheduler ran ✓ (${res?.processed_rooms ?? 0} rooms)` });
+    toast({ title: isFailed(res) ? "Scheduler failed" : `Scheduler ran ✓ (${res?.processed_rooms ?? 0} rooms)`, variant: isFailed(res) ? "destructive" : "default" });
   };
 
   return (
@@ -110,6 +112,31 @@ export default function SettingsPanel({ onClose, onArchive, onBackup, onSchedule
                 <p className="text-[8px]" style={{ color: COLORS.softGray }}>Room Score</p>
               </div>
             </div>
+            {aiStats && (
+              <div className="grid grid-cols-4 gap-1.5 mt-2">
+                <div className="rounded-lg p-2 text-center" style={{ background: "rgba(14,69,72,0.4)" }}>
+                  <p className="text-xs font-bold" style={{ color: aiStats.health != null ? COLORS.gold : COLORS.softGray }}>{aiStats.health != null ? aiStats.health : "—"}</p>
+                  <p className="text-[7px]" style={{ color: COLORS.softGray }}>Health</p>
+                </div>
+                <div className="rounded-lg p-2 text-center" style={{ background: "rgba(14,69,72,0.4)" }}>
+                  <p className="text-xs font-bold" style={{ color: aiStats.profit != null ? COLORS.gold : COLORS.softGray }}>{aiStats.profit != null ? aiStats.profit : "—"}</p>
+                  <p className="text-[7px]" style={{ color: COLORS.softGray }}>Profit</p>
+                </div>
+                <div className="rounded-lg p-2 text-center" style={{ background: "rgba(14,69,72,0.4)" }}>
+                  <p className="text-xs font-bold" style={{ color: aiStats.activity != null ? COLORS.gold : COLORS.softGray }}>{aiStats.activity != null ? aiStats.activity : "—"}</p>
+                  <p className="text-[7px]" style={{ color: COLORS.softGray }}>Activity</p>
+                </div>
+                <div className="rounded-lg p-2 text-center" style={{ background: "rgba(14,69,72,0.4)" }}>
+                  <p className="text-xs font-bold" style={{ color: aiStats.growth != null ? COLORS.gold : COLORS.softGray }}>{aiStats.growth != null ? aiStats.growth : "—"}</p>
+                  <p className="text-[7px]" style={{ color: COLORS.softGray }}>Growth</p>
+                </div>
+              </div>
+            )}
+            {aiStats?.action && (
+              <div className="rounded-lg p-2 mt-1.5 text-center" style={{ background: `${COLORS.gold}10`, border: `1px solid ${COLORS.gold}25` }}>
+                <span className="text-[9px] font-bold" style={{ color: COLORS.gold }}>🤖 AI Action: {aiStats.action}</span>
+              </div>
+            )}
           </div>
 
           {/* Room management: scheduler + backup + archive */}

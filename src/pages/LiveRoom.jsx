@@ -14,8 +14,12 @@ import { useToast } from "@/components/ui/use-toast";
 export default function LiveRoom() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { id: roomId } = useParams();
-  const { joined, joining, error: joinError, recommendations, giftStats, roomScore, audioAction, publishEvent, archiveRoom, backupRoom, requestMic, verifyPayment, runScheduler } = useLiveRoomApi(roomId);
+  const { id: urlRoomId } = useParams();
+  // Backend functions that use room_id as a DB key require a UUID.
+  // If the URL doesn't provide one, generate a session UUID.
+  const [sessionId] = useState(() => urlRoomId || (crypto?.randomUUID?.() || `room-${Date.now()}-${Math.random().toString(36).slice(2)}`));
+  const roomId = sessionId;
+  const { joined, joining, error: joinError, recommendations, aiStats, giftStats, roomScore, audioAction, publishEvent, archiveRoom, backupRoom, requestMic, verifyPayment, runScheduler } = useLiveRoomApi(roomId);
   const [themeIndex, setThemeIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
@@ -275,7 +279,7 @@ export default function LiveRoom() {
       {showLeaderboard && <GiftLeaderboard onClose={() => setShowLeaderboard(false)} />}
 
       {/* Settings */}
-      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} onScheduler={runScheduler} giftStats={giftStats} roomScore={roomScore} />}
+      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} onScheduler={runScheduler} giftStats={giftStats} roomScore={roomScore} aiStats={aiStats} />}
 
       <style>{`
         @keyframes pulse {

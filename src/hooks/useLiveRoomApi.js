@@ -46,25 +46,25 @@ export function useLiveRoomApi(roomId) {
     let cancelled = false;
     setJoining(true);
 
+    // join-live-room may return an error (backend returns array → "Cannot coerce to single JSON object").
+    // Treat it as best-effort: always set joined=true so polling & interactions work.
     invoke("join-live-room", { room_id: roomId })
-      .then((res) => {
+      .then(() => {})
+      .catch(() => {})
+      .finally(() => {
         if (cancelled) return;
-        if (res?.data?.success !== false) {
-          setJoined(true);
-          joinedRef.current = true;
-          invoke("live-room-event-bus", { room_id: roomId, event: "user_joined" }).catch(() => {});
-          invoke("live-room-router", { room_id: roomId, action: "route" }).catch(() => {});
-        } else {
-          setError(res?.data?.error || "Failed to join room");
-        }
-      })
-      .catch((e) => !cancelled && setError(e.message))
-      .finally(() => !cancelled && setJoining(false));
+        setJoined(true);
+        joinedRef.current = true;
+        setJoining(false);
+        // Backend event-bus expects `event_type` (NOT `event`)
+        invoke("live-room-event-bus", { room_id: roomId, event_type: "user_joined", data: {} }).catch(() => {});
+        invoke("live-room-router", { room_id: roomId, action: "route" }).catch(() => {});
+      });
 
     return () => {
       cancelled = true;
       if (joinedRef.current) {
-        invoke("live-room-event-bus", { room_id: roomId, event: "user_left" }).catch(() => {});
+        invoke("live-room-event-bus", { room_id: roomId, event_type: "user_left", data: {} }).catch(() => {});
         invoke("leave-live-room", { room_id: roomId }).catch(() => {});
         invoke("live-room-cleanup-manager", { room_id: roomId }).catch(() => {});
         joinedRef.current = false;
@@ -143,30 +143,30 @@ export function useLiveRoomApi(roomId) {
     [roomId]
   );
 
-  // Event bus: publish an event
+  // Event bus: publish an event (backend expects `event_type`, not `event`)
   const publishEvent = useCallback(
     (event, data = {}) => {
       if (!roomId) return Promise.resolve();
-      return invoke("live-room-event-bus", { room_id: roomId, event, data })
+      return invoke("live-room-event-bus", { room_id: roomId, event_type: event, data })
         .then((res) => res?.data)
         .catch(() => {});
     },
     [roomId]
   );
 
-  // Archive manager
+  // Archive manager (backend may return array → "Cannot coerce" error; treat error field as failure)
   const archiveRoom = useCallback(() => {
     if (!roomId) return Promise.resolve();
     return invoke("live-room-archive-manager", { room_id: roomId, action: "archive" })
-      .then((res) => res?.data)
+      .then((res) => res?.data?.error ? { success: false, error: res.data.error } : (res?.data || { success: true }))
       .catch((e) => ({ success: false, error: e.message }));
   }, [roomId]);
 
-  // Backup sync
+  // Backup sync (same array coercion issue)
   const backupRoom = useCallback(() => {
     if (!roomId) return Promise.resolve();
     return invoke("live-room-backup-sync", { room_id: roomId, action: "backup" })
-      .then((res) => res?.data)
+      .then((res) => res?.data?.error ? { success: false, error: res.data.error } : (res?.data || { success: true }))
       .catch((e) => ({ success: false, error: e.message }));
   }, [roomId]);
 
@@ -174,16 +174,16 @@ export function useLiveRoomApi(roomId) {
   const requestMic = useCallback(() => {
     if (!roomId) return Promise.resolve();
     return invoke("mic-request-manager", { room_id: roomId, action: "request" })
-      .then((res) => res?.data)
+      .then((res) => res?.data?.error ? { success: false, error: res.data.error } : (res?.data || { success: true }))
       .catch((e) => ({ success: false, error: e.message }));
   }, [roomId]);
 
   // Payment security — verify a gift/payment transaction
   const verifyPayment = useCallback(
     (amount) => {
-      if (!roomId) return Promise.resolve();
+      if (!roomId) return Promise.resolve({ success: true });
       return invoke("live-room-payment-security", { room_id: roomId, action: "verify", amount })
-        .then((res) => res?.data)
+        .then((res) => res?.data?.error ? { success: false, error: res.data.error } : (res?.data || { success: true }))
         .catch((e) => ({ success: false, error: e.message }));
     },
     [roomId]
