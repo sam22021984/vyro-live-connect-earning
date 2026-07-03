@@ -55,6 +55,7 @@ import CountryManagerDashboard from '@/pages/CountryManagerDashboard';
 import BusinessManagerDashboard from '@/pages/BusinessManagerDashboard';
 import BusinessDeveloperDashboard from '@/pages/BusinessDeveloperDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
+import UserDashboard from '@/pages/UserDashboard';
 import SellerDashboard from '@/pages/SellerDashboard';
 import OfficialCoinSellerPolicy from '@/pages/OfficialCoinSellerPolicy';
 import OcsReportDashboard from '@/pages/OcsReportDashboard';
@@ -137,6 +138,7 @@ const AuthenticatedApp = () => {
         <Route path="/business-manager-dashboard" element={<BusinessManagerDashboard />} />
         <Route path="/business-developer-dashboard" element={<BusinessDeveloperDashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/seller-dashboard" element={<SellerDashboard />} />
         <Route path="/official-coin-seller-policy" element={<OfficialCoinSellerPolicy />} />
         <Route path="/ocs-report-dashboard" element={<OcsReportDashboard />} />

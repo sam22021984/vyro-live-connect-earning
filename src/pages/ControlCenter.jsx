@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Building2, User, Radio, ChevronRight, Shield } from "lucide-react";
+import { ArrowLeft, Building2, User, Radio, ChevronRight, Shield, Sparkles } from "lucide-react";
 
 const dashboards = [
   {
@@ -22,6 +22,16 @@ const dashboards = [
     gradient: "linear-gradient(135deg, #2563EB, #3B82F6)",
     color: "#3B82F6",
     modules: ["Agent Overview", "Recruitment Management", "Host Support Center", "Target & KPI Center", "Earnings & Commission", "Analytics Center", "Tasks & Achievements", "Support & Compliance"],
+  },
+  {
+    id: "user",
+    title: "User Dashboard",
+    description: "Manage your profile, wallet, VIP, rewards, social connections, live rooms, gifts, events, achievements, and activity",
+    icon: Sparkles,
+    path: "/user-dashboard",
+    gradient: "linear-gradient(135deg, #D4AF37, #F59E0B)",
+    color: "#D4AF37",
+    modules: ["Home", "Profile Center", "Wallet Center", "Reward Center", "VIP Center", "Social Center", "Live Center", "Gift Center", "Event Center", "Achievement Center", "Referral Center", "Notification Center", "Settings", "Safety Center", "Support Center", "User Activity"],
   },
   {
     id: "host",
