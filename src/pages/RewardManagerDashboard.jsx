@@ -20,6 +20,7 @@ import {
   EXCLUSIVE_TOOLS, REPORTING_STRUCTURE,
 } from "@/components/reward-manager/rewardManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import RewardManagerPolicyTab from "@/components/reward-manager/RewardManagerPolicyTab";
 
 const ICONS = {
   LayoutDashboard, Trophy, Target, PartyPopper, Crown, Handshake, Building2,
@@ -755,7 +756,7 @@ const SECTIONS = {
   loyalty: LoyaltySection, bonus: BonusSection, coins: CoinsSection,
   country: CountrySection, earners: TopEarnersSection, ai: AISection,
   analytics: AnalyticsSection, reports: ReportsSection, team: TeamSection,
-  settings: SettingsSection, exclusive: ExclusiveSection,
+  settings: SettingsSection, exclusive: ExclusiveSection, policy: RewardManagerPolicyTab,
 };
 
 export default function RewardManagerDashboard() {
