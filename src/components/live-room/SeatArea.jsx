@@ -50,8 +50,8 @@ export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10
   const layout = getLayout(count);
 
   const getSeatEffects = (seatId) => seatEffects.filter((e) => e.seatId === seatId);
-  const seatSize = count <= 6 ? 56 : count <= 10 ? 52 : count <= 15 ? 46 : 42;
-  const gapVal = count <= 10 ? "0.75rem" : "0.5rem";
+  const seatSize = count <= 6 ? 64 : count <= 10 ? 58 : count <= 15 ? 52 : 48;
+  const gapVal = count <= 10 ? "1rem" : "0.7rem";
 
   // Split seats into rows based on layout
   let seatIndex = 0;
@@ -62,12 +62,12 @@ export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10
   });
 
   return (
-    <div className="flex flex-col items-center w-full max-w-sm mx-auto" style={{ gap: gapVal }}>
+    <div className="flex flex-col items-center w-full mx-auto" style={{ gap: gapVal, maxWidth: "420px" }}>
       {rows.map((rowSeats, rowIdx) => (
         <div
           key={rowIdx}
-          className="flex justify-center w-full"
-          style={{ gap: gapVal }}
+          className="flex justify-center items-center w-full"
+          style={{ gap: count <= 6 ? "1.25rem" : count <= 10 ? "1rem" : "0.8rem" }}
         >
           {rowSeats.map((seat) => {
             const isHost = seat.id === 0;
