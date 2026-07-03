@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone } from "lucide-react";
 
 const dashboards = [
   {
@@ -79,6 +79,17 @@ const dashboards = [
     color: "#EF4444",
     badge: "PK MANAGER",
     modules: ["Dashboard Home", "PK Overview", "Battle Management", "Tournament Center", "Event Management", "PK Rewards", "PK Rankings", "Global Monitoring", "AI Fair Play", "Disputes", "PK Revenue", "PK Achievements", "Host Performance", "Agency Performance", "Country Performance", "Analytics", "Communication", "Reports", "Team Management", "Settings", "Exclusive Tools"],
+  },
+  {
+    id: "marketing",
+    title: "Marketing Manager Dashboard",
+    description: "Central marketing, branding, advertising, campaign management, user acquisition, host promotion, event promotion, social media management, influencer collaboration, growth analytics, and brand development control center",
+    icon: Megaphone,
+    path: "/marketing-manager-dashboard",
+    gradient: "linear-gradient(135deg, #3B82F6, #1D4ED8)",
+    color: "#3B82F6",
+    badge: "MARKETING MGR",
+    modules: ["Dashboard Home", "Marketing Overview", "Campaign Management", "User Acquisition", "Host Promotion", "Agency Promotion", "Brand Management", "Social Media", "Influencer Management", "Event Promotion", "Advertising Center", "Growth Analytics", "AI Marketing Intelligence", "Brand Performance", "Communication Center", "Content Management", "Promotion Management", "Report Management", "Team Management", "Settings", "Exclusive Tools"],
   },
 ];
 

@@ -47,6 +47,7 @@ import SupportManagerDashboard from '@/pages/SupportManagerDashboard';
 import SuperAdminDashboard from '@/pages/SuperAdminDashboard';
 import RewardManagerDashboard from '@/pages/RewardManagerDashboard';
 import PkManagerDashboard from '@/pages/PkManagerDashboard';
+import MarketingManagerDashboard from '@/pages/MarketingManagerDashboard';
 import FamilyCenter from '@/pages/FamilyCenter';
 import MessageCenter from '@/pages/MessageCenter';
 import MessageHub from '@/pages/MessageHub';
@@ -116,6 +117,7 @@ const AuthenticatedApp = () => {
         <Route path="/super-admin-dashboard" element={<SuperAdminDashboard />} />
         <Route path="/reward-manager-dashboard" element={<RewardManagerDashboard />} />
         <Route path="/pk-manager-dashboard" element={<PkManagerDashboard />} />
+        <Route path="/marketing-manager-dashboard" element={<MarketingManagerDashboard />} />
         <Route path="/family-center" element={<FamilyCenter />} />
         <Route path="/message-center" element={<MessageCenter />} />
         <Route path="/message-hub" element={<MessageHub />} />
