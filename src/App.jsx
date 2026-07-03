@@ -46,6 +46,7 @@ import VipManagerDashboard from '@/pages/VipManagerDashboard';
 import SupportManagerDashboard from '@/pages/SupportManagerDashboard';
 import SuperAdminDashboard from '@/pages/SuperAdminDashboard';
 import RewardManagerDashboard from '@/pages/RewardManagerDashboard';
+import PkManagerDashboard from '@/pages/PkManagerDashboard';
 import FamilyCenter from '@/pages/FamilyCenter';
 import MessageCenter from '@/pages/MessageCenter';
 import FloatingNavigation from '@/components/FloatingNavigation';
@@ -113,6 +114,7 @@ const AuthenticatedApp = () => {
         <Route path="/support-manager-dashboard" element={<SupportManagerDashboard />} />
         <Route path="/super-admin-dashboard" element={<SuperAdminDashboard />} />
         <Route path="/reward-manager-dashboard" element={<RewardManagerDashboard />} />
+        <Route path="/pk-manager-dashboard" element={<PkManagerDashboard />} />
         <Route path="/family-center" element={<FamilyCenter />} />
         <Route path="/message-center" element={<MessageCenter />} />
       </Route>

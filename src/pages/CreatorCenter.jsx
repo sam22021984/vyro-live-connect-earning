@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords } from "lucide-react";
 
 const dashboards = [
   {
@@ -68,6 +68,17 @@ const dashboards = [
     color: "#F59E0B",
     badge: "REWARD MANAGER",
     modules: ["Dashboard Home", "Reward Overview", "Reward Management", "Achievement Rewards", "Event Rewards", "VIP Rewards", "Agent Rewards", "Agency Rewards", "Host Rewards", "User Rewards", "Loyalty Program", "Bonus Management", "Coin Rewards", "Country Performance", "Top Earners", "AI Intelligence", "Analytics", "Reports", "Team Management", "Settings", "Exclusive Tools"],
+  },
+  {
+    id: "pkmanager",
+    title: "PK Manager Dashboard",
+    description: "Central PK Battle management, competition administration, ranking control, reward distribution, event organization, fair-play monitoring, performance analytics, and PK ecosystem operations control center",
+    icon: Swords,
+    path: "/pk-manager-dashboard",
+    gradient: "linear-gradient(135deg, #EF4444, #B91C1C)",
+    color: "#EF4444",
+    badge: "PK MANAGER",
+    modules: ["Dashboard Home", "PK Overview", "Battle Management", "Tournament Center", "Event Management", "PK Rewards", "PK Rankings", "Global Monitoring", "AI Fair Play", "Disputes", "PK Revenue", "PK Achievements", "Host Performance", "Agency Performance", "Country Performance", "Analytics", "Communication", "Reports", "Team Management", "Settings", "Exclusive Tools"],
   },
 ];
 
