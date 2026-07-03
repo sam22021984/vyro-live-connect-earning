@@ -2,9 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Bell, Search } from "lucide-react";
 import { FINANCE_COLORS } from "./financeData";
+import { useBackNav } from "@/hooks/useBackNav";
 
 export default function FinanceHeader({ title, subtitle }) {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/more-services");
 
   return (
     <div
@@ -13,7 +15,7 @@ export default function FinanceHeader({ title, subtitle }) {
     >
       <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate("/more-services")}
+          onClick={handleBack}
           className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition"
           style={{ background: "rgba(255,255,255,0.1)" }}
         >

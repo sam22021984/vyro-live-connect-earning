@@ -16,11 +16,13 @@ import CategoryTags from "@/components/edit-profile/CategoryTags";
 import LanguageSelector from "@/components/edit-profile/LanguageSelector";
 import SocialLinks from "@/components/edit-profile/SocialLinks";
 import PreferencesSection from "@/components/edit-profile/PreferencesSection";
+import { useBackNav } from "@/hooks/useBackNav";
 
 const COUNTRIES = ["Qatar", "Saudi Arabia", "UAE", "Kuwait", "Bahrain", "Oman", "Egypt", "Jordan", "Lebanon", "Morocco", "Algeria", "Tunisia", "Iraq", "Sudan", "Turkey", "Indonesia", "Malaysia", "India", "Pakistan", "Bangladesh", "United States", "United Kingdom", "Other"];
 
 export default function EditProfile() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/profile-dashboard");
   const { user } = useAuth();
   const { toast } = useToast();
   const { moderate, moderating } = useContentModeration();
@@ -151,7 +153,7 @@ export default function EditProfile() {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="sticky top-0 z-20 px-4 py-3 flex items-center gap-3 bg-white/90 backdrop-blur-xl border-b border-gray-100">
-          <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center active:scale-95 transition">
+          <button onClick={handleBack} className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center active:scale-95 transition">
             <ArrowLeft size={18} className="text-gray-600" />
           </button>
           <div className="flex-1">

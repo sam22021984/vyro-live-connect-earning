@@ -9,6 +9,7 @@ import HistoryTab from "@/components/relationship/HistoryTab";
 import SafetyTab from "@/components/relationship/SafetyTab";
 import { RELATIONSHIP_COLORS, GRADIENT_DARK, GRADIENT_PINK_PURPLE, formatDate, formatTime } from "@/components/relationship/relationshipData";
 import { useToast } from "@/components/ui/use-toast";
+import { useBackNav } from "@/hooks/useBackNav";
 
 const TABS = [
   { key: "discover", label: "Discover", icon: Search },
@@ -20,6 +21,7 @@ const TABS = [
 
 export default function RelationshipCenter() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/social");
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("discover");
   const [existingRelations, setExistingRelations] = useState([]);
@@ -103,7 +105,7 @@ export default function RelationshipCenter() {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="sticky top-0 z-20 backdrop-blur-xl px-4 py-3 flex items-center gap-3" style={{ background: "rgba(26,11,46,0.8)", borderBottom: "1px solid " + RELATIONSHIP_COLORS.glassBorder }}>
-          <button onClick={() => navigate("/social")} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: RELATIONSHIP_COLORS.glassBg }}>
+          <button onClick={handleBack} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: RELATIONSHIP_COLORS.glassBg }}>
             <ArrowLeft size={18} style={{ color: RELATIONSHIP_COLORS.textLight }} />
           </button>
           <div className="flex-1">

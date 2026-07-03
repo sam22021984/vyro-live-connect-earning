@@ -7,9 +7,11 @@ import UserLevelDashboard from "@/components/levels/UserLevelDashboard";
 import StreamingLevelDashboard from "@/components/levels/StreamingLevelDashboard";
 import HostLevelDashboard from "@/components/levels/HostLevelDashboard";
 import GiftingLevelDashboard from "@/components/levels/GiftingLevelDashboard";
+import { useBackNav } from "@/hooks/useBackNav";
 
 export default function LevelSystem() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/more-services");
   const [activeLevel, setActiveLevel] = useState(null);
   const [activeView, setActiveView] = useState("overview");
   const [profile, setProfile] = useState(null);
@@ -65,7 +67,7 @@ export default function LevelSystem() {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 py-3 flex items-center gap-3">
-          <button onClick={() => navigate("/more-services")} className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center active:scale-95 transition">
+          <button onClick={handleBack} className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center active:scale-95 transition">
             <ArrowLeft size={18} className="text-gray-700" />
           </button>
           <div className="flex-1">

@@ -7,6 +7,7 @@ import RewardCenterTab from "@/components/tasks-rewards/RewardCenterTab";
 import DailyBonusTab from "@/components/tasks-rewards/DailyBonusTab";
 import EventsTab from "@/components/tasks-rewards/EventsTab";
 import AchievementTab from "@/components/tasks-rewards/AchievementTab";
+import { useBackNav } from "@/hooks/useBackNav";
 
 const tabs = [
   { key: "task-center", label: "Tasks", icon: "📋" },
@@ -18,6 +19,7 @@ const tabs = [
 
 export default function TasksRewards() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/more-services");
   const [activeTab, setActiveTab] = useState("task-center");
 
   return (
@@ -25,7 +27,7 @@ export default function TasksRewards() {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="sticky top-0 z-20 px-4 py-3 flex items-center gap-3" style={{ background: `${COLORS.white}f0`, backdropFilter: "blur(20px)", borderBottom: "1px solid #EEF0F4" }}>
-          <button onClick={() => navigate("/more-services")} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: COLORS.cardBg }}>
+          <button onClick={handleBack} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: COLORS.cardBg }}>
             <ArrowLeft size={18} style={{ color: COLORS.navy }} />
           </button>
           <div className="flex-1">

@@ -8,6 +8,7 @@ import { MESSAGE_CATEGORIES } from "@/components/message-center/messageCenterDat
 import CategoryContent from "@/components/message-center/CategoryContent";
 import { useToast } from "@/components/ui/use-toast";
 import { useServicesData } from "@/hooks/useServicesData";
+import { useBackNav } from "@/hooks/useBackNav";
 
 const ICON_MAP = {
   ArrowLeft, Mail, Bell, Megaphone, LifeBuoy, BadgeCheck, Flag, Server,
@@ -27,6 +28,7 @@ const GLASS = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(25
 
 export default function MessageCenter() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/more-services");
   const { toast } = useToast();
   const { data, loading, markAllAsRead } = useServicesData();
   const [activeCategory, setActiveCategory] = useState(MESSAGE_CATEGORIES[0].id);
@@ -54,7 +56,7 @@ export default function MessageCenter() {
       <div className="max-w-md mx-auto pb-8">
         {/* Header */}
         <div className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3" style={{ background: "rgba(10,15,30,0.8)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-          <button onClick={() => navigate("/more-services")} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "rgba(255,255,255,0.08)" }}>
+          <button onClick={handleBack} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "rgba(255,255,255,0.08)" }}>
             <ArrowLeft size={18} style={{ color: SOFT_WHITE }} />
           </button>
           <div className="flex-1">

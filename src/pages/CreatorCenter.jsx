@@ -8,6 +8,7 @@ import { base44 } from "@/api/base44Client";
 import { dashboards } from "@/components/creator/creatorData";
 import CreatorStatsBanner from "@/components/creator/CreatorStatsBanner";
 import { useCreatorCenter } from "@/hooks/useCreatorCenter";
+import { useBackNav } from "@/hooks/useBackNav";
 
 const ICON_MAP = {
   Crown, Shield, LifeBuoy, Gift, Swords, Megaphone, DollarSign, PartyPopper,
@@ -26,6 +27,7 @@ const DASHBOARD_ROLE_LEVEL = {
 
 export default function CreatorCenter() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/more-services");
   const { profile, stats, loading } = useCreatorCenter();
 
   const userRole = profile?.role || "user";
@@ -49,7 +51,7 @@ export default function CreatorCenter() {
       <div className="max-w-md mx-auto pb-8">
         {/* Header */}
         <div className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3" style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid #E5E7EB" }}>
-          <button onClick={() => navigate("/more-services")} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "#F7F9FC" }}>
+          <button onClick={handleBack} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "#F7F9FC" }}>
             <ArrowLeft size={18} style={{ color: "#0F1B3D" }} />
           </button>
           <div className="flex-1">

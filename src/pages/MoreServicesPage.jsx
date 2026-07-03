@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useBackNav } from "@/hooks/useBackNav";
 
 // Only miscellaneous/admin services — profile, live, party, community items
 // are accessed from their dedicated sections to avoid duplicates.
@@ -21,6 +22,7 @@ const services = [
 
 export default function MoreServicesPage() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/");
 
   return (
     <div className="min-h-screen bg-[#F8F9FC]">
@@ -28,7 +30,7 @@ export default function MoreServicesPage() {
         {/* Header */}
         <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 py-3 flex items-center gap-3">
           <button
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center active:scale-95 transition"
           >
             <ArrowLeft size={18} className="text-gray-700" />

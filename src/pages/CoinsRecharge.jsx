@@ -6,11 +6,13 @@ import { RECHARGE_TIERS } from "@/components/finance/rechargeTiersData";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import { useBackNav } from "@/hooks/useBackNav";
 
 const formatNum = (n) => n.toLocaleString();
 
 export default function CoinsRecharge() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/finance");
   const { user } = useAuth();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
@@ -123,7 +125,7 @@ export default function CoinsRecharge() {
       {/* Header */}
       <div className="sticky top-0 z-30 px-4 py-3" style={{ background: FINANCE_COLORS.navyGradient, boxShadow: "0 4px 20px rgba(15,27,61,0.3)" }}>
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/finance")} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "rgba(255,255,255,0.1)" }}>
+          <button onClick={handleBack} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "rgba(255,255,255,0.1)" }}>
             <ArrowLeft size={18} className="text-white" />
           </button>
           <div className="flex-1">

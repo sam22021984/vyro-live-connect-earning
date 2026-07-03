@@ -6,12 +6,14 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
+import { useBackNav } from "@/hooks/useBackNav";
 
 const COINS_PER_USD = 20000;
 const formatNum = (n) => n.toLocaleString();
 
 export default function Withdraw() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/coins-recharge");
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -82,7 +84,7 @@ export default function Withdraw() {
       {/* Header */}
       <div className="sticky top-0 z-30 px-4 py-3" style={{ background: FINANCE_COLORS.navyGradient, boxShadow: "0 4px 20px rgba(15,27,61,0.3)" }}>
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/coins-recharge")} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "rgba(255,255,255,0.1)" }}>
+          <button onClick={handleBack} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "rgba(255,255,255,0.1)" }}>
             <ArrowLeft size={18} className="text-white" />
           </button>
           <div className="flex-1">

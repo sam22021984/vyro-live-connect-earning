@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown, ChevronRight, Search, Bell } from "lucide-react";
 import { FINANCE_COLORS, FINANCE_CATEGORIES, FINANCE_QUICK_STATS } from "@/components/finance/financeOptionsData";
+import { useBackNav } from "@/hooks/useBackNav";
 
 const COLOR_MAP = {
   emerald: { bg: `${FINANCE_COLORS.emerald}10`, border: `${FINANCE_COLORS.emerald}30`, text: FINANCE_COLORS.emerald },
@@ -12,6 +13,7 @@ const COLOR_MAP = {
 
 export default function FinanceModule() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/finance");
   const [expanded, setExpanded] = useState("dashboard");
   const [search, setSearch] = useState("");
 
@@ -41,7 +43,7 @@ export default function FinanceModule() {
       >
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate("/finance")}
+            onClick={handleBack}
             className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition"
             style={{ background: "rgba(255,255,255,0.1)" }}
           >

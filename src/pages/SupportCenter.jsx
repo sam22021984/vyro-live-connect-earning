@@ -13,6 +13,7 @@ import {
   SUPPORT_SECURITY_REPORTS, SUPPORT_NOTIFICATIONS,
 } from "@/components/support-center/supportCenterData";
 import { useServicesData } from "@/hooks/useServicesData";
+import { useBackNav } from "@/hooks/useBackNav";
 
 const ICONS = {
   Book, MessageCircle, Headset, Bell, Smartphone, Ban, Flag, AlertTriangle,
@@ -33,6 +34,7 @@ function Card({ children, className = "" }) {
 
 export default function SupportCenter() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/more-services");
   const { toast } = useToast();
   const { data, createSupportTicket } = useServicesData();
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,7 +83,7 @@ export default function SupportCenter() {
       <div className="max-w-md mx-auto pb-8">
         {/* Header */}
         <div className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3" style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid #E5E7EB" }}>
-          <button onClick={() => navigate("/more-services")} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "#F7F9FC" }}>
+          <button onClick={handleBack} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "#F7F9FC" }}>
             <ArrowLeft size={18} style={{ color: DARK }} />
           </button>
           <div className="flex-1">

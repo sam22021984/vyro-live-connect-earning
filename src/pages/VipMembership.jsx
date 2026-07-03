@@ -20,9 +20,11 @@ import VipRewardSystem from "@/pages/VipRewardSystem";
 import VipAuthoritySystem from "@/pages/VipAuthoritySystem";
 import VipRoomManager from "@/pages/VipRoomManager";
 import VipSecurityAdminSystem from "@/pages/VipSecurityAdminSystem";
+import { useBackNav } from "@/hooks/useBackNav";
 
 export default function VipMembership() {
   const navigate = useNavigate();
+  const handleBack = useBackNav("/more-services");
   const [activeTab, setActiveTab] = useState("home");
   const [selectedDurationId, setSelectedDurationId] = useState(null);
 
@@ -64,7 +66,7 @@ export default function VipMembership() {
         <div className="sticky top-0 z-30 bg-[#0A0118]/90 backdrop-blur-xl border-b border-amber-500/20">
           <div className="px-4 py-3 flex items-center gap-3">
             <button
-              onClick={() => navigate("/more-services")}
+              onClick={handleBack}
               className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center active:scale-95 transition"
             >
               <ArrowLeft size={18} className="text-amber-400" />
