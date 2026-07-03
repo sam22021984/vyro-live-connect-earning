@@ -7,7 +7,7 @@ import { vipPricingTiers } from "@/components/vip/vipData";
 import VipSystemHeader from "@/components/vip-systems/VipSystemHeader";
 import VipSystemLoader from "@/components/vip-systems/VipSystemLoader";
 
-export default function VipCoreSystem() {
+export default function VipCoreSystem({ embedded }) {
   const { profile, loading } = useVipProfile();
   const navigate = useNavigate();
 
@@ -20,7 +20,7 @@ export default function VipCoreSystem() {
   return (
     <div className="min-h-screen bg-[#0A0118]">
       <div className="max-w-md mx-auto">
-        <VipSystemHeader title="VIP CORE SYSTEM" subtitle="Your VIP membership center" icon="👑" color="#FFD700" />
+        {!embedded && <VipSystemHeader title="VIP CORE SYSTEM" subtitle="Your VIP membership center" icon="👑" color="#FFD700" />}
 
         <div className="pb-6 animate-fadeIn">
           {/* VIP Status Card */}

@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import VipSystemHeader from "@/components/vip-systems/VipSystemHeader";
 import VipSystemLoader from "@/components/vip-systems/VipSystemLoader";
 
-export default function VipRewardSystem() {
+export default function VipRewardSystem({ embedded }) {
   const { profile, loading } = useVipProfile();
   const { toast } = useToast();
   const [claiming, setClaiming] = useState(null);
@@ -57,7 +57,7 @@ export default function VipRewardSystem() {
   return (
     <div className="min-h-screen bg-[#0A0118]">
       <div className="max-w-md mx-auto">
-        <VipSystemHeader title="VIP REWARD SYSTEM" subtitle="Exclusive VIP rewards & bonuses" icon="🎁" color="#10B981" />
+        {!embedded && <VipSystemHeader title="VIP REWARD SYSTEM" subtitle="Exclusive VIP rewards & bonuses" icon="🎁" color="#10B981" />}
 
         <div className="pb-6 animate-fadeIn">
           {/* Balance Card */}

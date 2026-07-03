@@ -15,6 +15,11 @@ import VipDurationTab from "@/components/vip/VipDurationTab";
 import VipHistoryTab from "@/components/vip/VipHistoryTab";
 import VipSettingsTab from "@/components/vip/VipSettingsTab";
 import VipNotificationsTab from "@/components/vip/VipNotificationsTab";
+import VipCoreSystem from "@/pages/VipCoreSystem";
+import VipRewardSystem from "@/pages/VipRewardSystem";
+import VipAuthoritySystem from "@/pages/VipAuthoritySystem";
+import VipRoomManager from "@/pages/VipRoomManager";
+import VipSecurityAdminSystem from "@/pages/VipSecurityAdminSystem";
 
 export default function VipMembership() {
   const navigate = useNavigate();
@@ -37,6 +42,11 @@ export default function VipMembership() {
       case "history": return <VipHistoryTab />;
       case "settings": return <VipSettingsTab />;
       case "notifications": return <VipNotificationsTab />;
+      case "vip-core": return <VipCoreSystem embedded />;
+      case "vip-rewards": return <VipRewardSystem embedded />;
+      case "vip-authority": return <VipAuthoritySystem embedded />;
+      case "vip-rooms": return <VipRoomManager embedded />;
+      case "vip-security": return <VipSecurityAdminSystem embedded />;
       default: return <VipHomeTab onNavigate={setActiveTab} />;
     }
   };

@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import VipSystemHeader from "@/components/vip-systems/VipSystemHeader";
 import VipSystemLoader from "@/components/vip-systems/VipSystemLoader";
 
-export default function VipSecurityAdminSystem() {
+export default function VipSecurityAdminSystem({ embedded }) {
   const { profile, loading } = useVipProfile();
   const { toast } = useToast();
   const [features, setFeatures] = useState(
@@ -39,7 +39,7 @@ export default function VipSecurityAdminSystem() {
   return (
     <div className="min-h-screen bg-[#0A0118]">
       <div className="max-w-md mx-auto">
-        <VipSystemHeader title="VIP SECURITY ADMIN" subtitle="Account security & protection" icon="🛡️" color="#3B82F6" />
+        {!embedded && <VipSystemHeader title="VIP SECURITY ADMIN" subtitle="Account security & protection" icon="🛡️" color="#3B82F6" />}
 
         <div className="pb-6 animate-fadeIn">
           {/* Security Score Card */}

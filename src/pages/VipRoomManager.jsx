@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import VipSystemHeader from "@/components/vip-systems/VipSystemHeader";
 import VipSystemLoader from "@/components/vip-systems/VipSystemLoader";
 
-export default function VipRoomManager() {
+export default function VipRoomManager({ embedded }) {
   const { profile, loading } = useVipProfile();
   const { toast } = useToast();
   const [showCreate, setShowCreate] = useState(false);
@@ -66,7 +66,7 @@ export default function VipRoomManager() {
   return (
     <div className="min-h-screen bg-[#0A0118]">
       <div className="max-w-md mx-auto">
-        <VipSystemHeader title="VIP ROOM MANAGER" subtitle="Create & manage VIP rooms" icon="🏠" color="#8B5CF6" />
+        {!embedded && <VipSystemHeader title="VIP ROOM MANAGER" subtitle="Create & manage VIP rooms" icon="🏠" color="#8B5CF6" />}
 
         <div className="pb-6 animate-fadeIn">
           {/* VIP Status Banner */}

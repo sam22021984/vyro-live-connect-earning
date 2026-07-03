@@ -7,7 +7,7 @@ import { vipPricingTiers } from "@/components/vip/vipData";
 import VipSystemHeader from "@/components/vip-systems/VipSystemHeader";
 import VipSystemLoader from "@/components/vip-systems/VipSystemLoader";
 
-export default function VipAuthoritySystem() {
+export default function VipAuthoritySystem({ embedded }) {
   const { profile, loading } = useVipProfile();
   const [selectedTier, setSelectedTier] = useState(null);
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function VipAuthoritySystem() {
   return (
     <div className="min-h-screen bg-[#0A0118]">
       <div className="max-w-md mx-auto">
-        <VipSystemHeader title="VIP AUTHORITY SYSTEM" subtitle="Room authority & moderation powers" icon="⚡" color="#EF4444" />
+        {!embedded && <VipSystemHeader title="VIP AUTHORITY SYSTEM" subtitle="Room authority & moderation powers" icon="⚡" color="#EF4444" />}
 
         <div className="pb-6 animate-fadeIn">
           {/* Current Authority Card */}

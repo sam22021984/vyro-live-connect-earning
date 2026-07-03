@@ -135,4 +135,9 @@ export const vipTabs = [
   { key: "history", label: "VIP History", icon: "📊" },
   { key: "settings", label: "VIP Settings", icon: "⚙️" },
   { key: "notifications", label: "VIP Notifications", icon: "🔔" },
+  { key: "vip-core", label: "VIP Core", icon: "👑" },
+  { key: "vip-rewards", label: "VIP Rewards", icon: "🎁" },
+  { key: "vip-authority", label: "VIP Authority", icon: "⚡" },
+  { key: "vip-rooms", label: "VIP Rooms", icon: "🏠" },
+  { key: "vip-security", label: "VIP Security", icon: "🛡️" },
 ];
