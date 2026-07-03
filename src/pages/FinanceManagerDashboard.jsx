@@ -20,6 +20,7 @@ import {
   FIN_SETTINGS_GROUPS, FIN_EXCLUSIVE_TOOLS, FIN_REPORTING_STRUCTURE,
 } from "@/components/finance-manager/financeManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import FinanceManagerPolicyTab from "@/components/finance-manager/FinanceManagerPolicyTab";
 
 const ICONS = {
   LayoutDashboard, TrendingUp, Banknote, CreditCard, Wallet, Coins, Gift,
@@ -803,7 +804,7 @@ const SECTIONS = {
   reports: ReportsSection, audit: AuditSection, fraud: FraudSection,
   analytics: AnalyticsSection, country: CountrySection, topearners: TopEarnersSection,
   ai: AISection, communication: CommunicationSection, team: TeamSection,
-  settings: SettingsSection, exclusive: ExclusiveSection,
+  settings: SettingsSection, exclusive: ExclusiveSection, policy: FinanceManagerPolicyTab,
 };
 
 export default function FinanceManagerDashboard() {
