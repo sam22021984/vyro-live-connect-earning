@@ -10,6 +10,7 @@ export function useHomeFeed() {
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [followingMap, setFollowingMap] = useState({});
   const reqId = useRef(0);
 
   const load = useCallback(async (isRefresh = false) => {
@@ -34,6 +35,16 @@ export function useHomeFeed() {
       setCreators(hosts || []);
       setFriendSuggestions((users || []).filter((u) => u.id !== profileRes?.data?.profile?.id));
       setProfile(profileRes?.data?.profile || null);
+
+      // Check following status for creators + friends
+      const allPeople = [...(hosts || []), ...(users || [])].filter((u) => u.id !== profileRes?.data?.profile?.id);
+      const ids = allPeople.map((u) => u.id).filter(Boolean);
+      if (ids.length > 0) {
+        try {
+          const followRes = await base44.functions.invoke("homeFeedActions", { action: "check_following", target_ids: ids });
+          setFollowingMap(followRes?.data?.following || {});
+        } catch {}
+      }
     } catch (e) {
       if (currentReq !== reqId.current) return;
       setError(e.message || "Failed to load feed");
@@ -54,5 +65,5 @@ export function useHomeFeed() {
     return () => { unsubLive(); unsubParty(); };
   }, [load]);
 
-  return { liveRooms, partyRooms, creators, friendSuggestions, profile, loading, error, refreshing, refresh: () => load(true) };
+  return { liveRooms, partyRooms, creators, friendSuggestions, profile, followingMap, loading, error, refreshing, refresh: () => load(true) };
 }

@@ -14,7 +14,7 @@ import { HomeSkeleton, EmptyState, ErrorState } from "@/components/home/HomeStat
 import WelcomeBonusPopup from "@/components/home/WelcomeBonusPopup";
 
 export default function Home() {
-  const { liveRooms, partyRooms, creators, friendSuggestions, loading, error, refreshing, refresh } = useHomeFeed();
+  const { liveRooms, partyRooms, creators, friendSuggestions, followingMap, loading, error, refreshing, refresh } = useHomeFeed();
   const [showSearch, setShowSearch] = useState(false);
   const [activeTab, setActiveTab] = useState("Recommended");
   const [country, setCountry] = useState("ALL");
@@ -131,13 +131,13 @@ export default function Home() {
 
             <PartyRoomFeed rooms={sortedParty} />
 
-            <CreatorSuggestions creators={filterContent(creators)} />
+            <CreatorSuggestions creators={filterContent(creators)} followingMap={followingMap} />
 
             <TrendingHashtags />
 
             <TrendingEvents />
 
-            <FriendSuggestions friends={filterContent(friendSuggestions)} />
+            <FriendSuggestions friends={filterContent(friendSuggestions)} followingMap={followingMap} />
 
             <ContinueWatching />
 

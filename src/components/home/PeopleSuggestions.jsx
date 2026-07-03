@@ -9,9 +9,20 @@ function FollowButton({ userId, initialFollowed }) {
 
   const handleFollow = async (e) => {
     e.stopPropagation();
+    if (loading) return;
     setLoading(true);
-    setFollowed(!followed);
-    setLoading(false);
+    const wasFollowed = followed;
+    setFollowed(!wasFollowed);
+    try {
+      await base44.functions.invoke("homeFeedActions", {
+        action: wasFollowed ? "unfollow" : "follow",
+        target_user_id: userId,
+      });
+    } catch (err) {
+      setFollowed(wasFollowed);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,7 +38,7 @@ function FollowButton({ userId, initialFollowed }) {
   );
 }
 
-export function CreatorSuggestions({ creators }) {
+export function CreatorSuggestions({ creators, followingMap = {} }) {
   const navigate = useNavigate();
   if (!creators || creators.length === 0) return null;
 
@@ -60,7 +71,7 @@ export function CreatorSuggestions({ creators }) {
               </p>
               <p className="text-[9px] text-gray-400">{c.followers || 0} followers</p>
               <div className="mt-1.5">
-                <FollowButton userId={c.id} />
+                <FollowButton userId={c.id} initialFollowed={!!followingMap[c.id]} />
               </div>
             </div>
           </div>
@@ -70,7 +81,7 @@ export function CreatorSuggestions({ creators }) {
   );
 }
 
-export function FriendSuggestions({ friends }) {
+export function FriendSuggestions({ friends, followingMap = {} }) {
   const navigate = useNavigate();
   if (!friends || friends.length === 0) return null;
 
@@ -94,7 +105,7 @@ export function FriendSuggestions({ friends }) {
             />
             <p className="text-xs font-bold text-gray-800 truncate">{f.username}</p>
             <p className="text-[9px] text-gray-400 mb-1.5">{f.country || "Unknown"}</p>
-            <FollowButton userId={f.id} />
+            <FollowButton userId={f.id} initialFollowed={!!followingMap[f.id]} />
           </div>
         ))}
       </div>

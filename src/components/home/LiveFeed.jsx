@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, Gift, BadgeCheck, Crown, Users } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 function formatDuration(seconds) {
   if (!seconds) return "0m";
@@ -12,6 +13,17 @@ function formatDuration(seconds) {
 
 export default function LiveFeed({ rooms }) {
   const navigate = useNavigate();
+
+  const handleJoinRoom = async (room) => {
+    try {
+      await base44.functions.invoke("homeFeedActions", {
+        action: "join_room",
+        room_id: room.room_id || room.id,
+        room_session_id: room.id,
+      });
+    } catch {}
+    navigate(`/live-room/${room.id}`);
+  };
 
   if (!rooms || rooms.length === 0) return null;
 
@@ -29,7 +41,7 @@ export default function LiveFeed({ rooms }) {
         {rooms.map((room) => (
           <button
             key={room.id}
-            onClick={() => navigate(`/live-room/${room.id}`)}
+            onClick={() => handleJoinRoom(room)}
             className="flex-shrink-0 w-36 rounded-2xl overflow-hidden bg-white border border-gray-50 shadow-sm active:scale-95 transition text-left"
           >
             {/* Thumbnail */}

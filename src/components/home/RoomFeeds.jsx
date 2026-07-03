@@ -1,6 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Users, Lock, Headphones, Mic, Crown } from "lucide-react";
+import { base44 } from "@/api/base44Client";
+
+const joinRoom = async (room) => {
+  try {
+    await base44.functions.invoke("homeFeedActions", {
+      action: "join_room",
+      room_id: room.id,
+    });
+  } catch {}
+};
 
 export function AudioRoomFeed({ rooms }) {
   const navigate = useNavigate();
@@ -19,7 +29,7 @@ export function AudioRoomFeed({ rooms }) {
         {audioRooms.map((room) => (
           <button
             key={room.id}
-            onClick={() => navigate(`/live-room/${room.id}`)}
+            onClick={() => { joinRoom(room); navigate(`/live-room/${room.id}`); }}
             className="flex-shrink-0 w-40 rounded-2xl overflow-hidden bg-white border border-gray-50 shadow-sm active:scale-95 transition text-left"
           >
             <div className="relative h-20 bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center">
@@ -63,7 +73,7 @@ export function PartyRoomFeed({ rooms }) {
         {partyRooms.slice(0, 10).map((room) => (
           <button
             key={room.id}
-            onClick={() => navigate(`/live-room/${room.id}`)}
+            onClick={() => { joinRoom(room); navigate(`/live-room/${room.id}`); }}
             className="flex-shrink-0 w-40 rounded-2xl overflow-hidden bg-white border border-gray-50 shadow-sm active:scale-95 transition text-left"
           >
             <div className="relative h-24 bg-gradient-to-br from-pink-400 to-rose-500">
