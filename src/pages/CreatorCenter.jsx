@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon } from "lucide-react";
 
 const dashboards = [
   {
@@ -46,6 +46,17 @@ const dashboards = [
     color: "#2F80ED",
     badge: "SUPPORT MANAGER",
     modules: ["Dashboard Home", "Support Overview", "Ticket Management", "User Support", "Host Support", "Agent Support", "Agency Support", "VIP Support", "Account Recovery", "Appeals Management", "Fraud Reports", "Payment Support", "Withdrawal Support", "Live Stream Support", "Technical Support", "Knowledge Base", "Communication", "Reports", "Staff Management", "Analytics", "Exclusive Tools"],
+  },
+  {
+    id: "superadmin",
+    title: "Super Admin Dashboard",
+    description: "Central operational management and monitoring system for overseeing agencies, talent agents, hosts, and admins. Approves applications, monitors performance, tracks revenue, and maintains platform standards",
+    icon: ShieldIcon,
+    path: "/super-admin-dashboard",
+    gradient: "linear-gradient(135deg, #475569, #64748B)",
+    color: "#475569",
+    badge: "SUPER ADMIN",
+    modules: ["Dashboard Home", "Agency Management", "Agent Management", "Host Management", "Admin Management", "Application Management", "Performance Monitoring", "Revenue Monitoring", "Event Monitoring", "PK Monitoring", "Reports & Violations", "Security Monitoring", "Communication Center", "Analytics Center", "Audit Log Center", "Operation Settings"],
   },
 ];
 
