@@ -281,12 +281,12 @@ export default function LiveRoom() {
       </div>
 
       {/* ===== Seat Grid — upper-mid ===== */}
-      <div className="relative z-10 flex-shrink-0 flex items-center justify-start" style={{ padding: "0 16px", flex: "0 1 auto", minHeight: "0" }}>
+      <div className="relative z-10 flex-shrink-0 flex items-center justify-start" style={{ padding: "0 16px", flex: "0 0 auto" }}>
         <SeatArea onSeatClick={handleSeatClick} seatEffects={seatEffects} seatCount={seatCount} />
       </div>
 
-      {/* ===== Message Area — tabs + warning + chat ===== */}
-      <div className="relative z-20 flex-shrink-0" style={{ padding: "0 16px" }}>
+      {/* ===== Message Area — tabs + warning + chat (flexible, moves with seat count) ===== */}
+      <div className="relative z-20 flex-1 min-h-0 flex flex-col justify-end" style={{ padding: "0 16px" }}>
         <MessageArea
           chat={chat}
           showWarning={showWarning}
