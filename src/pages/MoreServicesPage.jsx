@@ -19,7 +19,6 @@ const services = [
   { name: "VYRO Mall", icon: "🛒", gradient: "from-orange-400 to-red-500", highlight: true },
   { name: "Trust & Reputation", icon: "🛡️", gradient: "from-green-400 to-teal-500", highlight: false },
   { name: "Lucky ID Store", icon: "🎰", gradient: "from-pink-400 to-purple-500", highlight: true },
-  { name: "App ID System", icon: "🆔", gradient: "from-blue-400 to-indigo-500", highlight: true },
 ];
 
 export default function MoreServicesPage() {
@@ -56,8 +55,6 @@ export default function MoreServicesPage() {
       navigate("/trust-reputation");
     } else if (s.name === "Lucky ID Store") {
       navigate("/lucky-id-store");
-    } else if (s.name === "App ID System") {
-      navigate("/application-id-system");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
