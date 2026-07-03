@@ -75,6 +75,12 @@ export const SOCIAL_MODULES = [
       { name: "Sarah Chen", role: "Agency Owner", level: "LV.32", isOnline: true, isVip: true, avatar: "SC", color: "#D4AF37" },
       { name: "Mountain Echo", role: "Host", level: "LV.28", isOnline: false, isVip: false, avatar: "ME", color: "#10B981" },
     ],
+    features: [
+      "Connected Users List", "Followers", "Following", "Referral Members", "VIP Members",
+      "Hosts", "Agencies", "Family Members", "Friends", "Favorite Users", "Online Status",
+      "Last Active Time", "User Level", "VIP Badge", "Profile Preview", "Search People",
+      "Filter by Status", "Sort by Activity", "Mutual Connections", "Recently Connected", "Suggested People",
+    ],
     actions: ["View Profile", "Follow", "Unfollow", "Send Request", "Remove", "Block", "Report", "Message", "Voice Call", "Video Call", "Invite to Party", "Invite to Live", "Add to Favorites", "Share Profile"],
   },
   {
@@ -109,6 +115,13 @@ export const SOCIAL_MODULES = [
       { name: "Stella Streams", mutual: 12, date: "2026-07-02", avatar: "SS", color: "#EC4899" },
       { name: "Apex Agency", mutual: 8, date: "2026-07-01", avatar: "AA", color: "#8B5CF6" },
       { name: "Golden Dawn", mutual: 4, date: "2026-06-30", avatar: "GD", color: "#F59E0B" },
+    ],
+    features: [
+      "Friends List", "Friend Requests", "Pending Requests", "Sent Requests", "Mutual Friends",
+      "Best Friends", "Close Friends", "Online Friends", "Offline Friends", "Recently Active Friends",
+      "Birthday Reminder", "Friend Recommendations", "Search Friends", "Friend Categories",
+      "Favorite Friends", "Friend Levels", "Friendship Anniversary", "Friendship Points",
+      "Shared Interests", "Shared Groups",
     ],
     actions: ["Add Friend", "Accept", "Decline", "Cancel", "Remove", "Block", "Report", "Message", "Voice Call", "Video Call", "Invite to Party", "Invite to Live", "Send Gift", "Send Coins", "Share", "Pin Friend", "Mute", "Favorite"],
   },
