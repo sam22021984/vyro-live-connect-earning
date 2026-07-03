@@ -7,7 +7,7 @@ import {
   Video, Gift, Inbox, Sparkles, Check, Clock, Search,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { SOCIAL_MODULES } from "@/components/social/socialData";
+import { useSocialData } from "@/hooks/useSocialData";
 
 const ICONS = {
   Ticket, Users, Handshake, ChevronRight, Copy, QrCode, Share2, MessageCircle,
@@ -27,7 +27,26 @@ function Card({ children, className = "" }) {
 export default function Social() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { modules: socialModules, loading, acceptFriendRequest, rejectFriendRequest, removeFriend } = useSocialData();
   const [activeModule, setActiveModule] = useState(null);
+
+  const handleAccept = async (requestId) => {
+    try {
+      await acceptFriendRequest(requestId);
+      toast({ title: "✅ Friend request accepted" });
+    } catch (err) {
+      toast({ title: "Failed to accept", variant: "destructive" });
+    }
+  };
+
+  const handleDecline = async (requestId) => {
+    try {
+      await rejectFriendRequest(requestId);
+      toast({ title: "Request declined" });
+    } catch (err) {
+      toast({ title: "Failed to decline", variant: "destructive" });
+    }
+  };
 
   const handleAction = (action) => {
     toast({ title: action, description: "This feature will be available soon." });
@@ -48,6 +67,14 @@ export default function Social() {
       toast({ title: `${label} Copied!`, description: text });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: SOFT_BG }}>
+        <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ background: SOFT_BG }}>
@@ -79,7 +106,7 @@ export default function Social() {
 
         {/* Module Cards */}
         <div className="px-4 pt-4 space-y-3">
-          {SOCIAL_MODULES.map((mod) => {
+          {socialModules.map((mod) => {
             const Icon = ICONS[mod.icon] || Users;
             return (
               <button
@@ -126,22 +153,25 @@ export default function Social() {
       {/* Module Sheet */}
       {activeModule && (
         <ModuleSheet
-          module={SOCIAL_MODULES.find(m => m.id === activeModule)}
+          module={socialModules.find(m => m.id === activeModule)}
           onClose={() => setActiveModule(null)}
           onAction={handleAction}
           onShare={handleShare}
           onCopy={handleCopy}
+          onAccept={handleAccept}
+          onDecline={handleDecline}
+          onRemoveFriend={removeFriend}
         />
       )}
     </div>
   );
 }
 
-function ModuleSheet({ module, onClose, onAction, onShare, onCopy }) {
+function ModuleSheet({ module, onClose, onAction, onShare, onCopy, onAccept, onDecline, onRemoveFriend }) {
   if (!module) return null;
   const Icon = ICONS[module.icon] || Users;
-  const inviteCode = "VYRO-2847-A9K";
-  const inviteLink = "https://vyro.app/invite/VYRO-2847-A9K";
+  const inviteCode = module.inviteCode || "VYRO-XXXX-XXX";
+  const inviteLink = module.inviteLink || "https://vyro.app/invite/VYRO-XXXX-XXX";
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
@@ -369,10 +399,10 @@ function ModuleSheet({ module, onClose, onAction, onShare, onCopy }) {
                         <p className="text-[10px]" style={{ color: GRAY }}>{r.mutual} mutual • {r.date}</p>
                       </div>
                       <div className="flex gap-1.5">
-                        <button onClick={() => onAction("Accept")} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "#27AE6010" }}>
+                        <button onClick={() => onAccept(r.id)} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "#27AE6010" }}>
                           <Check size={14} style={{ color: "#27AE60" }} />
                         </button>
-                        <button onClick={() => onAction("Decline")} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "#EB575710" }}>
+                        <button onClick={() => onDecline(r.id)} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "#EB575710" }}>
                           <X size={14} style={{ color: "#EB5757" }} />
                         </button>
                       </div>
