@@ -2,18 +2,23 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import DeviceSettingsTab from "@/components/settings/DeviceSettingsTab";
+import PrivacySettingsTab from "@/components/settings/PrivacySettingsTab";
 
 export default function SettingDetail() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { name, icon } = location.state || { name: "Settings", icon: "⚙️" };
+  const { name, icon } = location.state || { name: "Settings", icon: "🔒" };
 
-  // Index 1 = Device Settings (mobile phone settings) — connected to Supabase
+  // Index 1 = Device Settings, Index 2 = Privacy Settings — connected to Supabase
   const pathSegments = location.pathname.split("/");
   const settingIndex = parseInt(pathSegments[pathSegments.length - 1], 10);
 
   if (settingIndex === 1) {
     return <DeviceSettingsTab />;
+  }
+
+  if (settingIndex === 2) {
+    return <PrivacySettingsTab />;
   }
 
   return (

@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 const settingsList = [
   { name: "App Settings", icon: "⚙️", color: "from-slate-400 to-gray-500" },
   { name: "Device Settings", icon: "📱", color: "from-blue-400 to-cyan-500" },
+  { name: "Privacy Settings", icon: "🔒", color: "from-purple-400 to-pink-500" },
   { name: "Language Settings", icon: "🌐", color: "from-green-400 to-emerald-500" },
   { name: "Notification Settings", icon: "🔔", color: "from-red-400 to-orange-500" },
   { name: "Storage & Data", icon: "💾", color: "from-purple-400 to-violet-500" },

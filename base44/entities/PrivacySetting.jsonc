@@ -1,0 +1,189 @@
+{
+  "name": "PrivacySetting",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "profile_visibility": {
+      "type": "string",
+      "enum": [
+        "everyone",
+        "friends_only",
+        "private"
+      ],
+      "default": "everyone"
+    },
+    "show_coins": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_level": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_followers": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_following": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_friends": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_visitors": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_gifts_received": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_gifts_sent": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_bio": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_birthday": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_country": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_age": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_online_status": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_activity_score": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_trust_score": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_reputation": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_xp": {
+      "type": "boolean",
+      "default": true
+    },
+    "who_can_message": {
+      "type": "string",
+      "enum": [
+        "everyone",
+        "friends_only",
+        "no_one"
+      ],
+      "default": "everyone"
+    },
+    "who_can_call": {
+      "type": "string",
+      "enum": [
+        "everyone",
+        "friends_only",
+        "no_one"
+      ],
+      "default": "everyone"
+    },
+    "who_can_gift": {
+      "type": "string",
+      "enum": [
+        "everyone",
+        "friends_only",
+        "no_one"
+      ],
+      "default": "everyone"
+    },
+    "who_can_view_profile": {
+      "type": "string",
+      "enum": [
+        "everyone",
+        "friends_only",
+        "no_one"
+      ],
+      "default": "everyone"
+    },
+    "allow_strangers": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_in_search": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_in_rankings": {
+      "type": "boolean",
+      "default": true
+    },
+    "allow_profile_visits": {
+      "type": "boolean",
+      "default": true
+    },
+    "blocked_users": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  },
+  "required": [
+    "user_id"
+  ],
+  "rls": {
+    "create": {
+      "data.user_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
