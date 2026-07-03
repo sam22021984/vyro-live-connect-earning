@@ -114,7 +114,11 @@ export default function GiftGallery({ open, onClose, onSend, coins: propCoins, r
                   className={`relative rounded-2xl flex flex-col items-center justify-center py-3 transition active:scale-95 border-2 ${selected?.id === g.id || selected?.name === g.name ? "border-blue-400 bg-blue-50" : "border-gray-100 bg-gray-50"}`}
                 >
                   {selected?.id === g.id || selected?.name === g.name ? <div className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: COLORS.primary }}><Check size={10} className="text-white" /></div> : null}
-                  <span className="text-3xl" style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))" }}>{g.icon}</span>
+                  {g.animation_url ? (
+                    <video src={g.animation_url} className="w-12 h-12 rounded-lg object-cover" muted loop autoPlay playsInline style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.15))" }} />
+                  ) : (
+                    <span className="text-3xl" style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))" }}>{g.icon}</span>
+                  )}
                   <span className="text-[10px] font-medium text-gray-600 mt-1">{g.name}</span>
                   <span className="flex items-center gap-0.5 text-[9px] font-bold mt-0.5" style={{ color: COLORS.gold }}>
                     <Coins size={9} /> {formatCoins(price)}
@@ -130,7 +134,11 @@ export default function GiftGallery({ open, onClose, onSend, coins: propCoins, r
           <div className="px-4 py-3 border-t border-gray-100 bg-white">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className="text-2xl">{selected.icon}</span>
+                {selected.animation_url ? (
+                  <video src={selected.animation_url} className="w-12 h-12 rounded-xl object-cover" muted loop autoPlay playsInline />
+                ) : (
+                  <span className="text-2xl">{selected.icon}</span>
+                )}
                 <div>
                   <p className="text-xs font-bold text-gray-800">{selected.name}</p>
                   <p className="flex items-center gap-1 text-[11px] font-bold" style={{ color: COLORS.gold }}>
