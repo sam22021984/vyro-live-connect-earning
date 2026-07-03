@@ -73,6 +73,7 @@ import VipRewardSystem from '@/pages/VipRewardSystem';
 import VipAuthoritySystem from '@/pages/VipAuthoritySystem';
 import VipRoomManager from '@/pages/VipRoomManager';
 import VipSecurityAdminSystem from '@/pages/VipSecurityAdminSystem';
+import AiTools from '@/pages/AiTools';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -166,6 +167,7 @@ const AuthenticatedApp = () => {
         <Route path="/vip-authority-system" element={<VipAuthoritySystem />} />
         <Route path="/vip-room-manager" element={<VipRoomManager />} />
         <Route path="/vip-security-admin" element={<VipSecurityAdminSystem />} />
+        <Route path="/ai-tools" element={<AiTools />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

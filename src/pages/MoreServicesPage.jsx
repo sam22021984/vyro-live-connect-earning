@@ -18,6 +18,7 @@ const services = [
   { name: "VIP Membership", icon: "💎", gradient: "from-amber-300 to-yellow-500", highlight: true },
   { name: "VYRO Mall", icon: "🛒", gradient: "from-orange-400 to-red-500", highlight: true },
   { name: "Trust & Reputation", icon: "🛡️", gradient: "from-green-400 to-teal-500", highlight: false },
+  { name: "AI Tools", icon: "🤖", gradient: "from-purple-400 to-indigo-500", highlight: true },
 ];
 
 export default function MoreServicesPage() {
@@ -52,6 +53,8 @@ export default function MoreServicesPage() {
       navigate("/support-center");
     } else if (s.name === "Trust & Reputation") {
       navigate("/trust-reputation");
+    } else if (s.name === "AI Tools") {
+      navigate("/ai-tools");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
