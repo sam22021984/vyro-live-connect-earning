@@ -9,6 +9,7 @@ import {
   CheckCircle, PlusCircle, UserPlus, ArrowUpCircle, MessageCircle,
   PauseCircle, Calendar, CalendarDays, CalendarRange, ShieldCheck,
   Coins, Swords, Gift, Zap, Cpu, Layers, Megaphone, Bell,
+  ChevronDown, Check, X,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -20,6 +21,7 @@ import {
   SUPPORT_PERMISSIONS_ALLOWED, SUPPORT_PERMISSIONS_RESTRICTED,
 } from "@/components/support-manager/supportManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import SupportManagerPolicyTab from "@/components/support-manager/SupportManagerPolicyTab";
 
 const ICONS = {
   LayoutDashboard, Ticket, User, Mic, Handshake, Building2, Crown, Lock,
@@ -28,7 +30,7 @@ const ICONS = {
   CheckCircle2, Clock, Timer, Smile, AlertOctagon, CheckCircle, PlusCircle,
   UserPlus, ArrowUpCircle, MessageCircle, PauseCircle, Calendar, CalendarDays,
   CalendarRange, ShieldCheck, Coins, Swords, Gift, Zap, Cpu, Layers,
-  Megaphone, Bell, LifeBuoy,
+  Megaphone, Bell, LifeBuoy, ChevronDown, Check, X,
 };
 
 const WHITE = "#FFFFFF";
@@ -486,7 +488,7 @@ const SECTIONS = {
   recovery: RecoverySection, appeals: AppealsSection, fraud: FraudSection,
   payment: PaymentSection, withdrawal: WithdrawalSection, live: LiveSection,
   technical: TechnicalSection, knowledge: KnowledgeSection, communication: CommunicationSection,
-  reports: ReportsSection, staff: StaffSection, analytics: AnalyticsSection, tools: ToolsSection,
+  reports: ReportsSection, staff: StaffSection, analytics: AnalyticsSection, tools: ToolsSection, policy: SupportManagerPolicyTab,
 };
 
 export default function SupportManagerDashboard() {

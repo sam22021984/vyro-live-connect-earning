@@ -22,6 +22,7 @@ export const SUPPORT_SECTIONS = [
   { id: "staff", label: "Staff", icon: "Users", color: "#56CCF2" },
   { id: "analytics", label: "Analytics", icon: "BarChart3", color: "#2F80ED" },
   { id: "tools", label: "Exclusive Tools", icon: "Rocket", color: "#D4AF37" },
+  { id: "policy", label: "Policy", icon: "FileText", color: "#2F80ED" },
 ];
 
 export const SUPPORT_KPIS = [
