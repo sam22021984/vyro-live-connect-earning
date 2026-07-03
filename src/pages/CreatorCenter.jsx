@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass } from "lucide-react";
 
 const dashboards = [
   {
@@ -134,6 +134,17 @@ const dashboards = [
     color: "#F59E0B",
     badge: "BUSINESS MGR",
     modules: ["Business Overview", "Team Management", "Host Performance", "Agent Management", "Agency Management", "Business Growth", "Target Management", "Revenue Management", "Campaign Management", "Event Management", "Application Management", "Communication Center", "Analytics Center", "Business Intelligence", "Performance Management", "Report Management", "Document Management", "Operations Center", "Notification Center", "Exclusive Tools"],
+  },
+  {
+    id: "bdev",
+    title: "Business Developer Dashboard",
+    description: "Primary growth, recruitment, expansion, and partnership management center — recruits hosts, onboards talent agents, develops agencies, builds strategic partnerships, expands into new markets, increases revenue, and achieves business targets",
+    icon: Compass,
+    path: "/business-developer-dashboard",
+    gradient: "linear-gradient(135deg, #3B82F6, #1D4ED8)",
+    color: "#3B82F6",
+    badge: "BIZ DEVELOPER",
+    modules: ["Business Overview", "Host Recruitment", "Talent Agent Recruitment", "Agency Development", "Lead Management", "Market Expansion", "Partnership Management", "Campaign Management", "Revenue Growth", "Regional Performance", "Application Management", "Communication Center", "Event Development", "Performance Tracking", "Business Intelligence", "Task Management", "Document Center", "Analytics Center", "Business Settings", "Exclusive Tools"],
   },
 ];
 
