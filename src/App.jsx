@@ -36,6 +36,7 @@ import GoLivePanel from '@/pages/GoLivePanel';
 import Finance from '@/pages/Finance';
 import FinanceModule from '@/pages/FinanceModule';
 import CoinsRecharge from '@/pages/CoinsRecharge';
+import Withdraw from '@/pages/Withdraw';
 import AgencyDashboard from '@/pages/AgencyDashboard';
 import AgentDashboard from '@/pages/AgentDashboard';
 import ControlCenter from '@/pages/ControlCenter';
@@ -122,6 +123,7 @@ const AuthenticatedApp = () => {
         <Route path="/finance" element={<Finance />} />
         <Route path="/finance-module" element={<FinanceModule />} />
         <Route path="/coins-recharge" element={<CoinsRecharge />} />
+        <Route path="/withdraw" element={<Withdraw />} />
         <Route path="/control-center" element={<ControlCenter />} />
         <Route path="/agency-dashboard" element={<AgencyDashboard />} />
         <Route path="/agent-dashboard" element={<AgentDashboard />} />
