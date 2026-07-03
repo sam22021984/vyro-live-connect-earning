@@ -28,44 +28,6 @@ export default function LevelSystem() {
           </div>
         </div>
 
-        {/* View tabs */}
-        <div className="sticky top-[57px] z-10 bg-[#F8F9FC]/90 backdrop-blur-xl px-4 pt-3 pb-2">
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="flex gap-2 min-w-max">
-              <button
-                onClick={() => setActiveView("overview")}
-                className={`py-2.5 px-4 rounded-xl text-xs font-bold transition active:scale-95 whitespace-nowrap ${activeView === "overview" ? "bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-md shadow-purple-200" : "bg-white text-gray-500 border border-gray-100"}`}
-              >
-                Overview
-              </button>
-              <button
-                onClick={() => setActiveView("user-dashboard")}
-                className={`py-2.5 px-4 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 whitespace-nowrap ${activeView === "user-dashboard" ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-200" : "bg-white text-gray-500 border border-gray-100"}`}
-              >
-                👤 User Level
-              </button>
-              <button
-                onClick={() => setActiveView("stream-dashboard")}
-                className={`py-2.5 px-4 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 whitespace-nowrap ${activeView === "stream-dashboard" ? "bg-gradient-to-r from-blue-400 to-cyan-500 text-white shadow-md shadow-blue-200" : "bg-white text-gray-500 border border-gray-100"}`}
-              >
-                📡 Streaming Level
-              </button>
-              <button
-                onClick={() => setActiveView("host-dashboard")}
-                className={`py-2.5 px-4 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 whitespace-nowrap ${activeView === "host-dashboard" ? "bg-gradient-to-r from-red-400 to-orange-500 text-white shadow-md shadow-red-200" : "bg-white text-gray-500 border border-gray-100"}`}
-              >
-                🎙️ Host Level
-              </button>
-              <button
-                onClick={() => setActiveView("gifting-dashboard")}
-                className={`py-2.5 px-4 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 whitespace-nowrap ${activeView === "gifting-dashboard" ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-white shadow-md shadow-amber-200" : "bg-white text-gray-500 border border-gray-100"}`}
-              >
-                🎁 Gifting Level
-              </button>
-            </div>
-          </div>
-        </div>
-
         <div className="p-4 space-y-4">
           {/* Hero banner - overview only */}
           {activeView === "overview" && (
