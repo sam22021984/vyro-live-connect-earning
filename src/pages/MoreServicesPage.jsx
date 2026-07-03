@@ -19,7 +19,6 @@ const services = [
   { name: "VIP Membership", icon: "💎", gradient: "from-amber-300 to-yellow-500", highlight: true },
   { name: "VYRO Mall", icon: "🛒", gradient: "from-orange-400 to-red-500", highlight: true },
   { name: "Trust & Reputation", icon: "🛡️", gradient: "from-green-400 to-teal-500", highlight: false },
-  { name: "Lucky ID Store", icon: "🍀", gradient: "from-lime-400 to-green-500", highlight: false },
 ];
 
 export default function MoreServicesPage() {
