@@ -19,6 +19,7 @@ import {
   BDEV_REPORTING_STRUCTURE,
 } from "@/components/business-developer/businessDeveloperData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import BusinessDeveloperPolicyTab from "@/components/business-developer/BusinessDeveloperPolicyTab";
 
 const ICONS = {
   LayoutDashboard, Users, Mic, Handshake, Building2, TrendingUp, Target,
@@ -715,7 +716,7 @@ const SECTIONS = {
   regional: RegionalSection, applications: ApplicationsSection, communication: CommunicationSection,
   events: EventsSection, performance: PerformanceSection, ai: AISection, tasks: TasksSection,
   documents: DocumentsSection, analytics: AnalyticsSection, settings: SettingsSection,
-  exclusive: ExclusiveSection,
+  exclusive: ExclusiveSection, policy: BusinessDeveloperPolicyTab,
 };
 
 export default function BusinessDeveloperDashboard() {

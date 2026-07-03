@@ -22,6 +22,7 @@ export const BDEV_SECTIONS = [
   { id: "analytics", label: "Analytics", icon: "BarChart3", color: "#2F80ED" },
   { id: "settings", label: "Settings", icon: "Settings", color: "#6B7280" },
   { id: "exclusive", label: "Exclusive Tools", icon: "Rocket", color: "#EC4899" },
+  { id: "policy", label: "Policy", icon: "FileText", color: "#3B82F6" },
 ];
 
 export const BDEV_KPIS = [
