@@ -19,6 +19,7 @@ import {
   PK_SETTINGS_GROUPS, PK_EXCLUSIVE_TOOLS, PK_REPORTING_STRUCTURE,
 } from "@/components/pk-manager/pkManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import PkManagerPolicyTab from "@/components/pk-manager/PkManagerPolicyTab";
 
 const ICONS = {
   LayoutDashboard, Swords, Trophy, PartyPopper, Gift, Award, Globe, BrainCircuit,
@@ -755,7 +756,7 @@ const SECTIONS = {
   revenue: RevenueSection, achievements: AchievementsSection, hostperf: HostPerfSection,
   agencyperf: AgencyPerfSection, countryperf: CountryPerfSection, analytics: AnalyticsSection,
   communication: CommunicationSection, reports: ReportsSection, team: TeamSection,
-  settings: SettingsSection, exclusive: ExclusiveSection,
+  settings: SettingsSection, exclusive: ExclusiveSection, policy: PkManagerPolicyTab,
 };
 
 export default function PkManagerDashboard() {
