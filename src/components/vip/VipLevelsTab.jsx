@@ -25,14 +25,18 @@ export default function VipLevelsTab() {
               style={isSelected ? { boxShadow: `0 4px 16px ${l.glow}30` } : {}}
             >
               <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden"
                 style={{
                   background: `linear-gradient(135deg, ${l.color}30, ${l.glow}20)`,
                   border: `1px solid ${l.color}40`,
                   boxShadow: `0 2px 8px ${l.glow}30`,
                 }}
               >
-                {l.icon}
+                {l.iconImage ? (
+                  <img src={l.iconImage} alt={l.name} className="w-full h-full object-cover" />
+                ) : (
+                  l.icon
+                )}
               </div>
               <div className="flex-1 text-left">
                 <div className="flex items-center gap-2">
@@ -53,7 +57,11 @@ export default function VipLevelsTab() {
       {level && (
         <div className="rounded-2xl p-4 bg-white/5 border border-amber-500/20" style={{ boxShadow: `0 4px 20px ${level.glow}20` }}>
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">{level.icon}</span>
+            {level.iconImage ? (
+              <img src={level.iconImage} alt={level.name} className="w-10 h-10 rounded-xl object-cover" />
+            ) : (
+              <span className="text-2xl">{level.icon}</span>
+            )}
             <div>
               <h3 className="text-sm font-bold" style={{ color: level.color }}>{level.name} Benefits</h3>
               <p className="text-[10px] text-gray-400">{level.title}</p>

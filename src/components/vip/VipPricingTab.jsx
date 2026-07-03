@@ -54,14 +54,18 @@ export default function VipPricingTab() {
                 <div className="flex items-center gap-3">
                   {/* 3D badge circle */}
                   <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden"
                     style={{
                       background: `linear-gradient(135deg, ${tier.color}30, ${tier.color}10)`,
                       border: `1px solid ${tier.color}40`,
                       boxShadow: `0 6px 16px ${tier.color}30, inset 0 2px 4px rgba(255,255,255,0.1)`,
                     }}
                   >
-                    <span style={{ filter: `drop-shadow(0 2px 4px ${tier.color}80)` }}>{tier.tierIcon}</span>
+                    {tier.iconImage ? (
+                      <img src={tier.iconImage} alt={tier.name} className="w-full h-full object-cover" style={{ filter: `drop-shadow(0 2px 4px ${tier.color}80)` }} />
+                    ) : (
+                      <span style={{ filter: `drop-shadow(0 2px 4px ${tier.color}80)` }}>{tier.tierIcon}</span>
+                    )}
                   </div>
 
                   <div className="flex-1 min-w-0">

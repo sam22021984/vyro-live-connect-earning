@@ -1,6 +1,6 @@
 export const vipLevels = [
-  { id: 1, name: "VIP 1", title: "Bronze Crystal Shield", icon: "🥉", color: "#CD7F32", glow: "#B8860B", coins: 100000, cash: 5, dailyCoins: 300, benefits: ["VIP Badge", "Basic Profile Frame", "Colored Username", "Exclusive VIP Emojis", "VIP Welcome Message", "Basic Priority Support"] },
-  { id: 2, name: "VVIP", title: "Silver Crystal Crown", icon: "🥈", color: "#C0C0C0", glow: "#94A3B8", coins: 200000, cash: 10, dailyCoins: 500, benefits: ["VVIP Badge", "Premium Profile Frame", "Colored Username", "Exclusive Chat Bubble", "VIP Emojis Pack", "Priority Support", "2% Gift Cashback"] },
+  { id: 1, name: "VIP 1", title: "Bronze Crystal Shield", icon: "🥉", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/f1fc4cbc5_file_0000000058107243b293076f7d382f01.png", color: "#CD7F32", glow: "#B8860B", coins: 100000, cash: 5, dailyCoins: 300, benefits: ["VIP Badge", "Basic Profile Frame", "Colored Username", "Exclusive VIP Emojis", "VIP Welcome Message", "Basic Priority Support"] },
+  { id: 2, name: "VVIP", title: "Silver Crystal Crown", icon: "🥈", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/cc31a5d07_file_000000001ea8724381868ba1867df54b.png", color: "#C0C0C0", glow: "#94A3B8", coins: 200000, cash: 10, dailyCoins: 500, benefits: ["VVIP Badge", "Premium Profile Frame", "Colored Username", "Exclusive Chat Bubble", "VIP Emojis Pack", "Priority Support", "2% Gift Cashback"] },
   { id: 3, name: "SVIP", title: "Golden Sapphire Crown", icon: "🥇", color: "#FFD700", glow: "#F59E0B", coins: 500000, cash: 25, dailyCoins: 700, benefits: ["SVIP Badge", "Animated Profile Frame", "Premium Chat Bubble", "Exclusive Stickers", "Entrance Effect", "Priority Support", "3% Gift Cashback"] },
   { id: 4, name: "SSVIP", title: "Diamond Crystal Shield", icon: "💠", color: "#22D3EE", glow: "#3B82F6", coins: 800000, cash: 40, dailyCoins: 1000, benefits: ["SSVIP Badge", "Animated Frame", "Animated Entrance Effect", "Exclusive Username Color", "Room Entry Priority", "VIP Support", "5% Gift Cashback"] },
   { id: 5, name: "MSVIP", title: "Master Royal Crown", icon: "🥇", color: "#A855F7", glow: "#7C3AED", coins: 1500000, cash: 75, dailyCoins: 1500, benefits: ["MSVIP Crown Badge", "Luxury Profile Frame", "Vehicle Entry Effect", "Premium Chat Bubble", "Exclusive Gifts Access", "VIP Support", "7% Gift Cashback"] },
@@ -14,7 +14,7 @@ export const vipLevels = [
 
 export const vipPricingTiers = [
   {
-    id: "vip1", name: "VIP 1", icon: "🥉", tierIcon: "🥉",
+    id: "vip1", name: "VIP 1", icon: "🥉", tierIcon: "🥉", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/f1fc4cbc5_file_0000000058107243b293076f7d382f01.png",
     color: "#CD7F32", gradient: "from-amber-600 to-yellow-700",
     coins: "100,000", cash: "$5", dailyCoins: "300",
     benefits: ["VIP Badge", "Basic Profile Frame", "Colored Username", "Exclusive VIP Emojis", "VIP Welcome Message", "Basic Priority Support"],
@@ -22,7 +22,7 @@ export const vipPricingTiers = [
     rewardTime: { dailyCoins: "Every 24 hours", frameEntry: "7 days" },
   },
   {
-    id: "vvip", name: "VVIP", icon: "🥈", tierIcon: "🥈",
+    id: "vvip", name: "VVIP", icon: "🥈", tierIcon: "🥈", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/cc31a5d07_file_000000001ea8724381868ba1867df54b.png",
     color: "#C0C0C0", gradient: "from-slate-300 to-slate-500",
     coins: "200,000", cash: "$10", dailyCoins: "500",
     benefits: ["VVIP Badge", "Premium Profile Frame", "Colored Username", "Exclusive Chat Bubble", "VIP Emojis Pack", "Priority Support", "2% Gift Cashback"],
