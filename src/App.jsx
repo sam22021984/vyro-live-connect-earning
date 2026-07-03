@@ -87,7 +87,8 @@ import CreatePassword from '@/pages/CreatePassword';
 import ProfileSetup from '@/pages/ProfileSetup';
 import WelcomeAnimation from '@/pages/WelcomeAnimation';
 import ProfileDashboard from '@/pages/ProfileDashboard';
-import FloatingNavigation from '@/components/FloatingNavigation';
+import Discover from '@/pages/Discover';
+import BottomNavigation from '@/components/BottomNavigation';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -126,6 +127,7 @@ const AuthenticatedApp = () => {
       <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="/welcome-animation" element={<WelcomeAnimation />} />
       <Route path="/profile-dashboard" element={<ProfileDashboard />} />
+      <Route path="/discover" element={<Discover />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/splash" replace />} />}>
         <Route path="/" element={<Home />} />
         <Route path="/settings" element={<Settings />} />
@@ -197,7 +199,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
-    <FloatingNavigation />
+    <BottomNavigation />
     </>
   );
 };
