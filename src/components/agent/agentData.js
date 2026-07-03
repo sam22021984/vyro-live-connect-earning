@@ -240,4 +240,14 @@ export const AGENT_MODULES = [
       { label: "View Compliance History", icon: "History", type: "secondary" },
     ],
   },
+  {
+    id: "agent_policy",
+    title: "Policy",
+    icon: "FileText",
+    color: "#6B7280",
+    gradient: "linear-gradient(135deg, #4B5563, #6B7280)",
+    description: "Agent policy, authority, responsibilities & terms",
+    features: [],
+    actions: [],
+  },
 ];

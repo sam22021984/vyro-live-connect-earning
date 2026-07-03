@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { AGENT_INFO, AGENT_STATS, AGENT_MODULES } from "@/components/agent/agentData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import AgentPolicyTab from "@/components/agent/AgentPolicyTab";
 
 const formatNum = (n) => n.toLocaleString();
 
@@ -19,7 +20,7 @@ const ICON_MAP = {
   CheckCircle, XCircle, MessageSquare, Headphones, Activity, AlertCircle,
   Eye, Pencil, Sun, CalendarDays, Calendar, LifeBuoy, DollarSign, Gift,
   Award, Download, ArrowDownToLine, Percent, TrendingUp, CheckSquare,
-  Trophy, History, Scale, AlertTriangle, ShieldCheck, Circle, Clock,
+  Trophy, History, Scale, AlertTriangle, ShieldCheck, Circle, Clock, FileText,
 };
 
 const getIcon = (name, size = 16, className = "") => {
@@ -297,6 +298,10 @@ function ModuleContent({ module }) {
         </div>
       </div>
     );
+  }
+
+  if (module.id === "agent_policy") {
+    return <AgentPolicyTab />;
   }
 
   if (module.id === "support_compliance") {
