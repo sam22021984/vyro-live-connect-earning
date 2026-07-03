@@ -1,43 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown } from "lucide-react";
-import { COLORS, STATS, formatNum } from "./communityData";
+import { COLORS, formatNum } from "./communityData";
 import FeedPost from "./FeedPost";
 
-function MiniGraph({ data, color }) {
-  const max = Math.max(...data);
-  const points = data.map((v, i) => `${(i / (data.length - 1)) * 100},${30 - (v / max) * 28}`).join(" ");
-  return (
-    <svg viewBox="0 0 100 30" className="w-full h-8" preserveAspectRatio="none">
-      <polyline points={points} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <polygon points={`0,30 ${points} 100,30`} fill={color} opacity="0.1" />
-    </svg>
-  );
-}
-
-function StatCard({ stat }) {
+function StatCard({ label, value, icon, color, suffix }) {
   const [count, setCount] = useState(0);
-  const isNegative = stat.growth < 0;
+  const target = value || 0;
 
   useEffect(() => {
-    const duration = 1000;
-    const steps = 30;
-    const increment = stat.value / steps;
-    let current = 0;
+    if (count === target) return;
+    const diff = target - count;
+    const steps = 20;
+    const increment = diff / steps;
+    let current = count;
     const interval = setInterval(() => {
       current += increment;
-      if (current >= stat.value) {
-        setCount(stat.value);
+      if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
+        setCount(target);
         clearInterval(interval);
       } else {
-        setCount(Math.floor(current));
+        setCount(Math.round(current));
       }
-    }, duration / steps);
+    }, 30);
     return () => clearInterval(interval);
-  }, [stat.value]);
+  }, [target]);
 
   return (
     <div
-      className="rounded-2xl p-3.5 transition-all duration-300 hover:scale-[1.02]"
+      className="rounded-2xl p-3.5 transition-all duration-300"
       style={{
         background: "rgba(255,255,255,0.7)",
         backdropFilter: "blur(12px)",
@@ -46,38 +35,38 @@ function StatCard({ stat }) {
       }}
     >
       <div className="flex items-start justify-between mb-2">
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg" style={{ background: `${stat.color}15` }}>
-          {stat.icon}
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg" style={{ background: `${color}15` }}>
+          {icon}
         </div>
-        <div className={`flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isNegative ? "" : ""}`} style={{ background: isNegative ? `${COLORS.crimson}15` : `${COLORS.emerald}15`, color: isNegative ? COLORS.crimson : COLORS.emerald }}>
-          {isNegative ? <TrendingDown size={10} /> : <TrendingUp size={10} />}
-          {Math.abs(stat.growth)}%
-        </div>
+        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: COLORS.emerald }} />
       </div>
       <p className="text-lg font-bold" style={{ color: COLORS.textPrimary }}>
-        {formatNum(count)}{stat.suffix || ""}
+        {formatNum(count)}{suffix || ""}
       </p>
-      <p className="text-[10px] mb-1.5" style={{ color: COLORS.textSecondary }}>{stat.label}</p>
-      <MiniGraph data={stat.trend} color={stat.color} />
+      <p className="text-[10px]" style={{ color: COLORS.textSecondary }}>{label}</p>
     </div>
   );
 }
 
 export default function OverviewTab({ posts = [], stats = {} }) {
-  const liveStats = STATS.map((s) => {
-    const liveValue = {
-      "Total Posts": stats.totalPosts || 0,
-      "Total Members": stats.totalMembers || 0,
-      "Online Members": stats.onlineMembers || 0,
-      "Active Groups": stats.totalGroups || 0,
-      "Likes": stats.totalLikes || 0,
-      "Comments": stats.totalComments || 0,
-      "Shares": stats.totalShares || 0,
-      "Gifts Sent": stats.totalGifts || 0,
-      "Reports Pending": stats.pendingReports || 0,
-    }[s.label];
-    return liveValue !== undefined ? { ...s, value: liveValue } : s;
-  });
+  const engagementRate = stats.totalPosts > 0
+    ? Math.min(100, Math.round((stats.totalInteractions / stats.totalPosts) * 10) / 10)
+    : 0;
+
+  const liveStats = [
+    { label: "Community Posts", value: stats.totalPosts, icon: "📝", color: COLORS.royalBlue },
+    { label: "Active Groups", value: stats.totalGroups, icon: "👥", color: COLORS.skyBlue },
+    { label: "Channels", value: stats.totalChannels, icon: "📢", color: COLORS.amber },
+    { label: "Group Members", value: stats.totalMembers, icon: "👥", color: COLORS.emerald },
+    { label: "Online Now", value: stats.onlineMembers, icon: "🟢", color: COLORS.emerald },
+    { label: "Total Likes", value: stats.totalLikes, icon: "❤️", color: COLORS.crimson },
+    { label: "Comments", value: stats.totalComments, icon: "💬", color: COLORS.skyBlue },
+    { label: "Shares", value: stats.totalShares, icon: "🔁", color: COLORS.royalBlue },
+    { label: "Gifts Sent", value: stats.totalGifts, icon: "🎁", color: COLORS.amber },
+    { label: "Media Shared", value: stats.mediaCount, icon: "📸", color: COLORS.gold },
+    { label: "Pending Reports", value: stats.pendingReports, icon: "🚩", color: COLORS.crimson },
+    { label: "Engagement Rate", value: engagementRate, icon: "📈", color: COLORS.royalBlue, suffix: "%" },
+  ];
 
   return (
     <div className="space-y-4">
@@ -86,26 +75,38 @@ export default function OverviewTab({ posts = [], stats = {} }) {
         <div className="relative flex items-center justify-between">
           <div>
             <h2 className="text-base font-bold text-white">Welcome back! 👋</h2>
-            <p className="text-xs text-white/80 mt-0.5">Your community grew 12.5% this week</p>
+            <p className="text-xs text-white/80 mt-0.5">{stats.totalPosts} posts • {stats.totalGroups} groups active</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-white">78.5%</p>
+            <p className="text-2xl font-bold text-white">{engagementRate}%</p>
             <p className="text-[10px] text-white/70">Engagement Rate</p>
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-xs font-bold mb-2 px-1" style={{ color: COLORS.textPrimary }}>📊 Live Statistics</h3>
+        <div className="flex items-center justify-between mb-2 px-1">
+          <h3 className="text-xs font-bold flex items-center gap-1.5" style={{ color: COLORS.textPrimary }}>
+            📊 Live Statistics
+          </h3>
+          <div className="flex items-center gap-1">
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: COLORS.emerald }} />
+            <span className="text-[9px] font-semibold" style={{ color: COLORS.emerald }}>LIVE</span>
+          </div>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
-          {liveStats.map((s) => <StatCard key={s.label} stat={s} />)}
+          {liveStats.map((s) => <StatCard key={s.label} {...s} />)}
         </div>
       </div>
 
       <div>
         <h3 className="text-xs font-bold mb-2 px-1" style={{ color: COLORS.textPrimary }}>📰 Recent Community Posts</h3>
         <div className="space-y-3">
-          {posts.slice(0, 2).map((post) => <FeedPost key={post.id} post={post} />)}
+          {posts.length === 0 ? (
+            <p className="text-center text-xs py-8" style={{ color: COLORS.textSecondary }}>No posts yet</p>
+          ) : (
+            posts.slice(0, 2).map((post) => <FeedPost key={post.id} post={post} />)
+          )}
         </div>
       </div>
     </div>

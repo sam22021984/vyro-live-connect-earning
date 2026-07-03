@@ -44,8 +44,9 @@ export function useCommunityData() {
   }, [fetchAll]);
 
   const stats = {
-    totalPosts: posts.reduce((s, p) => s + (p.likes || 0), 0) > 0 ? posts.length : 0,
+    totalPosts: posts.length,
     totalGroups: groups.length,
+    totalChannels: channels.length,
     totalMembers: groups.reduce((s, g) => s + (g.members || 0), 0),
     onlineMembers: groups.reduce((s, g) => s + (g.online || 0), 0),
     totalLikes: posts.reduce((s, p) => s + (p.likes || 0), 0),
@@ -53,7 +54,9 @@ export function useCommunityData() {
     totalShares: posts.reduce((s, p) => s + (p.shares || 0), 0),
     totalGifts: posts.reduce((s, p) => s + (p.gifts || 0), 0),
     pendingReports: reports.filter((r) => r.status !== "resolved").length,
+    resolvedReports: reports.filter((r) => r.status === "resolved").length,
     mediaCount: media.length,
+    totalInteractions: posts.reduce((s, p) => s + (p.likes || 0) + (p.comments || 0) + (p.shares || 0) + (p.gifts || 0), 0),
   };
 
   return { posts, groups, channels, media, reports, stats, loading, refetch: fetchAll };
