@@ -57,6 +57,7 @@ import AdminDashboard from '@/pages/AdminDashboard';
 import FamilyCenter from '@/pages/FamilyCenter';
 import MessageCenter from '@/pages/MessageCenter';
 import MessageHub from '@/pages/MessageHub';
+import SupportCenter from '@/pages/SupportCenter';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -133,6 +134,7 @@ const AuthenticatedApp = () => {
         <Route path="/family-center" element={<FamilyCenter />} />
         <Route path="/message-center" element={<MessageCenter />} />
         <Route path="/message-hub" element={<MessageHub />} />
+        <Route path="/support-center" element={<SupportCenter />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

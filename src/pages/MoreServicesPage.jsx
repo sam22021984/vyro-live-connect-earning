@@ -52,6 +52,8 @@ export default function MoreServicesPage() {
       navigate("/message-center");
     } else if (s.name === "Creator Center") {
       navigate("/creator-center");
+    } else if (s.name === "Support") {
+      navigate("/support-center");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
