@@ -1,10 +1,18 @@
 import React from "react";
-import { BadgeCheck, Bell, BellOff, Plus } from "lucide-react";
-import { COLORS, CHANNELS } from "./communityData";
+import { Loader2, BadgeCheck, Bell, BellOff, Plus } from "lucide-react";
+import { COLORS } from "./communityData";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function ChannelsTab() {
+export default function ChannelsTab({ channels = [], loading }) {
   const { toast } = useToast();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: COLORS.royalBlue }} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
@@ -15,7 +23,7 @@ export default function ChannelsTab() {
         </button>
       </div>
       <div className="space-y-2.5">
-        {CHANNELS.map((ch) => (
+        {channels.map((ch) => (
           <div key={ch.id} className="rounded-2xl p-3 flex items-center gap-3" style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", border: `1px solid ${COLORS.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
             <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: `${COLORS.royalBlue}10` }}>
               {ch.logo}

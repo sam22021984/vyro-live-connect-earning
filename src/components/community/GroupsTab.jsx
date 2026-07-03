@@ -1,6 +1,6 @@
 import React from "react";
-import { Lock, Users, Circle, Crown } from "lucide-react";
-import { COLORS, GROUPS, formatNum } from "./communityData";
+import { Loader2, Lock, Users, Circle, Crown } from "lucide-react";
+import { COLORS, formatNum } from "./communityData";
 import { useToast } from "@/components/ui/use-toast";
 
 const ACTIVITY_COLORS = {
@@ -10,14 +10,22 @@ const ACTIVITY_COLORS = {
   Medium: COLORS.emerald,
 };
 
-export default function GroupsTab() {
+export default function GroupsTab({ groups = [], loading }) {
   const { toast } = useToast();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: COLORS.royalBlue }} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
       <h3 className="text-xs font-bold px-1" style={{ color: COLORS.textPrimary }}>👥 Community Groups</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {GROUPS.map((g) => (
+        {groups.map((g) => (
           <div key={g.id} className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", border: `1px solid ${COLORS.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
             <div className="relative h-24">
               <img src={g.cover} className="w-full h-full object-cover" alt="" />

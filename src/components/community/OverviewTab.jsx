@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { COLORS, STATS, FEED_POSTS, formatNum } from "./communityData";
+import { COLORS, STATS, formatNum } from "./communityData";
 import FeedPost from "./FeedPost";
 
 function MiniGraph({ data, color }) {
@@ -63,10 +63,24 @@ function StatCard({ stat }) {
   );
 }
 
-export default function OverviewTab() {
+export default function OverviewTab({ posts = [], stats = {} }) {
+  const liveStats = STATS.map((s) => {
+    const liveValue = {
+      "Total Posts": stats.totalPosts || 0,
+      "Total Members": stats.totalMembers || 0,
+      "Online Members": stats.onlineMembers || 0,
+      "Active Groups": stats.totalGroups || 0,
+      "Likes": stats.totalLikes || 0,
+      "Comments": stats.totalComments || 0,
+      "Shares": stats.totalShares || 0,
+      "Gifts Sent": stats.totalGifts || 0,
+      "Reports Pending": stats.pendingReports || 0,
+    }[s.label];
+    return liveValue !== undefined ? { ...s, value: liveValue } : s;
+  });
+
   return (
     <div className="space-y-4">
-      {/* Hero banner */}
       <div className="rounded-2xl p-4 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${COLORS.royalBlue} 0%, ${COLORS.skyBlue} 100%)` }}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 0%, transparent 50%)" }} />
         <div className="relative flex items-center justify-between">
@@ -81,19 +95,17 @@ export default function OverviewTab() {
         </div>
       </div>
 
-      {/* Stats grid */}
       <div>
         <h3 className="text-xs font-bold mb-2 px-1" style={{ color: COLORS.textPrimary }}>📊 Live Statistics</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
-          {STATS.map((s) => <StatCard key={s.label} stat={s} />)}
+          {liveStats.map((s) => <StatCard key={s.label} stat={s} />)}
         </div>
       </div>
 
-      {/* Recent feed preview */}
       <div>
         <h3 className="text-xs font-bold mb-2 px-1" style={{ color: COLORS.textPrimary }}>📰 Recent Community Posts</h3>
         <div className="space-y-3">
-          {FEED_POSTS.slice(0, 2).map((post) => <FeedPost key={post.id} post={post} />)}
+          {posts.slice(0, 2).map((post) => <FeedPost key={post.id} post={post} />)}
         </div>
       </div>
     </div>

@@ -1,0 +1,77 @@
+{
+  "name": "CommunityPost",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string"
+    },
+    "avatar": {
+      "type": "string"
+    },
+    "vip_level": {
+      "type": "string"
+    },
+    "country_flag": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "image": {
+      "type": "string"
+    },
+    "likes": {
+      "type": "number",
+      "default": 0
+    },
+    "comments": {
+      "type": "number",
+      "default": 0
+    },
+    "shares": {
+      "type": "number",
+      "default": 0
+    },
+    "gifts": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "username",
+    "content"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

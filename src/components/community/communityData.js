@@ -48,64 +48,6 @@ export const STATS = [
   { label: "Engagement Rate", value: 78.5, growth: 7.8, suffix: "%", icon: "📈", color: COLORS.royalBlue, trend: [55, 60, 63, 68, 72, 75, 78] },
 ];
 
-export const FEED_POSTS = [
-  {
-    id: 1, username: "Aisha Khan", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
-    vip_level: "VIP 6", country_flag: "🇦🇪", timestamp: "2 min ago",
-    content: "Just hit VIP 6! 🎉 Thank you all for the amazing support in the community! Let's keep growing together! ❤️🔥",
-    image: "https://images.unsplash.com/photo-1533167649158-613dfb92e9ad?w=600&h=400&fit=crop",
-    likes: 1240, comments: 89, shares: 45, gifts: 12, saved: false, liked: false,
-  },
-  {
-    id: 2, username: "Mohammed Ali", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop",
-    vip_level: "VIP 4", country_flag: "🇸🇦", timestamp: "15 min ago",
-    content: "Amazing PK Battle tonight! 🔥 The energy was unreal! Who's ready for the next one? 💪",
-    likes: 856, comments: 124, shares: 67, gifts: 8, saved: false, liked: true,
-  },
-  {
-    id: 3, username: "Sara Ahmed", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop",
-    vip_level: "VIP 8", country_flag: "🇪🇬", timestamp: "1 hour ago",
-    content: "New family event coming this weekend! Join 'Royal Eagles' family for exciting rewards and competitions! 🦅✨",
-    image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&h=400&fit=crop",
-    likes: 2100, comments: 245, shares: 180, gifts: 25, saved: true, liked: false,
-  },
-  {
-    id: 4, username: "David Lee", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop",
-    vip_level: "VIP 3", country_flag: "🇰🇷", timestamp: "2 hours ago",
-    content: "Thank you everyone for 10K followers! 🎉 This community is incredible! Special thanks to all my gifters! 🎁💕",
-    likes: 3200, comments: 312, shares: 95, gifts: 45, saved: false, liked: true,
-  },
-];
-
-export const GROUPS = [
-  { id: 1, name: "Royal Eagles", category: "Family", cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=200&fit=crop", members: 4520, online: 320, is_private: false, is_owner: true, activity: "High" },
-  { id: 2, name: "Global VIP Lounge", category: "VIP", cover: "https://images.unsplash.com/photo-1573164574572-cb89e39749b4?w=400&h=200&fit=crop", members: 8900, online: 1240, is_private: true, is_owner: false, activity: "Very High" },
-  { id: 3, name: "PK Battle Arena", category: "Gaming", cover: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=200&fit=crop", members: 12300, online: 890, is_private: false, is_owner: false, activity: "Extreme" },
-  { id: 4, name: "Music Lovers Club", category: "Music", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=200&fit=crop", members: 6700, online: 450, is_private: false, is_owner: false, activity: "Medium" },
-  { id: 5, name: "Arabian Nights", category: "Cultural", cover: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=400&h=200&fit=crop", members: 3200, online: 210, is_private: true, is_owner: false, activity: "High" },
-  { id: 6, name: "Gift Masters", category: "Gifting", cover: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=400&h=200&fit=crop", members: 5400, online: 680, is_private: false, is_owner: true, activity: "Very High" },
-];
-
-export const CHANNELS = [
-  { id: 1, name: "VYRO Official", logo: "🚀", verified: true, announcement: "New VIP levels launched! Check the VIP center for details.", updated: "5 min ago", following: true, notifications: true },
-  { id: 2, name: "Event Center", logo: "🎪", verified: true, announcement: "Champion Cup starts this Friday! Register your team now.", updated: "1 hour ago", following: true, notifications: false },
-  { id: 3, name: "Gift Store Updates", logo: "🎁", verified: true, announcement: "New luxury gifts available! Diamond Crown & Golden Mansion.", updated: "3 hours ago", following: false, notifications: true },
-  { id: 4, name: "Community Guidelines", logo: "📜", verified: true, announcement: "Updated safety policies effective immediately. Please review.", updated: "1 day ago", following: true, notifications: false },
-  { id: 5, name: "Host Spotlight", logo: "🎙️", verified: true, announcement: "Featured host of the week: Aisha Khan! Congratulations!", updated: "2 days ago", following: false, notifications: false },
-];
-
-export const MEDIA_ITEMS = [
-  { id: 1, type: "photo", url: "https://images.unsplash.com/photo-1533167649158-613dfb92e9ad?w=300&h=300&fit=crop", date: "02 July 2026", category: "Events" },
-  { id: 2, type: "video", url: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=300&h=300&fit=crop", date: "02 July 2026", category: "PK Battles" },
-  { id: 3, type: "photo", url: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=300&h=300&fit=crop", date: "01 July 2026", category: "Events" },
-  { id: 4, type: "photo", url: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop", date: "01 July 2026", category: "Music" },
-  { id: 5, type: "video", url: "https://images.unsplash.com/photo-1573164574572-cb89e39749b4?w=300&h=300&fit=crop", date: "30 June 2026", category: "VIP" },
-  { id: 6, type: "photo", url: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=300&h=300&fit=crop", date: "30 June 2026", category: "Cultural" },
-  { id: 7, type: "photo", url: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=300&h=300&fit=crop", date: "29 June 2026", category: "Gifting" },
-  { id: 8, type: "video", url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&h=300&fit=crop", date: "29 June 2026", category: "PK Battles" },
-  { id: 9, type: "photo", url: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=300&h=300&fit=crop", date: "28 June 2026", category: "Events" },
-];
-
 export const GIFTS_DATA = [
   { id: 1, name: "Rose", icon: "🌹", price: 10000, category: "Standard" },
   { id: 2, name: "Crown", icon: "👑", price: 100000, category: "Luxury" },
@@ -121,14 +63,6 @@ export const TOP_GIFTERS = [
   { name: "Fatima Noor", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop", gifts: 1250, coins: 8500000 },
   { name: "Ahmed Hassan", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop", gifts: 980, coins: 6200000 },
   { name: "Layla Rose", avatar: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=100&h=100&fit=crop", gifts: 845, coins: 5100000 },
-];
-
-export const REPORTS = [
-  { id: 1, reporter: "User #VY10042", reported: "Spam Account #VY10099", reason: "Spam Messages", status: "pending", severity: "medium", date: "02 July 2026", evidence: "Chat screenshots" },
-  { id: 2, reporter: "User #VY10051", reported: "Fake Profile #VY10102", reason: "Impersonation", status: "investigating", severity: "high", date: "02 July 2026", evidence: "Profile comparison" },
-  { id: 3, reporter: "User #VY10044", reported: "Harasser #VY10088", reason: "Harassment", status: "pending", severity: "high", date: "01 July 2026", evidence: "Message logs" },
-  { id: 4, reporter: "User #VY10046", reported: "Scammer #VY10115", reason: "Fraud/Scam", status: "reviewing", severity: "critical", date: "01 July 2026", evidence: "Transaction records" },
-  { id: 5, reporter: "User #VY10050", reported: "Inappropriate #VY10077", reason: "Inappropriate Content", status: "resolved", severity: "low", date: "30 June 2026", evidence: "Post screenshot" },
 ];
 
 export const ANALYTICS_DATA = {

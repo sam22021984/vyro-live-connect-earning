@@ -14,6 +14,7 @@ import ReportsTab from "@/components/community/ReportsTab";
 import AnalyticsTab from "@/components/community/AnalyticsTab";
 import SecurityTab from "@/components/community/SecurityTab";
 import { COLORS } from "@/components/community/communityData";
+import { useCommunityData } from "@/hooks/useCommunityData";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function CommunityDashboard() {
@@ -22,28 +23,29 @@ export default function CommunityDashboard() {
   const [active, setActive] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [coins] = useState(5000000);
+  const { posts, groups, channels, media, reports, stats, loading } = useCommunityData();
 
   const renderContent = () => {
     switch (active) {
-      case "overview": return <OverviewTab />;
+      case "overview": return <OverviewTab posts={posts} stats={stats} />;
       case "feed":
       case "posts":
       case "saved":
-        return <FeedTab />;
-      case "groups": return <GroupsTab />;
+        return <FeedTab posts={posts} loading={loading} />;
+      case "groups": return <GroupsTab groups={groups} loading={loading} />;
       case "channels":
       case "announcements":
-        return <ChannelsTab />;
-      case "media": return <MediaGalleryTab />;
+        return <ChannelsTab channels={channels} loading={loading} />;
+      case "media": return <MediaGalleryTab media={media} loading={loading} />;
       case "gifting": return <GiftingTab />;
-      case "reports": return <ReportsTab />;
+      case "reports": return <ReportsTab reports={reports} loading={loading} />;
       case "admin":
         return <AnalyticsTab />;
       case "security":
       case "membership":
         return <SecurityTab />;
       default:
-        return <OverviewTab />;
+        return <OverviewTab posts={posts} stats={stats} />;
     }
   };
 

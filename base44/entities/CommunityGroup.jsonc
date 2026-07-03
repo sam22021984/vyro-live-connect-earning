@@ -1,0 +1,74 @@
+{
+  "name": "CommunityGroup",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "cover": {
+      "type": "string"
+    },
+    "members": {
+      "type": "number",
+      "default": 0
+    },
+    "online": {
+      "type": "number",
+      "default": 0
+    },
+    "is_private": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_owner": {
+      "type": "boolean",
+      "default": false
+    },
+    "activity": {
+      "type": "string",
+      "enum": [
+        "Medium",
+        "High",
+        "Very High",
+        "Extreme"
+      ],
+      "default": "Medium"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
