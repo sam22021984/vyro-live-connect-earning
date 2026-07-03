@@ -28,7 +28,7 @@ export default function Register() {
     setLoading(true);
     try {
       await supabaseAuth.signUp(email, password);
-      setShowOtp(true);
+      window.location.href = "/";
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {
@@ -40,7 +40,7 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      await supabaseAuth.verifyOtp(email, otpCode);
+      await supabaseAuth.verifyOtp(email, otpCode, password);
       window.location.href = "/";
     } catch (err) {
       setError(err.message || "Invalid verification code");

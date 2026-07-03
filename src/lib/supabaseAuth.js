@@ -53,6 +53,7 @@ export const supabaseAuth = {
     const res = await invoke({ action: "signup", email, password });
     const { data, ok } = res.data;
     if (!ok) throw new Error(extractError(data));
+    if (data.access_token) this.setToken(data.access_token, data.refresh_token);
     return data;
   },
 
@@ -64,8 +65,8 @@ export const supabaseAuth = {
     return data;
   },
 
-  async verifyOtp(email, otp) {
-    const res = await invoke({ action: "verify", email, otp, type: "signup" });
+  async verifyOtp(email, otp, password) {
+    const res = await invoke({ action: "verify", email, otp, password, type: "signup" });
     const { data, ok } = res.data;
     if (!ok) throw new Error(extractError(data));
     if (data.access_token) this.setToken(data.access_token, data.refresh_token);

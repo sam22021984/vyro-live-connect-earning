@@ -8,6 +8,7 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')?.replace(/\/$/, '');
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
     if (!supabaseUrl || !anonKey) {
       return Response.json({ data: { error: 'Supabase not configured' }, ok: false, status: 500 });
@@ -18,16 +19,53 @@ Deno.serve(async (req) => {
       'Content-Type': 'application/json',
     };
 
+    // Custom signup: create user via admin API with email auto-confirmed (no email sent, no rate limit)
+    if (action === 'signup') {
+      if (!serviceRoleKey) {
+        return Response.json({ data: { error: 'Service role not configured' }, ok: false, status: 500 });
+      }
+      const adminHeaders = { ...baseHeaders, 'Authorization': `Bearer ${serviceRoleKey}` };
+
+      // Create user (email_confirm: true → no verification email needed)
+      const createResponse = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
+        method: 'POST',
+        headers: adminHeaders,
+        body: JSON.stringify({ email, password, email_confirm: true }),
+      });
+      const createData = await createResponse.json();
+      if (!createResponse.ok) {
+        return Response.json({ data: createData, ok: false, status: createResponse.status });
+      }
+
+      // Immediately log in to get access token
+      const loginResponse = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: baseHeaders,
+        body: JSON.stringify({ email, password }),
+      });
+      const loginData = await loginResponse.json();
+      return Response.json({ data: loginData, ok: loginResponse.ok, status: loginResponse.status });
+    }
+
+    // Custom OAuth URL with correct app origin
+    if (action === 'oauth-url') {
+      const referer = req.headers.get('referer') || req.headers.get('origin') || '';
+      let appOrigin = '';
+      try { if (referer) appOrigin = new URL(referer).origin; } catch {}
+      let redirect = redirect_to || '/';
+      if (redirect.startsWith('/') && appOrigin) redirect = appOrigin + redirect;
+      else if (!redirect.startsWith('http') && appOrigin) redirect = appOrigin + '/' + redirect;
+      const url = `${supabaseUrl}/auth/v1/authorize?provider=${encodeURIComponent(provider)}&redirect_to=${encodeURIComponent(redirect)}`;
+      return Response.json({ data: { url }, ok: true, status: 200 });
+    }
+
+    // Standard Supabase Auth endpoints for remaining actions
     let endpoint = '';
     let method = 'POST';
     let reqBody: any = null;
     let extraHeaders: Record<string, string> = {};
 
     switch (action) {
-      case 'signup':
-        endpoint = '/auth/v1/signup';
-        reqBody = { email, password };
-        break;
       case 'login':
         endpoint = '/auth/v1/token?grant_type=password';
         reqBody = { email, password };
@@ -55,23 +93,6 @@ Deno.serve(async (req) => {
         reqBody = { password };
         extraHeaders['Authorization'] = `Bearer ${access_token}`;
         break;
-      case 'oauth-url': {
-        // Use the app's origin from the referer header, not the function's URL
-        const referer = req.headers.get('referer') || req.headers.get('origin') || '';
-        let appOrigin = '';
-        try {
-          if (referer) appOrigin = new URL(referer).origin;
-        } catch {}
-        // redirect_to from frontend may be a path like "/" — prepend the app origin
-        let redirect = redirect_to || '/';
-        if (redirect.startsWith('/') && appOrigin) {
-          redirect = appOrigin + redirect;
-        } else if (!redirect.startsWith('http') && appOrigin) {
-          redirect = appOrigin + '/' + redirect;
-        }
-        const url = `${supabaseUrl}/auth/v1/authorize?provider=${encodeURIComponent(provider)}&redirect_to=${encodeURIComponent(redirect)}`;
-        return Response.json({ data: { url }, ok: true, status: 200 });
-      }
       default:
         return Response.json({ data: { error: 'Invalid action' }, ok: false, status: 400 });
     }
