@@ -65,6 +65,7 @@ export const USER_MODULES = [
   { id: "safety", title: "Safety", icon: "🛡️", color: "#10B981", gradient: "linear-gradient(135deg, #10B981, #047857)" },
   { id: "support", title: "Support", icon: "📞", color: "#06B6D4", gradient: "linear-gradient(135deg, #06B6D4, #0E7490)" },
   { id: "activity", title: "Activity", icon: "📊", color: "#8B5CF6", gradient: "linear-gradient(135deg, #8B5CF6, #6D28D9)" },
+  { id: "policy", title: "Policy", icon: "📜", color: "#64748B", gradient: "linear-gradient(135deg, #64748B, #475569)" },
 ];
 
 export const WALLET_DATA = {

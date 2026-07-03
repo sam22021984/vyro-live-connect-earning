@@ -19,13 +19,14 @@ import SettingsSection from "@/components/user-dashboard/sections/SettingsSectio
 import SafetySection from "@/components/user-dashboard/sections/SafetySection";
 import SupportSection from "@/components/user-dashboard/sections/SupportSection";
 import ActivitySection from "@/components/user-dashboard/sections/ActivitySection";
+import UserPolicyTab from "@/components/user-dashboard/UserPolicyTab";
 
 const SECTIONS = {
   home: HomeSection, profile: ProfileSection, wallet: WalletSection, rewards: RewardSection,
   vip: VipSection, social: SocialSection, live: LiveSection, gifts: GiftSection,
   events: EventSection, achievements: AchievementSection, referral: ReferralSection,
   notifications: NotificationSection, settings: SettingsSection, safety: SafetySection,
-  support: SupportSection, activity: ActivitySection,
+  support: SupportSection, activity: ActivitySection, policy: UserPolicyTab,
 };
 
 export default function UserDashboard() {
