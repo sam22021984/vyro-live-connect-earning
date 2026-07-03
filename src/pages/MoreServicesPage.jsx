@@ -18,6 +18,7 @@ const services = [
   { name: "Tasks & Rewards", icon: "🎁", gradient: "from-teal-400 to-green-500", path: "/tasks-rewards" },
   { name: "Social", icon: "🤝", gradient: "from-purple-400 to-violet-500", path: "/social" },
   { name: "VIP Membership", icon: "👑", gradient: "from-yellow-400 to-amber-500", path: "/vip-membership", highlight: true },
+  { name: "Level System", icon: "📊", gradient: "from-violet-400 to-purple-500", path: "/level-system", highlight: true },
 ];
 
 export default function MoreServicesPage() {
