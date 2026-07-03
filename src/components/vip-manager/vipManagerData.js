@@ -22,6 +22,7 @@ export const VIP_SECTIONS = [
   { id: "team", label: "Team", icon: "Users", color: "#56CCF2" },
   { id: "settings", label: "Settings", icon: "Settings", color: "#6B7280" },
   { id: "tools", label: "Exclusive Tools", icon: "Rocket", color: "#D4AF37" },
+  { id: "policy", label: "Policy", icon: "ScrollText", color: "#D4AF37" },
 ];
 
 export const VIP_KPIS = [

@@ -16,6 +16,7 @@ import {
   CheckCircle2, XCircle,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import VipManagerPolicyTab from "@/components/vip-manager/VipManagerPolicyTab";
 import {
   VIP_SECTIONS, VIP_KPIS, VIP_QUICK_ACTIONS, VIP_REALTIME_COUNTERS,
   VIP_LIVE_STREAM, VIP_MEMBERS, VIP_LEVELS, VIP_REWARDS, VIP_EVENTS,
@@ -740,7 +741,7 @@ const SECTIONS = {
   communication: CommunicationSection, benefits: BenefitsSection, partnerships: PartnershipsSection,
   country: CountrySection, rankings: RankingsSection, ai: AISection,
   analytics: AnalyticsSection, reports: ReportsSection, team: TeamSection,
-  settings: SettingsSection, tools: ToolsSection,
+  settings: SettingsSection, tools: ToolsSection, policy: VipManagerPolicyTab,
 };
 
 export default function VipManagerDashboard() {
