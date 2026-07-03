@@ -22,6 +22,7 @@ export const CTRY_SECTIONS = [
   { id: "broadcast", label: "Broadcast", icon: "Megaphone", color: "#3B82F6" },
   { id: "analytics", label: "Analytics", icon: "BarChart3", color: "#10B981" },
   { id: "settings", label: "Settings", icon: "Settings", color: "#6B7280" },
+  { id: "policy", label: "Policy", icon: "FileText", color: "#1D4ED8" },
 ];
 
 export const CTRY_KPIS = [

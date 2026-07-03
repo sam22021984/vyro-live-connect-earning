@@ -19,6 +19,7 @@ import {
   CTRY_ANALYTICS, CTRY_SETTINGS_GROUPS, CTRY_COUNTRY_INFO, CTRY_REPORTING_STRUCTURE,
 } from "@/components/country-manager/countryManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import CountryManagerPolicyTab from "@/components/country-manager/CountryManagerPolicyTab";
 
 const ICONS = {
   LayoutDashboard, Search, Users, Mic, User, Building2, FileCheck,
@@ -776,7 +777,7 @@ const SECTIONS = {
   revenue: RevenueSection, gifts: GiftsSection, coins: CoinsSection, rankings: RankingsSection,
   live: LiveSection, pk: PkSection, events: EventsSection, vip: VipSection,
   reports: ReportsSection, security: SecuritySection, broadcast: BroadcastSection,
-  analytics: AnalyticsSection, settings: SettingsSection,
+  analytics: AnalyticsSection, settings: SettingsSection, policy: CountryManagerPolicyTab,
 };
 
 export default function CountryManagerDashboard() {
