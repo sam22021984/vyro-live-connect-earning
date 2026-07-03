@@ -74,7 +74,7 @@ export default function BottomNavigation() {
   if (location.pathname.startsWith("/live-room")) return null;
 
   const tabs = [
-    { icon: Home, label: "Home", path: "/", color: "#8B5CF6" },
+    { icon: Home, label: "Party", path: "/", color: "#8B5CF6" },
     { icon: Users, label: "Community", path: "/community-dashboard", color: "#3B82F6" },
     { icon: Plus, label: "Go Live", path: "/go-live", color: "#EC4899", isCenter: true },
     { icon: MessageCircle, label: "Inbox", path: "/messages", color: "#10B981", badge: unreadCount },
