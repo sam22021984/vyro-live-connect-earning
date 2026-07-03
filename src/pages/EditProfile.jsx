@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, ShieldAlert, Loader2, Camera, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Save, ShieldAlert, Loader2, Clock, ChevronRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useContentModeration } from "@/hooks/useContentModeration";
@@ -8,36 +8,16 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import MediaUploader from "@/components/edit-profile/MediaUploader";
+import UsernameField from "@/components/edit-profile/UsernameField";
+import DisplayNameField from "@/components/edit-profile/DisplayNameField";
+import UserIdField from "@/components/edit-profile/UserIdField";
+import CategoryTags from "@/components/edit-profile/CategoryTags";
+import LanguageSelector from "@/components/edit-profile/LanguageSelector";
+import SocialLinks from "@/components/edit-profile/SocialLinks";
+import PreferencesSection from "@/components/edit-profile/PreferencesSection";
 
-const TEXT_FIELDS = [
-  { key: "username", label: "Username", type: "input", max: 30 },
-  { key: "title", label: "Title", type: "input", max: 50 },
-  { key: "bio", label: "Bio", type: "textarea", max: 200 },
-  { key: "signature", label: "Signature", type: "input", max: 100 },
-  { key: "country", label: "Country", type: "input", max: 50 },
-  { key: "birthday", label: "Birthday", type: "input", max: 50 },
-  { key: "gender", label: "Gender", type: "select", options: ["", "Male", "Female", "Other"] },
-];
-
-// Fields that contribute to profile completion (key → weight %)
-const COMPLETION_FIELDS = {
-  avatar_url: 25,
-  cover_url: 20,
-  bio: 15,
-  signature: 10,
-  title: 10,
-  country: 10,
-  birthday: 5,
-  gender: 5,
-};
-
-function calculateCompletion(form) {
-  let pct = 0;
-  for (const [key, weight] of Object.entries(COMPLETION_FIELDS)) {
-    if (form[key] && String(form[key]).trim()) pct += weight;
-  }
-  return Math.min(pct, 100);
-}
+const COUNTRIES = ["Qatar", "Saudi Arabia", "UAE", "Kuwait", "Bahrain", "Oman", "Egypt", "Jordan", "Lebanon", "Morocco", "Algeria", "Tunisia", "Iraq", "Sudan", "Turkey", "Indonesia", "Malaysia", "India", "Pakistan", "Bangladesh", "United States", "United Kingdom", "Other"];
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -49,7 +29,7 @@ export default function EditProfile() {
   const [prevForm, setPrevForm] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploadingField, setUploadingField] = useState(null);
+  const [syncing, setSyncing] = useState(false);
   const [moderationError, setModerationError] = useState(null);
 
   useEffect(() => {
@@ -63,43 +43,54 @@ export default function EditProfile() {
       if (profiles.length > 0) {
         const p = profiles[0];
         setProfileId(p.id);
-        const formData = {};
-        [...Object.keys(COMPLETION_FIELDS), ...TEXT_FIELDS.map(f => f.key)].forEach((key) => {
-          formData[key] = p[key] || (key === "gender" ? "" : "");
-        });
+        const formData = {
+          username: p.username || "",
+          full_name: p.full_name || "",
+          bio: p.bio || "",
+          country: p.country || "",
+          gender: p.gender || "",
+          birthday: p.birthday || "",
+          avatar_url: p.avatar_url || "",
+          cover_url: p.cover_url || "",
+          interests: p.interests || [],
+          languages: p.languages || (p.language ? [p.language] : ["English"]),
+          social_links: p.social_links || {},
+          privacy_level: p.privacy_level || "everyone",
+          show_online_status: p.show_online_status !== false,
+          global_id: p.global_id || "",
+        };
         setForm(formData);
         setPrevForm({ ...formData });
       }
-    } catch (e) {
-      // no profile yet
-    }
+    } catch (e) {}
     setLoading(false);
   };
+
+  const hasChanges = JSON.stringify(form) !== JSON.stringify(prevForm);
 
   const handleChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setModerationError(null);
   };
 
-  const handleImageUpload = async (key, file) => {
-    if (!file) return;
-    setUploadingField(key);
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      handleChange(key, file_url);
-      toast({ title: "✅ Image uploaded", description: "Image has been set." });
-    } catch (err) {
-      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
-    }
-    setUploadingField(null);
-  };
-
   const handleSave = async () => {
     setSaving(true);
     setModerationError(null);
 
-    // Moderate all text fields together
-    const combinedText = [form.username, form.title, form.bio, form.signature].filter(Boolean).join(" | ");
+    // Validate
+    if (!form.username || form.username.length < 4) {
+      toast({ title: "Username must be 4+ characters", variant: "destructive" });
+      setSaving(false);
+      return;
+    }
+    if (!form.full_name || form.full_name.length < 2) {
+      toast({ title: "Display name must be 2+ characters", variant: "destructive" });
+      setSaving(false);
+      return;
+    }
+
+    // Moderation
+    const combinedText = [form.username, form.full_name, form.bio].filter(Boolean).join(" | ");
     const result = await moderate(combinedText, form.avatar_url, "profile edit");
 
     if (!result?.approved) {
@@ -109,32 +100,19 @@ export default function EditProfile() {
     }
 
     try {
-      const payload = {};
-      TEXT_FIELDS.forEach((f) => { payload[f.key] = form[f.key] || undefined; });
-      payload.avatar_url = form.avatar_url || undefined;
-      payload.cover_url = form.cover_url || undefined;
-
-      // Calculate profile completion
-      const completion = calculateCompletion(form);
-      payload.profile_completion = completion;
-
-      // Award XP for newly filled fields (fields that were empty before but are now filled)
-      let xpGained = 0;
-      for (const key of Object.keys(COMPLETION_FIELDS)) {
-        const wasEmpty = !prevForm[key] || !String(prevForm[key]).trim();
-        const isFilled = form[key] && String(form[key]).trim();
-        if (wasEmpty && isFilled) xpGained += 50;
-      }
-      // Bonus XP for completing profile
-      const wasComplete = calculateCompletion(prevForm) >= 100;
-      const isComplete = completion >= 100;
-      if (isComplete && !wasComplete) xpGained += 200;
-
-      if (xpGained > 0) {
-        payload.user_xp = (form.user_xp || 0) + xpGained;
-        payload.total_xp = (form.total_xp || 0) + xpGained;
-        payload.activity_score = (form.activity_score || 0) + xpGained;
-      }
+      const payload = {
+        username: form.username,
+        full_name: form.full_name,
+        bio: form.bio || undefined,
+        country: form.country || undefined,
+        gender: form.gender || undefined,
+        birthday: form.birthday || undefined,
+        avatar_url: form.avatar_url || undefined,
+        cover_url: form.cover_url || undefined,
+        interests: form.interests || [],
+        language: (form.languages || [])[0] || "English",
+        social_links: form.social_links || {},
+      };
 
       if (profileId) {
         await base44.entities.UserProfile.update(profileId, payload);
@@ -143,16 +121,21 @@ export default function EditProfile() {
         await base44.entities.UserProfile.create(payload);
       }
 
-      if (xpGained > 0) {
-        toast({ title: "✅ Profile Updated", description: `+${xpGained} XP earned!` });
-      } else {
-        toast({ title: "✅ Profile Updated", description: "Your changes have been saved." });
-      }
-      navigate(-1);
+      // Sync state
+      setSyncing(true);
+      setPrevForm({ ...form });
+
+      toast({ title: "✅ Profile updated successfully" });
+
+      setTimeout(() => {
+        setSyncing(false);
+        setSaving(false);
+        navigate(-1);
+      }, 1000);
     } catch (err) {
       toast({ title: "Save failed", description: err.message, variant: "destructive" });
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   if (loading) {
@@ -177,7 +160,7 @@ export default function EditProfile() {
           </div>
           <Button
             onClick={handleSave}
-            disabled={saving || moderating}
+            disabled={!hasChanges || saving || moderating}
             size="sm"
             className="bg-purple-500 hover:bg-purple-600 text-white"
           >
@@ -185,6 +168,16 @@ export default function EditProfile() {
             Save
           </Button>
         </div>
+
+        {/* Syncing banner */}
+        {syncing && (
+          <div className="px-4 pt-3">
+            <div className="rounded-xl p-3 bg-blue-50 border border-blue-100 flex items-center gap-2">
+              <Loader2 size={14} className="text-blue-500 animate-spin" />
+              <p className="text-xs text-blue-600 font-medium">Syncing profile changes…</p>
+            </div>
+          </div>
+        )}
 
         {/* Moderation error */}
         {moderationError && (
@@ -201,115 +194,122 @@ export default function EditProfile() {
         <div className="mx-4 mt-4 rounded-xl p-3 bg-white border border-gray-100">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-semibold text-gray-600">Profile Completion</span>
-            <span className="text-xs font-bold text-purple-500">{calculateCompletion(form)}%</span>
+            <span className="text-xs font-bold text-purple-500">
+              {[form.avatar_url, form.cover_url, form.bio, form.full_name, form.country, form.interests?.length > 0].filter(Boolean).length}/6
+            </span>
           </div>
           <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
             <div
               className="h-full rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300"
-              style={{ width: `${calculateCompletion(form)}%` }}
+              style={{ width: `${Math.min([form.avatar_url, form.cover_url, form.bio, form.full_name, form.country, form.interests?.length > 0].filter(Boolean).length / 6 * 100, 100)}%` }}
             />
           </div>
-          <p className="text-[10px] text-gray-400 mt-1.5">Fill in your details to earn XP and level up</p>
         </div>
 
-        {/* Cover Photo Upload */}
-        <div className="p-4">
-          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Cover Photo</label>
-          <div className="relative rounded-xl overflow-hidden border border-gray-200" style={{ height: "120px" }}>
-            {form.cover_url ? (
-              <img src={form.cover_url} alt="Cover" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center">
-                <ImageIcon size={28} className="text-gray-300" />
-              </div>
-            )}
-            <label className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center cursor-pointer active:scale-90 transition">
-              {uploadingField === "cover_url" ? (
-                <Loader2 size={14} className="text-white animate-spin" />
-              ) : (
-                <Camera size={14} className="text-white" />
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => handleImageUpload("cover_url", e.target.files?.[0])}
+        {/* === 1. IDENTITY SECTION === */}
+        <Section title="Identity" icon="👤">
+          <DisplayNameField value={form.full_name} onChange={(v) => handleChange("full_name", v)} />
+          <UsernameField value={form.username} onChange={(v) => handleChange("username", v)} currentUserId={user?.id} />
+          <UserIdField userId={form.global_id || user?.id} />
+        </Section>
+
+        {/* === 2. MEDIA SECTION === */}
+        <Section title="Media" icon="📸">
+          <MediaUploader field="avatar_url" label="Profile Photo" value={form.avatar_url} onChange={(v) => handleChange("avatar_url", v)} aspect="avatar" />
+          <MediaUploader field="cover_url" label="Cover Photo" value={form.cover_url} onChange={(v) => handleChange("cover_url", v)} aspect="cover" />
+        </Section>
+
+        {/* === 3. BIO & BRANDING === */}
+        <Section title="Bio & Branding" icon="✨">
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Bio (About Me)</label>
+            <Textarea
+              value={form.bio || ""}
+              onChange={(e) => handleChange("bio", e.target.value)}
+              maxLength={300}
+              placeholder="Live streamer 🎤 | Gaming & Music lover 🎮🎵"
+              className="resize-none"
+              rows={3}
+            />
+            <p className="text-[9px] text-gray-300 mt-0.5 text-right">{(form.bio || "").length}/300</p>
+          </div>
+          <CategoryTags selected={form.interests || []} onChange={(v) => handleChange("interests", v)} />
+        </Section>
+
+        {/* === 4. SOCIAL INFO === */}
+        <Section title="Social Info" icon="🌐">
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Country</label>
+            <select
+              value={form.country || ""}
+              onChange={(e) => handleChange("country", e.target.value)}
+              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm"
+            >
+              <option value="">Select country...</option>
+              {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <LanguageSelector selected={form.languages || []} onChange={(v) => handleChange("languages", v)} />
+          <SocialLinks links={form.social_links || {}} onChange={(v) => handleChange("social_links", v)} />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Gender</label>
+              <select
+                value={form.gender || ""}
+                onChange={(e) => handleChange("gender", e.target.value)}
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm"
+              >
+                <option value="">Select...</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Birthday</label>
+              <Input
+                type="date"
+                value={form.birthday || ""}
+                onChange={(e) => handleChange("birthday", e.target.value)}
               />
-            </label>
-          </div>
-        </div>
-
-        {/* Avatar Upload */}
-        <div className="px-4">
-          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Profile Picture</label>
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-purple-200">
-                {form.avatar_url ? (
-                  <img src={form.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-200 to-blue-200 flex items-center justify-center text-xl font-bold text-purple-400">
-                    {(form.username || "V")[0]?.toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <label className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center cursor-pointer active:scale-90 transition border-2 border-white">
-                {uploadingField === "avatar_url" ? (
-                  <Loader2 size={10} className="text-white animate-spin" />
-                ) : (
-                  <Camera size={10} className="text-white" />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleImageUpload("avatar_url", e.target.files?.[0])}
-                />
-              </label>
             </div>
-            <p className="text-[11px] text-gray-400 flex-1">Tap the camera icon to upload</p>
           </div>
-        </div>
+        </Section>
 
-        {/* Text Fields */}
-        <div className="p-4 space-y-4">
-          {TEXT_FIELDS.map((field) => (
-            <div key={field.key}>
-              <label className="text-xs font-semibold text-gray-600 mb-1.5 block">{field.label}</label>
-              {field.type === "textarea" ? (
-                <Textarea
-                  value={form[field.key] || ""}
-                  onChange={(e) => handleChange(field.key, e.target.value)}
-                  maxLength={field.max}
-                  placeholder={`Enter your ${field.label.toLowerCase()}`}
-                  className="resize-none"
-                  rows={3}
-                />
-              ) : field.type === "select" ? (
-                <select
-                  value={form[field.key] || ""}
-                  onChange={(e) => handleChange(field.key, e.target.value)}
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm appearance-none"
-                  style={{ height: "42px" }}
-                >
-                  {field.options.map((opt) => (
-                    <option key={opt} value={opt}>{opt || "Select..."}</option>
-                  ))}
-                </select>
-              ) : (
-                <Input
-                  value={form[field.key] || ""}
-                  onChange={(e) => handleChange(field.key, e.target.value)}
-                  maxLength={field.max}
-                  placeholder={`Enter your ${field.label.toLowerCase()}`}
-                />
-              )}
-              {field.max && (
-                <p className="text-[9px] text-gray-300 mt-0.5 text-right">{(form[field.key] || "").length}/{field.max}</p>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* === 5. PREFERENCES === */}
+        <Section title="Preferences" icon="⚙️">
+          <PreferencesSection form={form} onChange={(f) => setForm(f)} />
+        </Section>
+
+        {/* === 6. SECURITY / HISTORY === */}
+        <Section title="Security & History" icon="🔒">
+          <button onClick={() => navigate("/settings/8")} className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-100 active:scale-95 transition">
+            <ShieldAlert size={16} className="text-gray-400" />
+            <span className="text-xs font-medium text-gray-700 flex-1 text-left">Security Settings</span>
+            <ChevronRight size={14} className="text-gray-300" />
+          </button>
+          <button onClick={() => toast({ title: "Profile edit history" })} className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-100 active:scale-95 transition">
+            <Clock size={16} className="text-gray-400" />
+            <span className="text-xs font-medium text-gray-700 flex-1 text-left">Profile Edit History</span>
+            <ChevronRight size={14} className="text-gray-300" />
+          </button>
+        </Section>
+
+        <div className="h-8" />
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, icon, children }) {
+  return (
+    <div className="mx-4 mt-4">
+      <div className="flex items-center gap-1.5 mb-2">
+        <span className="text-sm">{icon}</span>
+        <h2 className="text-sm font-bold text-gray-700">{title}</h2>
+      </div>
+      <div className="bg-white rounded-2xl border border-gray-50 shadow-sm p-4 space-y-4">
+        {children}
       </div>
     </div>
   );
