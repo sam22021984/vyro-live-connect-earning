@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Video, Mic, PartyPopper, Users, Swords, Calendar, Dumbbell, Camera, X, ChevronRight } from "lucide-react";
 import { COLORS, ROOM_TAGS } from "@/components/live-room/roomData";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
 const LIVE_TYPES = [
@@ -20,6 +21,7 @@ const LANGUAGES = ["English", "Arabic", "Urdu", "Hindi", "Turkish", "Bengali", "
 export default function GoLivePanel() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user: me } = useAuth();
   const [selectedType, setSelectedType] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -70,7 +72,11 @@ export default function GoLivePanel() {
 
     setStarting(true);
     try {
-      const me = await base44.auth.me();
+      if (!me?.id) {
+        toast({ title: "Please log in to go live", variant: "destructive" });
+        setStarting(false);
+        return;
+      }
       let profile = null;
       try {
         const profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
