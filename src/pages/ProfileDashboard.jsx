@@ -17,6 +17,7 @@ import MyContent from "@/components/my-profile/MyContent";
 import MyAchievements from "@/components/my-profile/MyAchievements";
 import MyDecorations from "@/components/my-profile/MyDecorations";
 import MyMoreMenu from "@/components/my-profile/MyMoreMenu";
+import MoreServices from "@/components/profile/MoreServices";
 
 export default function ProfileDashboard() {
   const [profile, setProfile] = useState(null);
@@ -107,6 +108,8 @@ export default function ProfileDashboard() {
         <MyAchievements achievements={achievements} />
 
         <MyDecorations profile={profile} />
+
+        <MoreServices />
 
         <div className="h-4" />
 

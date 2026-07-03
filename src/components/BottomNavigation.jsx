@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Compass, Plus, MessageCircle, User, WifiOff, Grid } from "lucide-react";
+import { Home, Compass, Plus, MessageCircle, User, WifiOff, Users } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const HIDE_DELAY = 5000;
@@ -96,11 +96,10 @@ export default function BottomNavigation() {
 
   const tabs = [
     { icon: Home, label: "Home", path: "/", color: "#8B5CF6" },
-    { icon: Compass, label: "Discover", path: "/discover", color: "#3B82F6" },
+    { icon: Users, label: "Community", path: "/community-dashboard", color: "#3B82F6" },
     { icon: Plus, label: "Go Live", path: "/go-live", color: "#EC4899", isCenter: true },
     { icon: MessageCircle, label: "Inbox", path: "/messages", color: "#10B981", badge: unreadCount },
     { icon: User, label: "Profile", path: "/profile-dashboard", color: "#F59E0B" },
-    { icon: Grid, label: "More", path: "/more-services", color: "#6366F1" },
   ];
 
   const handleTabClick = (path) => {
