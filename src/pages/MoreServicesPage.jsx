@@ -19,11 +19,6 @@ const services = [
   { name: "VYRO Mall", icon: "🛒", gradient: "from-orange-400 to-red-500", highlight: true },
   { name: "Trust & Reputation", icon: "🛡️", gradient: "from-green-400 to-teal-500", highlight: false },
   { name: "Role Control", icon: "🎭", gradient: "from-indigo-400 to-purple-500", highlight: true },
-  { name: "VIP Core", icon: "👑", gradient: "from-amber-400 to-yellow-500", highlight: true },
-  { name: "VIP Rewards", icon: "🎁", gradient: "from-green-400 to-emerald-500", highlight: true },
-  { name: "VIP Authority", icon: "⚡", gradient: "from-red-400 to-orange-500", highlight: true },
-  { name: "VIP Rooms", icon: "🏠", gradient: "from-purple-400 to-violet-600", highlight: true },
-  { name: "VIP Security", icon: "🔐", gradient: "from-blue-400 to-cyan-500", highlight: true },
 ];
 
 export default function MoreServicesPage() {
@@ -60,16 +55,6 @@ export default function MoreServicesPage() {
       navigate("/trust-reputation");
     } else if (s.name === "Role Control") {
       navigate("/vyro-role-control");
-    } else if (s.name === "VIP Core") {
-      navigate("/vip-core-system");
-    } else if (s.name === "VIP Rewards") {
-      navigate("/vip-reward-system");
-    } else if (s.name === "VIP Authority") {
-      navigate("/vip-authority-system");
-    } else if (s.name === "VIP Rooms") {
-      navigate("/vip-room-manager");
-    } else if (s.name === "VIP Security") {
-      navigate("/vip-security-admin");
     } else {
       navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
     }
