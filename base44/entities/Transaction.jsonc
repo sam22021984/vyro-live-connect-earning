@@ -53,12 +53,15 @@
   ],
   "rls": {
     "create": {
-      "data.user_id": "{{user.id}}"
+      "created_by_id": "{{user.id}}"
     },
     "read": {
       "$or": [
         {
           "data.user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
         },
         {
           "user_condition": {
@@ -71,6 +74,9 @@
       "$or": [
         {
           "data.user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
         },
         {
           "user_condition": {
