@@ -1,5 +1,5 @@
 import React from "react";
-import { SEATS, GRID_LAYOUTS } from "./roomData";
+import { SEATS } from "./roomData";
 import Seat from "./Seat";
 
 // Generate seats for any count. Uses existing SEATS data for the first 10,
@@ -16,32 +16,73 @@ function generateSeats(count) {
   return seats;
 }
 
+// Row-based layouts: each array defines seats per row.
+//   4 seats  → [1, 3]          → 1 top + 3 bottom
+//   6 seats  → [3, 3]          → 3 top + 3 bottom
+//  10 seats  → [2, 4, 4]       → 2 top + two rows of 4
+//  15 seats  → [5, 5, 5]       → three grids of 5
+//  20 seats  → [5, 5, 5, 5]    → four grids of 5
+const SEAT_LAYOUTS = {
+  4: [1, 3],
+  6: [3, 3],
+  10: [2, 4, 4],
+  15: [5, 5, 5],
+  20: [5, 5, 5, 5],
+};
+
+function getLayout(count) {
+  if (SEAT_LAYOUTS[count]) return SEAT_LAYOUTS[count];
+  // Fallback for other counts: rows of 5 (first row gets remainder)
+  if (count <= 4) return [1, 3];
+  const rows = [];
+  let remaining = count;
+  while (remaining > 0) {
+    const rowSize = Math.min(5, remaining);
+    rows.push(rowSize);
+    remaining -= rowSize;
+  }
+  return rows;
+}
+
 export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10 }) {
   const count = Math.max(4, seatCount);
-  const layout = GRID_LAYOUTS[count] || GRID_LAYOUTS[10];
   const seats = generateSeats(count);
-  const host = seats[0];
-  const speakers = seats.slice(1);
-  const cols = layout.cols;
+  const layout = getLayout(count);
 
   const getSeatEffects = (seatId) => seatEffects.filter((e) => e.seatId === seatId);
   const seatSize = count <= 6 ? 56 : count <= 10 ? 52 : count <= 15 ? 46 : 42;
-  const gapY = count <= 10 ? "gap-y-3" : "gap-y-2";
+  const gapVal = count <= 10 ? "0.75rem" : "0.5rem";
+
+  // Split seats into rows based on layout
+  let seatIndex = 0;
+  const rows = layout.map((rowSize, rowIdx) => {
+    const rowSeats = seats.slice(seatIndex, seatIndex + rowSize);
+    seatIndex += rowSize;
+    return rowSeats;
+  });
 
   return (
-    <div className="flex flex-col items-center gap-3 py-1 w-full max-w-sm mx-auto">
-      {/* Host seat - centered at top */}
-      <Seat seat={host} size={seatSize + 8} onClick={onSeatClick} effects={getSeatEffects(host.id)} />
-
-      {/* Speaker grid */}
-      <div
-        className={`grid gap-x-3 ${gapY} w-full`}
-        style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
-      >
-        {speakers.map((seat) => (
-          <Seat key={seat.id} seat={seat} size={seatSize} onClick={onSeatClick} effects={getSeatEffects(seat.id)} />
-        ))}
-      </div>
+    <div className="flex flex-col items-center w-full max-w-sm mx-auto" style={{ gap: gapVal }}>
+      {rows.map((rowSeats, rowIdx) => (
+        <div
+          key={rowIdx}
+          className="flex justify-center w-full"
+          style={{ gap: gapVal }}
+        >
+          {rowSeats.map((seat) => {
+            const isHost = seat.id === 0;
+            return (
+              <Seat
+                key={seat.id}
+                seat={seat}
+                size={isHost ? seatSize + 8 : seatSize}
+                onClick={onSeatClick}
+                effects={getSeatEffects(seat.id)}
+              />
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }
