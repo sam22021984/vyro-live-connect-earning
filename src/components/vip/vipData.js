@@ -112,11 +112,11 @@ export const globalVipBenefits = [
 ];
 
 export const durationPlans = [
-  { id: 1, name: "15 Days", icon: "⚡", discount: 0, desc: "Short Premium Access" },
-  { id: 2, name: "1 Month", icon: "📅", discount: 0, desc: "Standard Membership" },
-  { id: 3, name: "3 Months", icon: "🗓️", discount: 15, desc: "Long Term Access" },
-  { id: 4, name: "6 Months", icon: "📆", discount: 25, desc: "Premium Package" },
-  { id: 5, name: "12 Months", icon: "🏆", discount: 40, desc: "Best Value" },
+  { id: 1, name: "15 Days", icon: "⚡", discount: 0, months: 0.5, desc: "Short Premium Access" },
+  { id: 2, name: "1 Month", icon: "📅", discount: 0, months: 1, desc: "Standard Membership" },
+  { id: 3, name: "3 Months", icon: "🗓️", discount: 15, months: 3, desc: "Long Term Access" },
+  { id: 4, name: "6 Months", icon: "📆", discount: 25, months: 6, desc: "Premium Package" },
+  { id: 5, name: "12 Months", icon: "🏆", discount: 40, months: 12, desc: "Best Value" },
 ];
 
 export const vipTabs = [
