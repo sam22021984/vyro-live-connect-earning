@@ -49,6 +49,7 @@ import RewardManagerDashboard from '@/pages/RewardManagerDashboard';
 import PkManagerDashboard from '@/pages/PkManagerDashboard';
 import FamilyCenter from '@/pages/FamilyCenter';
 import MessageCenter from '@/pages/MessageCenter';
+import MessageHub from '@/pages/MessageHub';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -117,6 +118,7 @@ const AuthenticatedApp = () => {
         <Route path="/pk-manager-dashboard" element={<PkManagerDashboard />} />
         <Route path="/family-center" element={<FamilyCenter />} />
         <Route path="/message-center" element={<MessageCenter />} />
+        <Route path="/message-hub" element={<MessageHub />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

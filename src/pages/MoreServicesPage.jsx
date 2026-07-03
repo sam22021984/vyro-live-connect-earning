@@ -46,6 +46,8 @@ export default function MoreServicesPage() {
       navigate("/profile-stats");
     } else if (s.name === "Social") {
       navigate("/social");
+    } else if (s.name === "Messages") {
+      navigate("/message-hub");
     } else if (s.name === "Message Center") {
       navigate("/message-center");
     } else if (s.name === "Creator Center") {
