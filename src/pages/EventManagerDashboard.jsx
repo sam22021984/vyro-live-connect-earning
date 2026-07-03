@@ -18,6 +18,7 @@ import {
   EVT_TEAM_MEMBERS, EVT_SETTINGS_GROUPS, EVT_EXCLUSIVE_TOOLS, EVT_REPORTING_STRUCTURE,
 } from "@/components/event-manager/eventManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import EventManagerPolicyTab from "@/components/event-manager/EventManagerPolicyTab";
 
 const ICONS = {
   LayoutDashboard, Calendar, Trophy, Gift, Users, Globe, Mic, Building2,
@@ -763,7 +764,7 @@ const SECTIONS = {
   host: HostSection, agency: AgencySection, vip: VipSection, revenue: RevenueSection,
   rankings: RankingsSection, communication: CommunicationSection, festival: FestivalSection,
   country: CountrySection, ai: AISection, analytics: AnalyticsSection, reports: ReportsSection,
-  team: TeamSection, settings: SettingsSection, exclusive: ExclusiveSection,
+  team: TeamSection, settings: SettingsSection, exclusive: ExclusiveSection, policy: EventManagerPolicyTab,
 };
 
 export default function EventManagerDashboard() {
