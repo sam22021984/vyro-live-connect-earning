@@ -21,7 +21,7 @@ const ROLE_HIERARCHY = {
 const DASHBOARD_ROLE_LEVEL = {
   owner: 5, sam: 5, vip: 4, support: 4, superadmin: 4, reward: 4,
   pkmanager: 4, marketing: 4, finance: 4, event: 4, country: 4,
-  business: 4, bdev: 4, admin: 4, seller: 0,
+  business: 4, bdev: 4, admin: 4,
 };
 
 export default function CreatorCenter() {
@@ -134,7 +134,6 @@ function DashboardCard({ d, onNavigate, stats, locked }) {
       case "superadmin": return `${stats.hosts} hosts · ${stats.totalGroups} groups`;
       case "marketing": return `${stats.totalPosts} posts · ${stats.totalChannels} channels`;
       case "reward": return `${stats.totalTransactions} reward transactions`;
-      case "seller": return `${stats.totalCoins?.toLocaleString()} coins in circulation`;
       case "event": return `${stats.totalRooms} active rooms`;
       case "country": return `${stats.totalUsers} users globally`;
       default: return null;
