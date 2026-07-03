@@ -75,6 +75,8 @@ import VipRoomManager from '@/pages/VipRoomManager';
 import VipSecurityAdminSystem from '@/pages/VipSecurityAdminSystem';
 import AiTools from '@/pages/AiTools';
 import RoomManagement from '@/pages/RoomManagement';
+import ApplicationIdSystem from '@/pages/ApplicationIdSystem';
+import LuckyIdStore from '@/pages/LuckyIdStore';
 import FloatingNavigation from '@/components/FloatingNavigation';
 
 const AuthenticatedApp = () => {
@@ -170,6 +172,8 @@ const AuthenticatedApp = () => {
         <Route path="/vip-security-admin" element={<VipSecurityAdminSystem />} />
         <Route path="/ai-tools" element={<AiTools />} />
         <Route path="/room-management" element={<RoomManagement />} />
+        <Route path="/application-id-system" element={<ApplicationIdSystem />} />
+        <Route path="/lucky-id-store" element={<LuckyIdStore />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

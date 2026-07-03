@@ -7,6 +7,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowLeft, Loader2, ArrowRight, CheckCircle2, 
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import SocialButtons from "@/components/SocialButtons";
 import GlobalIdBadge from "@/components/auth/GlobalIdBadge";
+import { COUNTRY_LIST } from "@/components/application-id/countryConfig";
 import { toast } from "@/components/ui/use-toast";
 
 export default function Register() {
@@ -20,6 +21,7 @@ export default function Register() {
   const [otpCode, setOtpCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [onboarding, setOnboarding] = useState(null);
+  const [country, setCountry] = useState("QAT");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,6 +38,7 @@ export default function Register() {
         action: "initProfile",
         role: "user",
         username: email.split("@")[0],
+        country,
       });
       const { profile, global_id, isNew } = res.data;
       setOnboarding({ profile, globalId: global_id, isNew });
@@ -254,6 +257,25 @@ export default function Register() {
         </div>
         <div className="relative flex justify-center text-xs">
           <span className="bg-[#F7F4FF] px-4 text-gray-400 font-medium">or</span>
+        </div>
+      </div>
+
+      {/* Country selector */}
+      <div className="px-6 mb-3">
+        <div className="relative">
+          <select
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="w-full rounded-2xl bg-white border-gray-100 text-sm shadow-sm px-4 py-3 appearance-none font-medium text-gray-700"
+            style={{ height: "48px" }}
+          >
+            {COUNTRY_LIST.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.flag} {c.name} (+{c.calling_code})
+              </option>
+            ))}
+          </select>
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">▼</span>
         </div>
       </div>
 

@@ -1,0 +1,76 @@
+{
+  "name": "ApplicationId",
+  "type": "object",
+  "properties": {
+    "application_id": {
+      "type": "string"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "calling_code": {
+      "type": "string"
+    },
+    "serial_number": {
+      "type": "number"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    },
+    "country_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "reserved",
+        "locked",
+        "disabled",
+        "replaced"
+      ],
+      "default": "active"
+    },
+    "is_lucky": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_premium": {
+      "type": "boolean",
+      "default": false
+    },
+    "previous_id": {
+      "type": "string"
+    },
+    "locked_reason": {
+      "type": "string"
+    },
+    "locked_by": {
+      "type": "string"
+    },
+    "disabled_reason": {
+      "type": "string"
+    },
+    "disabled_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "application_id",
+    "country_code",
+    "serial_number"
+  ],
+  "rls": {
+    "create": null,
+    "read": null,
+    "update": null,
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

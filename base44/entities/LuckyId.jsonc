@@ -1,0 +1,81 @@
+{
+  "name": "LuckyId",
+  "type": "object",
+  "properties": {
+    "application_id": {
+      "type": "string"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "calling_code": {
+      "type": "string"
+    },
+    "serial_number": {
+      "type": "number"
+    },
+    "price_coins": {
+      "type": "number",
+      "default": 0
+    },
+    "price_usd": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "available",
+        "reserved",
+        "sold",
+        "disabled"
+      ],
+      "default": "available"
+    },
+    "reserved_for": {
+      "type": "string"
+    },
+    "purchased_by": {
+      "type": "string"
+    },
+    "purchase_date": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "lucky",
+        "premium",
+        "vip"
+      ],
+      "default": "lucky"
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "country_name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "application_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

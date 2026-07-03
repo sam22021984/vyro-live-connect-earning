@@ -1,0 +1,68 @@
+{
+  "name": "IdHistory",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    },
+    "previous_id": {
+      "type": "string"
+    },
+    "new_id": {
+      "type": "string"
+    },
+    "change_reason": {
+      "type": "string"
+    },
+    "admin_log": {
+      "type": "string"
+    },
+    "changed_by": {
+      "type": "string"
+    },
+    "change_type": {
+      "type": "string",
+      "enum": [
+        "initial",
+        "lucky_purchase",
+        "admin_transfer",
+        "admin_disable",
+        "admin_lock"
+      ],
+      "default": "initial"
+    }
+  },
+  "required": [
+    "user_id",
+    "previous_id",
+    "new_id"
+  ],
+  "rls": {
+    "create": null,
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
