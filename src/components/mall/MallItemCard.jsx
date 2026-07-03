@@ -1,11 +1,27 @@
 import React, { useState } from "react";
-import { Coins, Check, Eye, Sparkles } from "lucide-react";
+import { Coins, Check, Eye, Sparkles, Loader2, Lock } from "lucide-react";
 import { rarityStyles } from "@/components/mall/mallData";
+import { useToast } from "@/components/ui/use-toast";
 
-export default function MallItemCard({ item, sectionColor }) {
-  const [equipped, setEquipped] = useState(false);
+export default function MallItemCard({ item, sectionColor, owned, equipped, onBuy, onEquip, onUnequip, processing }) {
   const [previewing, setPreviewing] = useState(false);
+  const { toast } = useToast();
   const rarity = rarityStyles[item.rarity] || rarityStyles["—"];
+  const price = item.price_coins || item.price || 0;
+  const canAfford = true; // checked on backend
+
+  const handleBuy = () => {
+    if (price === 0 || item.price === "—") return;
+    onBuy?.(item);
+  };
+
+  const handleEquip = () => {
+    if (equipped) {
+      onUnequip?.(item);
+    } else {
+      onEquip?.(item);
+    }
+  };
 
   return (
     <div
@@ -18,6 +34,15 @@ export default function MallItemCard({ item, sectionColor }) {
     >
       {/* Rarity top bar */}
       <div className="h-1" style={{ background: `linear-gradient(to right, ${rarity.color}, ${rarity.color}80)` }} />
+
+      {/* Owned badge */}
+      {owned && (
+        <div className="absolute top-2 right-2 z-10 px-1.5 py-0.5 rounded-md bg-green-500/20 border border-green-500/30">
+          <span className="text-[8px] font-bold text-green-400 flex items-center gap-0.5">
+            <Check size={8} /> OWNED
+          </span>
+        </div>
+      )}
 
       <div className="p-3">
         {/* Item icon + rarity badge */}
@@ -32,7 +57,7 @@ export default function MallItemCard({ item, sectionColor }) {
           >
             <span style={{ filter: `drop-shadow(0 2px 3px ${sectionColor}60)` }}>{item.icon}</span>
           </div>
-          {item.rarity !== "—" && (
+          {item.rarity && item.rarity !== "—" && !owned && (
             <span
               className="text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider"
               style={{ background: rarity.bg, color: rarity.color, border: `1px solid ${rarity.border}` }}
@@ -44,13 +69,13 @@ export default function MallItemCard({ item, sectionColor }) {
 
         {/* Name + desc */}
         <h4 className="text-xs font-bold text-white mb-0.5 truncate">{item.name}</h4>
-        <p className="text-[10px] text-gray-400 leading-tight mb-2 line-clamp-2">{item.desc}</p>
+        <p className="text-[10px] text-gray-400 leading-tight mb-2 line-clamp-2">{item.description || item.desc}</p>
 
         {/* Price */}
-        {item.price !== "—" && (
+        {price > 0 && (
           <div className="flex items-center gap-1 mb-2.5">
             <Coins size={11} className="text-amber-400" />
-            <span className="text-xs font-bold text-amber-300">{item.price}</span>
+            <span className="text-xs font-bold text-amber-300">{price.toLocaleString()}</span>
           </div>
         )}
 
@@ -62,21 +87,33 @@ export default function MallItemCard({ item, sectionColor }) {
           >
             <Eye size={11} /> Preview
           </button>
-          {equipped ? (
+          {owned ? (
             <button
-              onClick={() => setEquipped(false)}
+              onClick={handleEquip}
               className="flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold active:scale-95 transition"
-              style={{ background: `${sectionColor}20`, color: sectionColor, border: `1px solid ${sectionColor}40` }}
+              style={{
+                background: equipped ? `${sectionColor}20` : `${sectionColor}10`,
+                color: sectionColor,
+                border: `1px solid ${sectionColor}40`,
+              }}
             >
-              <Check size={11} /> Equipped
+              {equipped ? <><Check size={11} /> Equipped</> : <><Sparkles size={11} /> Equip</>}
+            </button>
+          ) : processing ? (
+            <button
+              disabled
+              className="flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold text-white opacity-60"
+              style={{ background: `linear-gradient(to right, ${sectionColor}, ${sectionColor}cc)` }}
+            >
+              <Loader2 size={11} className="animate-spin" /> Buying...
             </button>
           ) : (
             <button
-              onClick={() => setEquipped(true)}
+              onClick={handleBuy}
               className="flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold text-white active:scale-95 transition"
               style={{ background: `linear-gradient(to right, ${sectionColor}, ${sectionColor}cc)`, boxShadow: `0 2px 6px ${sectionColor}40` }}
             >
-              <Sparkles size={11} /> {item.price === "—" ? "View" : "Buy"}
+              <Sparkles size={11} /> Buy
             </button>
           )}
         </div>

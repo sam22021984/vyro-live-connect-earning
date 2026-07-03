@@ -11,16 +11,22 @@
     "section": {
       "type": "string",
       "enum": [
-        "frames",
-        "entrances",
-        "bubbles",
-        "cars",
-        "themes",
+        "lucky_id",
+        "avatar_frame",
+        "entry_effect",
+        "room_entry",
+        "bubble_chat",
+        "text_style",
+        "room_cover",
         "gifts",
-        "avatars",
-        "special"
+        "profile_effects",
+        "badges",
+        "voice_effects",
+        "event_items",
+        "vip_mall",
+        "limited_edition"
       ],
-      "default": "frames"
+      "default": "avatar_frame"
     },
     "price_coins": {
       "type": "number",

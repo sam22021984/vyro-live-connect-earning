@@ -9,7 +9,10 @@
       "type": "string",
       "enum": [
         "recharge",
-        "withdraw"
+        "withdraw",
+        "gift",
+        "purchase",
+        "reward"
       ],
       "default": "recharge"
     },
@@ -44,6 +47,22 @@
     },
     "description": {
       "type": "string"
+    },
+    "recipient_id": {
+      "type": "string"
+    },
+    "recipient_name": {
+      "type": "string"
+    },
+    "gift_name": {
+      "type": "string"
+    },
+    "gift_icon": {
+      "type": "string"
+    },
+    "gift_quantity": {
+      "type": "number",
+      "default": 1
     }
   },
   "required": [

@@ -138,10 +138,10 @@ export default function ChatRoom() {
     return replies[Math.floor(Math.random() * replies.length)];
   };
 
-  const handleGiftSend = async (gift) => {
-    setCoins((c) => c - gift.price);
+  const handleGiftSend = async (gift, quantity = 1) => {
     setGiftOpen(false);
     const now = new Date();
+    const price = gift.price_coins || gift.price || 0;
     const msg = await base44.entities.ChatMessage.create({
       conversation_id: id,
       type: "gift",
@@ -150,12 +150,12 @@ export default function ChatRoom() {
       gift_id: gift.id,
       gift_name: gift.name,
       gift_icon: gift.icon,
-      gift_price: gift.price,
+      gift_price: price,
       date: formatDate(now),
       time: formatTime(now),
     });
     setMessages((prev) => [...prev, msg]);
-    toast({ title: `🎁 ${gift.name} sent!`, description: `${formatCoins(gift.price)} coins deducted` });
+    toast({ title: `🎁 ${gift.name} sent!`, description: `${formatCoins(price * quantity)} coins deducted` });
 
     // simulate gift received reply
     setTimeout(async () => {
@@ -264,7 +264,14 @@ export default function ChatRoom() {
         />
 
         <EmojiPanel open={emojiOpen} mode={emojiMode} onClose={() => setEmojiOpen(false)} onPick={(e) => setInput((p) => p + e)} onBuyPremium={handlePremiumBuy} coins={coins} />
-        <GiftGallery open={giftOpen} onClose={() => setGiftOpen(false)} onSend={handleGiftSend} coins={coins} />
+        <GiftGallery
+          open={giftOpen}
+          onClose={() => setGiftOpen(false)}
+          onSend={handleGiftSend}
+          coins={coins}
+          recipientId={conv?.user_id || conv?.other_user_id}
+          recipientName={conv?.name || conv?.username}
+        />
         <ChatSearch open={searchOpen} onClose={() => setSearchOpen(false)} messages={messages} />
         <TranslationPanel
           open={transOpen}

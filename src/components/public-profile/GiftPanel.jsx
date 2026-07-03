@@ -1,58 +1,24 @@
 import React, { useState } from "react";
-import { X, Coins, Check, AlertCircle } from "lucide-react";
-import { base44 } from "@/api/base44Client";
-import { getCurrentUser } from "@/lib/getCurrentUser";
+import { X, Coins, Check, AlertCircle, Loader2 } from "lucide-react";
+import { useGifts } from "@/hooks/useGifts";
 import { useToast } from "@/components/ui/use-toast";
-
-const GIFT_CATEGORIES = [
-  {
-    name: "Popular",
-    gifts: [
-      { name: "Rose", icon: "🌹", price: 10 },
-      { name: "Heart", icon: "❤️", price: 50 },
-      { name: "Kiss", icon: "💋", price: 99 },
-      { name: "Teddy", icon: "🧸", price: 199 },
-    ],
-  },
-  {
-    name: "Luxury",
-    gifts: [
-      { name: "Ring", icon: "💍", price: 500 },
-      { name: "Crown", icon: "👑", price: 999 },
-      { name: "Car", icon: "🚗", price: 2999 },
-      { name: "Castle", icon: "🏰", price: 9999 },
-    ],
-  },
-  {
-    name: "Fun",
-    gifts: [
-      { name: "Pizza", icon: "🍕", price: 30 },
-      { name: "Coffee", icon: "☕", price: 20 },
-      { name: "Ice Cream", icon: "🍦", price: 15 },
-      { name: "Cake", icon: "🎂", price: 100 },
-    ],
-  },
-  {
-    name: "Special",
-    gifts: [
-      { name: "Rocket", icon: "🚀", price: 1500 },
-      { name: "Firework", icon: "🎆", price: 2000 },
-      { name: "Diamond", icon: "💎", price: 5000 },
-      { name: "Unicorn", icon: "🦄", price: 3500 },
-    ],
-  },
-];
 
 export default function GiftPanel({ profile, myCoins, onClose }) {
   const { toast } = useToast();
+  const { gifts, coins: hookCoins, loading, sending: hookSending, sendGift } = useGifts();
   const [activeCategory, setActiveCategory] = useState(0);
   const [selectedGift, setSelectedGift] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [sending, setSending] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [sending, setSending] = useState(false);
 
-  const totalCost = (selectedGift?.price || 0) * quantity;
-  const canAfford = totalCost <= myCoins;
+  const coins = myCoins !== undefined ? myCoins : hookCoins;
+  const categories = [...new Set(gifts.map((g) => g.category))];
+  const activeCat = categories[activeCategory] || categories[0];
+  const filtered = gifts.filter((g) => g.category === activeCat);
+
+  const totalCost = (selectedGift?.price_coins || selectedGift?.price || 0) * quantity;
+  const canAfford = totalCost <= coins;
 
   const handleSend = async () => {
     if (!selectedGift) return;
@@ -62,36 +28,15 @@ export default function GiftPanel({ profile, myCoins, onClose }) {
     }
     setSending(true);
     try {
-      const me = await getCurrentUser();
-      // Deduct coins from sender
-      let myProfiles = await base44.entities.UserProfile.filter({ user_id: me.id });
-      if (myProfiles.length > 0) {
-        await base44.entities.UserProfile.update(myProfiles[0].id, {
-          coins: (myProfiles[0].coins || 0) - totalCost,
-          gifts_sent: (myProfiles[0].gifts_sent || 0) + quantity,
-        });
-      }
-      // Add coins to receiver
-      let theirProfiles = await base44.entities.UserProfile.filter({ user_id: profile.user_id || profile.id });
-      if (theirProfiles.length === 0) {
-        theirProfiles = await base44.entities.UserProfile.filter({ id: profile.id });
-      }
-      if (theirProfiles.length > 0) {
-        await base44.entities.UserProfile.update(theirProfiles[0].id, {
-          coins: (theirProfiles[0].coins || 0) + totalCost,
-          gifts_received: (theirProfiles[0].gifts_received || 0) + quantity,
-        });
-      }
-      // Record transaction
-      await base44.entities.Transaction.create({
-        user_id: me.id,
-        type: "gift_sent",
-        amount: -totalCost,
-        description: `Sent ${quantity}x ${selectedGift.name} to ${profile.username}`,
-        recipient_id: profile.user_id || profile.id,
-        recipient_name: profile.username,
-      });
+      await sendGift({
 
+        recipient_id: profile.user_id || profile.id,
+        recipient_name: profile.username || profile.full_name || "",
+        gift_name: selectedGift.name,
+        gift_icon: selectedGift.icon,
+        price_coins: selectedGift.price_coins || selectedGift.price || 0,
+        quantity,
+      });
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
@@ -99,10 +44,12 @@ export default function GiftPanel({ profile, myCoins, onClose }) {
       }, 2000);
     } catch (e) {
       toast({ title: "Failed to send gift", description: e.message, variant: "destructive" });
-    } finally {
-      setSending(false);
     }
   };
+
+  // Fallback static categories if no gifts loaded yet
+  const displayCategories = categories.length > 0 ? categories : ["Popular", "Luxury", "Fun", "Special"];
+  const displayGifts = filtered.length > 0 ? filtered : [];
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-end" onClick={onClose}>
@@ -112,7 +59,7 @@ export default function GiftPanel({ profile, myCoins, onClose }) {
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-bold text-gray-800">Send Gift</h3>
             <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold">
-              <Coins size={10} /> {myCoins?.toLocaleString() || 0}
+              <Coins size={10} /> {coins?.toLocaleString() || 0}
             </span>
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center active:scale-90">
@@ -122,38 +69,51 @@ export default function GiftPanel({ profile, myCoins, onClose }) {
 
         {/* Category tabs */}
         <div className="flex gap-1 px-3 py-2 overflow-x-auto scrollbar-hide border-b border-gray-50">
-          {GIFT_CATEGORIES.map((cat, i) => (
+          {displayCategories.map((cat, i) => (
             <button
-              key={cat.name}
+              key={cat}
               onClick={() => setActiveCategory(i)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${
+              className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition capitalize ${
                 activeCategory === i ? "bg-purple-500 text-white" : "bg-gray-50 text-gray-500"
               }`}
             >
-              {cat.name}
+              {cat}
             </button>
           ))}
         </div>
 
         {/* Gifts grid */}
         <div className="p-3 overflow-y-auto" style={{ maxHeight: "300px" }}>
-          <div className="grid grid-cols-4 gap-2">
-            {GIFT_CATEGORIES[activeCategory].gifts.map((gift) => (
-              <button
-                key={gift.name}
-                onClick={() => { setSelectedGift(gift); setQuantity(1); }}
-                className={`flex flex-col items-center gap-1 p-2 rounded-2xl border transition active:scale-95 ${
-                  selectedGift?.name === gift.name ? "border-purple-400 bg-purple-50" : "border-gray-50 bg-gray-50"
-                }`}
-              >
-                <span className="text-3xl">{gift.icon}</span>
-                <span className="text-[10px] font-bold text-gray-700">{gift.name}</span>
-                <span className="flex items-center gap-0.5 text-[9px] font-bold text-amber-600">
-                  <Coins size={8} /> {gift.price}
-                </span>
-              </button>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+            </div>
+          ) : displayGifts.length === 0 ? (
+            <div className="text-center py-8 text-gray-400">
+              <p className="text-sm">No gifts available</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-2">
+              {displayGifts.map((gift) => {
+                const price = gift.price_coins || gift.price || 0;
+                return (
+                  <button
+                    key={gift.id || gift.name}
+                    onClick={() => { setSelectedGift(gift); setQuantity(1); }}
+                    className={`flex flex-col items-center gap-1 p-2 rounded-2xl border transition active:scale-95 ${
+                      selectedGift?.id === gift.id || selectedGift?.name === gift.name ? "border-purple-400 bg-purple-50" : "border-gray-50 bg-gray-50"
+                    }`}
+                  >
+                    <span className="text-3xl">{gift.icon}</span>
+                    <span className="text-[10px] font-bold text-gray-700">{gift.name}</span>
+                    <span className="flex items-center gap-0.5 text-[9px] font-bold text-amber-600">
+                      <Coins size={8} /> {price}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Selected gift + quantity + send */}
@@ -164,7 +124,7 @@ export default function GiftPanel({ profile, myCoins, onClose }) {
                 <span className="text-2xl">{selectedGift.icon}</span>
                 <div>
                   <p className="text-xs font-bold text-gray-700">{selectedGift.name}</p>
-                  <p className="text-[10px] text-gray-400">{selectedGift.price} coins each</p>
+                  <p className="text-[10px] text-gray-400">{(selectedGift.price_coins || selectedGift.price || 0)} coins each</p>
                 </div>
               </div>
               {/* Quantity selector */}
@@ -183,10 +143,11 @@ export default function GiftPanel({ profile, myCoins, onClose }) {
 
             <button
               onClick={handleSend}
-              disabled={sending}
-              className="w-full py-3 rounded-2xl text-sm font-bold text-white transition active:scale-95 disabled:opacity-60"
+              disabled={sending || hookSending}
+              className="w-full py-3 rounded-2xl text-sm font-bold text-white transition active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
               style={{ background: canAfford ? "linear-gradient(135deg, #F59E0B, #EF4444)" : "#9CA3AF" }}
             >
+              {sending ? <Loader2 size={16} className="animate-spin" /> : null}
               {sending ? "Sending..." : `Send ${quantity}x ${selectedGift.name} (${totalCost} coins)`}
             </button>
             {!canAfford && (

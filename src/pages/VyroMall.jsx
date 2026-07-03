@@ -1,19 +1,85 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Coins, Sparkles, TrendingUp, Shield, Check } from "lucide-react";
+import { ArrowLeft, Coins, Sparkles, TrendingUp, Shield, Check, Loader2 } from "lucide-react";
 import { mallSections, rarityStyles } from "@/components/mall/mallData";
 import MallItemCard from "@/components/mall/MallItemCard";
-import { useServicesData } from "@/hooks/useServicesData";
+import { useMallItems } from "@/hooks/useMallItems";
 import { useBackNav } from "@/hooks/useBackNav";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function VyroMall() {
   const navigate = useNavigate();
   const handleBack = useBackNav("/more-services");
   const [activeSection, setActiveSection] = useState("home");
-  const { data } = useServicesData();
-  const userCoins = data?.mall?.coins || 0;
+  const { toast } = useToast();
 
+  const {
+    items,
+    purchases,
+    coins,
+    loading,
+    processing,
+    purchaseItem,
+    equipItem,
+    unequipItem,
+    isOwned,
+    isEquipped,
+    refresh,
+  } = useMallItems();
+
+  // Group entity items by section
+  const itemsBySection = useMemo(() => {
+    const map = {};
+    for (const item of items) {
+      if (!map[item.section]) map[item.section] = [];
+      map[item.section].push(item);
+    }
+    return map;
+  }, [items]);
+
+  // Merge: entity items take priority, fall back to static items
   const section = mallSections.find((s) => s.id === activeSection) || mallSections[0];
+  const sectionItems = itemsBySection[section.id] || section.items || [];
+
+  const handleBuy = async (item) => {
+    try {
+      const result = await purchaseItem(item);
+      if (result.success) {
+        toast({
+          title: "Purchase Successful! 🎉",
+          description: `${item.name} added to your inventory`,
+        });
+      } else if (result.already_owned) {
+        toast({ title: "Already owned", description: "You already have this item" });
+      }
+    } catch (e) {
+      toast({ title: "Purchase failed", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const handleEquip = async (item) => {
+    const purchase = purchases.find((p) => p.item_id === (item.id || item.name));
+    if (purchase) {
+      await equipItem(purchase.id);
+      toast({ title: "Item equipped", description: `${item.name} is now active` });
+    }
+  };
+
+  const handleUnequip = async (item) => {
+    const purchase = purchases.find((p) => p.item_id === (item.id || item.name));
+    if (purchase) {
+      await unequipItem(purchase.id);
+      toast({ title: "Item unequipped" });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0A0118] flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-orange-400" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0A0118]">
@@ -36,10 +102,13 @@ export default function VyroMall() {
                 <p className="text-[9px] text-gray-400 -mt-0.5">Premium Digital Marketplace</p>
               </div>
             </div>
-            <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/5 border border-white/10">
+            <button
+              onClick={() => navigate("/coins-recharge")}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/5 border border-white/10 active:scale-95 transition"
+            >
               <Coins size={13} className="text-amber-400" />
-              <span className="text-xs font-bold text-amber-300">{userCoins.toLocaleString()}</span>
-            </div>
+              <span className="text-xs font-bold text-amber-300">{coins.toLocaleString()}</span>
+            </button>
           </div>
 
           {/* Scrollable section tab bar */}
@@ -141,15 +210,76 @@ export default function VyroMall() {
             </div>
           )}
 
-          {/* Non-home: show items grid + features */}
-          {section.id !== "home" && (
+          {/* Inventory: show owned items */}
+          {section.id === "inventory" && (
             <>
-              {/* Items grid */}
-              {section.items.length > 0 && (
+              {purchases.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <p className="text-sm">No items in your inventory yet</p>
+                  <p className="text-[10px] mt-1">Purchase items from the store to see them here</p>
+                </div>
+              ) : (
                 <div className="grid grid-cols-2 gap-3">
-                  {section.items.map((item, i) => (
-                    <MallItemCard key={i} item={item} sectionColor={section.color} />
+                  {purchases.map((p, i) => (
+                    <MallItemCard
+                      key={i}
+                      item={{ name: p.item_name, icon: p.icon, rarity: p.rarity, description: "", price_coins: 0, price: "—" }}
+                      sectionColor="#64748B"
+                      owned={true}
+                      equipped={p.status === "equipped"}
+                      onEquip={() => handleEquip({ id: p.item_id, name: p.item_name })}
+                      onUnequip={() => handleUnequip({ id: p.item_id, name: p.item_name })}
+                    />
                   ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Payment center */}
+          {section.id === "payment" && (
+            <div className="space-y-3">
+              <div className="rounded-2xl p-4 bg-white/5 border border-white/5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Coins size={18} className="text-amber-400" />
+                    <h3 className="text-sm font-bold text-white">Your Balance</h3>
+                  </div>
+                  <span className="text-lg font-bold text-amber-300">{coins.toLocaleString()} coins</span>
+                </div>
+                <button
+                  onClick={() => navigate("/coins-recharge")}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-[#0A0118] text-sm font-bold active:scale-95 transition"
+                >
+                  Recharge Coins
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Non-special sections: show items grid */}
+          {!["home", "inventory", "payment"].includes(section.id) && (
+            <>
+              {sectionItems.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {sectionItems.map((item, i) => (
+                    <MallItemCard
+                      key={item.id || i}
+                      item={item}
+                      sectionColor={section.color}
+                      owned={isOwned(item.id || item.name)}
+                      equipped={isEquipped(item.id || item.name)}
+                      onBuy={handleBuy}
+                      onEquip={handleEquip}
+                      onUnequip={handleUnequip}
+                      processing={processing}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <p className="text-sm">No items available in this section yet</p>
+                  <p className="text-[10px] mt-1">Check back soon for new arrivals</p>
                 </div>
               )}
 
@@ -166,23 +296,6 @@ export default function VyroMall() {
                       >
                         {f}
                       </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Available actions */}
-              {section.actions && section.actions.length > 0 && (
-                <div className="rounded-2xl p-4 border" style={{ background: `${section.color}08`, borderColor: `${section.color}20` }}>
-                  <h3 className="text-xs font-bold mb-2" style={{ color: section.color }}>Available Actions</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {section.actions.map((a, i) => (
-                      <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-white/5">
-                        <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${section.color}25` }}>
-                          <Check size={9} style={{ color: section.color }} />
-                        </div>
-                        <span className="text-[10px] text-gray-300">{a}</span>
-                      </div>
                     ))}
                   </div>
                 </div>
