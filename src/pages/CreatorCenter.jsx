@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog, Store, FileText, ClipboardList } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog, Store } from "lucide-react";
 
 const dashboards = [
   {
@@ -147,37 +147,15 @@ const dashboards = [
     modules: ["Business Overview", "Host Recruitment", "Talent Agent Recruitment", "Agency Development", "Lead Management", "Market Expansion", "Partnership Management", "Campaign Management", "Revenue Growth", "Regional Performance", "Application Management", "Communication Center", "Event Development", "Performance Tracking", "Business Intelligence", "Task Management", "Document Center", "Analytics Center", "Business Settings", "Exclusive Tools"],
   },
   {
-    id: "ocs-reports",
-    title: "OCS Report Submission Dashboard",
-    description: "Offline Coin Seller reporting system — report submission workflow, daily/weekly/monthly sales reports, report statuses, SAM report center, approval history, and full report management with create, draft, submit, upload, and analytics actions",
-    icon: ClipboardList,
-    path: "/ocs-report-dashboard",
-    gradient: "linear-gradient(135deg, #FFD700, #22D3EE)",
-    color: "#FFD700",
-    badge: "REPORTS",
-    modules: ["Send Report", "View Reports", "Draft Reports", "Report History", "Pending Reports", "Approved Reports", "Rejected Reports", "Report Analytics", "Download PDF", "Export Excel", "Search Reports", "Filter Reports", "Notification Center", "Daily Sales Report", "Weekly Sales Report", "Monthly Sales Report", "Customer Payment Report", "Coin Distribution Report", "Pending Payment Report", "Refund Request Report", "Fraud Report", "Sales Performance Report", "SAM Report Center", "Approval History"],
-  },
-  {
-    id: "seller-policy",
-    title: "Official Coin Seller Policy",
-    description: "Official Coin Seller (OCS) policy, authority, responsibilities, revenue model, sale rules, prohibited activities, KPIs, benefits, disciplinary actions, confidentiality, and agreement terms",
-    icon: FileText,
-    path: "/official-coin-seller-policy",
-    gradient: "linear-gradient(135deg, #FFD700, #22D3EE)",
-    color: "#FFD700",
-    badge: "POLICY",
-    modules: ["Position & Department", "Authority Level", "Coin Distribution", "Sales Reporting", "User Support", "Revenue & Commission", "Sale Rules", "Prohibited Activities", "Performance Expectations", "KPIs", "Benefits", "Disciplinary Actions", "Confidentiality", "Professional Conduct", "Agreement"],
-  },
-  {
     id: "seller",
     title: "Offline Coins Seller Dashboard",
-    description: "Complete offline coins seller system — premium seller management, manual recharge, customer management, seller levels, packages, rewards, rankings, security, wallet, and admin controls with dark luxury glassmorphism UI",
+    description: "Complete offline coins seller system — premium seller management, manual recharge, customer management, seller levels, packages, rewards, rankings, security, wallet, OCS policy, report submission, and admin controls with dark luxury glassmorphism UI",
     icon: Store,
     path: "/seller-dashboard",
     gradient: "linear-gradient(135deg, #FFD700, #22D3EE)",
     color: "#FFD700",
     badge: "SELLER SYSTEM",
-    modules: ["Seller Panel", "Manual Recharge", "Recharge History", "Recharge Analytics", "Customer Management", "Seller Earnings", "Monthly Reports", "Daily Reports", "Seller Wallet", "Withdraw Requests", "Bonus Control", "Starter Packages", "Medium Packages", "VIP Packages", "Bronze Seller", "Silver Seller", "Gold Seller", "Diamond Seller", "Seller Rewards", "Top Rankings", "Country Rankings", "Security Center", "Admin Controls", "Recharge Process", "Notifications"],
+    modules: ["Seller Panel", "Manual Recharge", "Recharge History", "Recharge Analytics", "Customer Management", "Seller Earnings", "Monthly Reports", "Daily Reports", "Seller Wallet", "Withdraw Requests", "Bonus Control", "Starter Packages", "Medium Packages", "VIP Packages", "Bronze Seller", "Silver Seller", "Gold Seller", "Diamond Seller", "Seller Rewards", "Top Rankings", "Country Rankings", "Security Center", "Admin Controls", "Recharge Process", "Notifications", "OCS Policy", "Report Submission", "Authority & Terms", "Send Report", "Report Types", "Approval History"],
   },
   {
     id: "admin",

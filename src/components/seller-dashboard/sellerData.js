@@ -122,5 +122,7 @@ export const SELLER_DASHBOARD = {
     { id: "rewards", label: "Rewards", icon: "🎁" },
     { id: "rankings", label: "Rankings", icon: "🏅" },
     { id: "security", label: "Security", icon: "🛡️" },
+    { id: "policy", label: "Policy", icon: "📜" },
+    { id: "reports", label: "Reports", icon: "📤" },
   ],
 };

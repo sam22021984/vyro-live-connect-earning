@@ -6,6 +6,8 @@ import {
   ChevronRight, Star, AlertTriangle, Clock, Award,
 } from "lucide-react";
 import { SELLER_DASHBOARD } from "@/components/seller-dashboard/sellerData";
+import SellerPolicyTab from "@/components/seller-dashboard/SellerPolicyTab";
+import SellerReportsTab from "@/components/seller-dashboard/SellerReportsTab";
 import ReportToSection from "@/components/shared/ReportToSection";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -509,6 +511,16 @@ export default function SellerDashboard() {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* POLICY */}
+          {activeTab === "policy" && (
+            <SellerPolicyTab />
+          )}
+
+          {/* REPORTS */}
+          {activeTab === "reports" && (
+            <SellerReportsTab />
           )}
 
           {/* SECURITY */}
