@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { supabaseAuth } from "@/lib/supabaseAuth";
 import { Input } from "@/components/ui/input";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft, Loader2, ArrowRight } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
@@ -27,7 +27,7 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      await base44.auth.register({ email, password });
+      await supabaseAuth.signUp(email, password);
       setShowOtp(true);
     } catch (err) {
       setError(err.message || "Registration failed");
@@ -40,10 +40,7 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      const result = await base44.auth.verifyOtp({ email, otpCode });
-      if (result?.access_token) {
-        base44.auth.setToken(result.access_token);
-      }
+      await supabaseAuth.verifyOtp(email, otpCode);
       window.location.href = "/";
     } catch (err) {
       setError(err.message || "Invalid verification code");
@@ -55,7 +52,7 @@ export default function Register() {
   const handleResend = async () => {
     setError("");
     try {
-      await base44.auth.resendOtp(email);
+      await supabaseAuth.resendOtp(email);
       toast({ title: "Code sent", description: "Check your email for the new code." });
     } catch (err) {
       setError(err.message || "Failed to resend code");
@@ -63,8 +60,8 @@ export default function Register() {
   };
 
   const handleProvider = (provider) => {
-    if (provider === "google") base44.auth.loginWithProvider("google", "/");
-    else if (provider === "facebook") base44.auth.loginWithProvider("facebook", "/");
+    if (provider === "google") supabaseAuth.loginWithProvider("google", "/");
+    else if (provider === "facebook") supabaseAuth.loginWithProvider("facebook", "/");
     else if (provider === "whatsapp" || provider === "mobile") {
       setError(`${provider === "whatsapp" ? "WhatsApp" : "Mobile"} sign up is coming soon!`);
     }

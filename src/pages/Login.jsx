@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { supabaseAuth } from "@/lib/supabaseAuth";
 import { Input } from "@/components/ui/input";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft, Loader2 } from "lucide-react";
 import SocialButtons from "@/components/SocialButtons";
@@ -18,7 +18,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await base44.auth.loginViaEmailPassword(email, password);
+      await supabaseAuth.signIn(email, password);
       window.location.href = "/";
     } catch (err) {
       setError(err.message || "Invalid email or password");
@@ -28,8 +28,8 @@ export default function Login() {
   };
 
   const handleProvider = (provider) => {
-    if (provider === "google") base44.auth.loginWithProvider("google", "/");
-    else if (provider === "facebook") base44.auth.loginWithProvider("facebook", "/");
+    if (provider === "google") supabaseAuth.loginWithProvider("google", "/");
+    else if (provider === "facebook") supabaseAuth.loginWithProvider("facebook", "/");
     else if (provider === "whatsapp" || provider === "mobile") {
       setError(`${provider === "whatsapp" ? "WhatsApp" : "Mobile"} login is coming soon!`);
     }
