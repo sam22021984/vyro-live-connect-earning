@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign } from "lucide-react";
 
 const dashboards = [
   {
@@ -90,6 +90,17 @@ const dashboards = [
     color: "#3B82F6",
     badge: "MARKETING MGR",
     modules: ["Dashboard Home", "Marketing Overview", "Campaign Management", "User Acquisition", "Host Promotion", "Agency Promotion", "Brand Management", "Social Media", "Influencer Management", "Event Promotion", "Advertising Center", "Growth Analytics", "AI Marketing Intelligence", "Brand Performance", "Communication Center", "Content Management", "Promotion Management", "Report Management", "Team Management", "Settings", "Exclusive Tools"],
+  },
+  {
+    id: "finance",
+    title: "Finance Manager Dashboard",
+    description: "Central financial management, revenue monitoring, commission control, withdrawal management, payment verification, wallet auditing, financial reporting, and business profitability control center of the platform",
+    icon: DollarSign,
+    path: "/finance-manager-dashboard",
+    gradient: "linear-gradient(135deg, #F59E0B, #D97706)",
+    color: "#F59E0B",
+    badge: "FINANCE MGR",
+    modules: ["Dashboard Home", "Finance Overview", "Revenue Management", "Withdrawal Management", "Payment Management", "Wallet Management", "Coin Economy", "Gift Revenue", "Commissions", "Profit & Loss", "Financial Reports", "Transaction Audit", "Fraud Detection", "Revenue Analytics", "Country Revenue", "Top Earners", "AI Intelligence", "Communication", "Team Management", "Settings", "Exclusive Tools"],
   },
 ];
 
