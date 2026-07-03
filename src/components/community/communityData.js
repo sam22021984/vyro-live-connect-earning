@@ -19,6 +19,7 @@ export const SIDEBAR_ITEMS = [
   { key: "groups", label: "Groups", icon: "👥" },
   { key: "channels", label: "Channels", icon: "📢" },
   { key: "chat", label: "Chat", icon: "💬" },
+  { key: "social", label: "Social Hub", icon: "🤝" },
   { key: "media", label: "Media Gallery", icon: "🖼️" },
   { key: "gifting", label: "Gifting", icon: "🎁" },
   { key: "reports", label: "Reports", icon: "🚩" },

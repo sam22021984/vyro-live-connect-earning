@@ -2,65 +2,25 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
+// Only miscellaneous/admin services — profile, live, party, community items
+// are accessed from their dedicated sections to avoid duplicates.
 const services = [
-  { name: "Finance", icon: "💰", gradient: "from-green-400 to-emerald-500", highlight: false },
-  { name: "Tasks & Rewards", icon: "🎁", gradient: "from-pink-400 to-rose-500", highlight: false },
-  { name: "Live & Audio", icon: "🎙️", gradient: "from-red-400 to-orange-500", highlight: false },
-  { name: "Social", icon: "👥", gradient: "from-blue-400 to-cyan-500", highlight: false },
-  { name: "Message Center", icon: "📨", gradient: "from-indigo-400 to-blue-600", highlight: true },
-  { name: "Profile & Stats", icon: "📊", gradient: "from-violet-400 to-purple-500", highlight: false },
-  { name: "Level System", icon: "⭐", gradient: "from-amber-400 to-yellow-500", highlight: false },
-  { name: "Settings", icon: "⚙️", gradient: "from-slate-400 to-gray-500", highlight: false },
-  { name: "Support", icon: "🛟", gradient: "from-teal-400 to-cyan-500", highlight: false },
-  { name: "Apply Center", icon: "💼", gradient: "from-indigo-400 to-blue-500", highlight: false },
-  { name: "Control Center", icon: "🎛️", gradient: "from-fuchsia-400 to-purple-500", highlight: true },
-  { name: "Creator Center", icon: "🚀", gradient: "from-purple-400 to-violet-600", highlight: true },
-  { name: "VIP Membership", icon: "💎", gradient: "from-amber-300 to-yellow-500", highlight: true },
-  { name: "VYRO Mall", icon: "🛒", gradient: "from-orange-400 to-red-500", highlight: true },
-  { name: "Trust & Reputation", icon: "🛡️", gradient: "from-green-400 to-teal-500", highlight: false },
-  { name: "Lucky ID Store", icon: "🎰", gradient: "from-pink-400 to-purple-500", highlight: true },
+  { name: "Settings", icon: "⚙️", gradient: "from-slate-400 to-gray-500", path: "/settings" },
+  { name: "Support", icon: "🛟", gradient: "from-teal-400 to-cyan-500", path: "/support-center" },
+  { name: "Apply Center", icon: "💼", gradient: "from-indigo-400 to-blue-500", path: "/apply-center" },
+  { name: "Control Center", icon: "🎛️", gradient: "from-fuchsia-400 to-purple-500", path: "/control-center", highlight: true },
+  { name: "VYRO Mall", icon: "🛒", gradient: "from-orange-400 to-red-500", path: "/vyro-mall", highlight: true },
+  { name: "Lucky ID Store", icon: "🎰", gradient: "from-pink-400 to-purple-500", path: "/lucky-id-store", highlight: true },
+  { name: "Trust & Reputation", icon: "🛡️", gradient: "from-green-400 to-teal-500", path: "/trust-reputation" },
+  { name: "Application ID", icon: "🪪", gradient: "from-blue-400 to-indigo-500", path: "/application-id-system" },
+  { name: "AI Tools", icon: "🤖", gradient: "from-violet-400 to-purple-500", path: "/ai-tools" },
+  { name: "Room Management", icon: "🏠", gradient: "from-rose-400 to-pink-500", path: "/room-management" },
+  { name: "Role Control", icon: "🎖️", gradient: "from-amber-400 to-orange-500", path: "/vyro-role-control" },
+  { name: "Official Coin Seller", icon: "🏦", gradient: "from-emerald-400 to-green-500", path: "/official-coin-seller-policy" },
 ];
 
 export default function MoreServicesPage() {
   const navigate = useNavigate();
-
-  const handleServiceClick = (s, i) => {
-    if (s.name === "Settings") {
-      navigate("/settings");
-    } else if (s.name === "VIP Membership") {
-      navigate("/vip-membership");
-    } else if (s.name === "Apply Center") {
-      navigate("/apply-center");
-    } else if (s.name === "Finance") {
-      navigate("/finance");
-    } else if (s.name === "Control Center") {
-      navigate("/control-center");
-    } else if (s.name === "Level System") {
-      navigate("/level-system");
-    } else if (s.name === "VYRO Mall") {
-      navigate("/vyro-mall");
-    } else if (s.name === "Tasks & Rewards") {
-      navigate("/tasks-rewards");
-    } else if (s.name === "Profile & Stats") {
-      navigate("/profile-stats");
-    } else if (s.name === "Social") {
-      navigate("/social");
-    } else if (s.name === "Live & Audio") {
-      navigate("/party-dashboard");
-    } else if (s.name === "Message Center") {
-      navigate("/message-center");
-    } else if (s.name === "Creator Center") {
-      navigate("/creator-center");
-    } else if (s.name === "Support") {
-      navigate("/support-center");
-    } else if (s.name === "Trust & Reputation") {
-      navigate("/trust-reputation");
-    } else if (s.name === "Lucky ID Store") {
-      navigate("/lucky-id-store");
-    } else {
-      navigate(`/service/${i}`, { state: { name: s.name, icon: s.icon, gradient: s.gradient } });
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[#F8F9FC]">
@@ -83,7 +43,7 @@ export default function MoreServicesPage() {
               <button
                 key={i}
                 type="button"
-                onClick={() => handleServiceClick(s, i)}
+                onClick={() => navigate(s.path)}
                 className={`relative flex flex-col items-center justify-center gap-2 p-3 rounded-[20px] transition-all duration-200 active:scale-95 hover:scale-[1.05]
                   ${s.highlight
                     ? "bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200/60"

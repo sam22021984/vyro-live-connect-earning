@@ -127,7 +127,7 @@ const AuthenticatedApp = () => {
       <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="/welcome-animation" element={<WelcomeAnimation />} />
       <Route path="/profile-dashboard" element={<ProfileDashboard />} />
-      <Route path="/discover" element={<Discover />} />
+      <Route path="/discover" element={<Navigate to="/community-dashboard" replace />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/splash" replace />} />}>
         <Route path="/" element={<Home />} />
         <Route path="/settings" element={<Settings />} />

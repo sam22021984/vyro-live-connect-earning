@@ -54,6 +54,10 @@ export default function CommunityDashboard() {
       navigate("/messages");
       return;
     }
+    if (key === "social") {
+      navigate("/social");
+      return;
+    }
     setActive(key);
   };
 

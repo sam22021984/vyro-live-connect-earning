@@ -32,7 +32,7 @@ export default function MoreServices() {
           </div>
           <div className="text-left">
             <h3 className="text-sm font-bold text-gray-800">More Services</h3>
-            <p className="text-[10px] text-gray-400 font-medium">16 premium services</p>
+            <p className="text-[10px] text-gray-400 font-medium">Premium services</p>
           </div>
         </div>
         <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
