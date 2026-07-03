@@ -48,39 +48,43 @@ export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10
   const count = Math.max(4, seatCount);
   const seats = generateSeats(count);
   const layout = getLayout(count);
+  const numRows = layout.length;
+  const maxPerRow = Math.max(...layout);
 
   const getSeatEffects = (seatId) => seatEffects.filter((e) => e.seatId === seatId);
-  const seatSize = count <= 6 ? 64 : count <= 10 ? 58 : count <= 15 ? 52 : 48;
-  const gapVal = count <= 10 ? "1rem" : "0.7rem";
+  // Gaps scale with seat density
+  const rowGap = count <= 6 ? "0.6rem" : count <= 10 ? "0.5rem" : "0.4rem";
+  const colGap = count <= 6 ? "0.6rem" : count <= 10 ? "0.5rem" : "0.35rem";
 
   // Split seats into rows based on layout
   let seatIndex = 0;
-  const rows = layout.map((rowSize, rowIdx) => {
+  const rows = layout.map((rowSize) => {
     const rowSeats = seats.slice(seatIndex, seatIndex + rowSize);
     seatIndex += rowSize;
     return rowSeats;
   });
 
+  // Each seat takes equal share of the row width
+  const seatFlex = `1 1 0`;
+
   return (
-    <div className="flex flex-col items-center w-full mx-auto" style={{ gap: gapVal, maxWidth: "420px" }}>
+    <div className="flex flex-col justify-between w-full h-full">
       {rows.map((rowSeats, rowIdx) => (
         <div
           key={rowIdx}
           className="flex justify-center items-center w-full"
-          style={{ gap: count <= 6 ? "1.25rem" : count <= 10 ? "1rem" : "0.8rem" }}
+          style={{ gap: colGap }}
         >
-          {rowSeats.map((seat) => {
-            const isHost = seat.id === 0;
-            return (
+          {rowSeats.map((seat) => (
+            <div key={seat.id} style={{ flex: seatFlex, maxWidth: "80px" }} className="flex justify-center">
               <Seat
-                key={seat.id}
                 seat={seat}
-                size={isHost ? seatSize + 8 : seatSize}
+                fluid
                 onClick={onSeatClick}
                 effects={getSeatEffects(seat.id)}
               />
-            );
-          })}
+            </div>
+          ))}
         </div>
       ))}
     </div>

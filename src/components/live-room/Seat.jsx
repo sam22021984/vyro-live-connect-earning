@@ -2,16 +2,17 @@ import React from "react";
 import { Armchair, Mic, MicOff, Crown } from "lucide-react";
 import { COLORS } from "./roomData";
 
-export default function Seat({ seat, size = 56, onClick, effects = [] }) {
+export default function Seat({ seat, size = 56, onClick, effects = [], fluid = false }) {
   const { user, id, role } = seat;
   const isEmpty = !user;
   const isHost = role === "host";
   const hasShake = effects.some((e) => e.effect === "hammer");
   const hasGlow = effects.length > 0 && !hasShake;
+  const seatStyle = fluid ? { width: "100%", aspectRatio: "1 / 1" } : { width: size, height: size };
 
   return (
-    <div className="flex flex-col items-center gap-1" style={{ animation: hasShake ? "seatShake 0.5s ease-in-out 3" : "none" }}>
-      <div className="relative" style={{ width: size, height: size }}>
+    <div className="flex flex-col items-center gap-1 w-full" style={{ animation: hasShake ? "seatShake 0.5s ease-in-out 3" : "none" }}>
+      <div className="relative w-full" style={seatStyle}>
         {isEmpty ? (
           <div
             className="w-full h-full rounded-full flex items-center justify-center"
