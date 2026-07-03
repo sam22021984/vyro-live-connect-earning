@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog, Store, FileText } from "lucide-react";
+import { ArrowLeft, Crown, ChevronRight, Rocket, Shield, LifeBuoy, Shield as ShieldIcon, Gift, Swords, Megaphone, DollarSign, PartyPopper, Globe, Briefcase, Compass, UserCog, Store, FileText, ClipboardList } from "lucide-react";
 
 const dashboards = [
   {
@@ -145,6 +145,17 @@ const dashboards = [
     color: "#3B82F6",
     badge: "BIZ DEVELOPER",
     modules: ["Business Overview", "Host Recruitment", "Talent Agent Recruitment", "Agency Development", "Lead Management", "Market Expansion", "Partnership Management", "Campaign Management", "Revenue Growth", "Regional Performance", "Application Management", "Communication Center", "Event Development", "Performance Tracking", "Business Intelligence", "Task Management", "Document Center", "Analytics Center", "Business Settings", "Exclusive Tools"],
+  },
+  {
+    id: "ocs-reports",
+    title: "OCS Report Submission Dashboard",
+    description: "Offline Coin Seller reporting system — report submission workflow, daily/weekly/monthly sales reports, report statuses, SAM report center, approval history, and full report management with create, draft, submit, upload, and analytics actions",
+    icon: ClipboardList,
+    path: "/ocs-report-dashboard",
+    gradient: "linear-gradient(135deg, #FFD700, #22D3EE)",
+    color: "#FFD700",
+    badge: "REPORTS",
+    modules: ["Send Report", "View Reports", "Draft Reports", "Report History", "Pending Reports", "Approved Reports", "Rejected Reports", "Report Analytics", "Download PDF", "Export Excel", "Search Reports", "Filter Reports", "Notification Center", "Daily Sales Report", "Weekly Sales Report", "Monthly Sales Report", "Customer Payment Report", "Coin Distribution Report", "Pending Payment Report", "Refund Request Report", "Fraud Report", "Sales Performance Report", "SAM Report Center", "Approval History"],
   },
   {
     id: "seller-policy",
