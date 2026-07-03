@@ -155,6 +155,63 @@ export default function LevelSystem() {
                 </div>
               </div>
             ))}
+
+            {/* Bottom navigation tiles */}
+            <div className="pt-2">
+              <h3 className="text-xs font-bold text-gray-700 mb-3 px-1">Explore Level Dashboards</h3>
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  onClick={() => setActiveView("overview")}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white border border-gray-100 active:scale-95 transition"
+                  style={{ boxShadow: "0 4px 10px rgba(0,0,0,0.04)" }}
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-xl shadow-md shadow-purple-200">
+                    📊
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-700">Overview</span>
+                </button>
+                <button
+                  onClick={() => setActiveView("user-dashboard")}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white border border-gray-100 active:scale-95 transition"
+                  style={{ boxShadow: "0 4px 10px rgba(0,0,0,0.04)" }}
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xl shadow-md shadow-blue-200">
+                    👤
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-700">User Level</span>
+                </button>
+                <button
+                  onClick={() => setActiveView("host-dashboard")}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white border border-gray-100 active:scale-95 transition"
+                  style={{ boxShadow: "0 4px 10px rgba(0,0,0,0.04)" }}
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-red-400 to-orange-500 flex items-center justify-center text-xl shadow-md shadow-red-200">
+                    🎙️
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-700">Host Level</span>
+                </button>
+                <button
+                  onClick={() => setActiveView("stream-dashboard")}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white border border-gray-100 active:scale-95 transition"
+                  style={{ boxShadow: "0 4px 10px rgba(0,0,0,0.04)" }}
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-xl shadow-md shadow-blue-200">
+                    📡
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-700">Streaming Level</span>
+                </button>
+                <button
+                  onClick={() => setActiveView("gifting-dashboard")}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white border border-gray-100 active:scale-95 transition col-span-2"
+                  style={{ boxShadow: "0 4px 10px rgba(0,0,0,0.04)" }}
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center text-xl shadow-md shadow-amber-200">
+                    🎁
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-700">Gifting Level</span>
+                </button>
+              </div>
+            </div>
           </div>
           )}
         </div>
