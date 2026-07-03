@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { ChevronDown, Check, X } from "lucide-react";
 
-const DARK = "#0F1B3D";
 const PINK = "#EC4899";
 const PURPLE = "#8B5CF6";
 const GOLD = "#D4AF37";
 const BLUE = "#3B82F6";
-const WHITE = "#FFFFFF";
-const GRAY = "rgba(255,255,255,0.5)";
-const MUTED = "rgba(255,255,255,0.4)";
+const TEXT_DARK = "#1F2937";
+const TEXT_BODY = "#374151";
+const TEXT_MUTED = "#6B7280";
+const TEXT_LIGHT = "#9CA3AF";
 
 const POLICY = {
   position: "Host",
@@ -98,55 +98,55 @@ export default function HostPolicyTab() {
         <div className="relative">
           <div className="text-3xl mb-1">🌐</div>
           <h2 className="text-base font-bold text-white">VYRO LIVE CONNECT</h2>
-          <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>Host Policy, Authority, Responsibilities & Terms</p>
+          <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.6)" }}>Host Policy, Authority, Responsibilities & Terms</p>
         </div>
       </div>
 
       {/* Position & Department */}
-      <GlassCard>
+      <Card>
         <div className="flex items-center gap-2 mb-3">
           <span className="text-lg">📋</span>
-          <h3 className="text-sm font-bold text-white">Position & Department</h3>
+          <h3 className="text-sm font-bold" style={{ color: TEXT_DARK }}>Position & Department</h3>
         </div>
         <div className="space-y-2.5">
           <div>
-            <p className="text-[9px]" style={{ color: MUTED }}>🎤 POSITION TITLE</p>
-            <p className="text-xs font-bold text-white">{POLICY.position}</p>
+            <p className="text-[9px] font-semibold" style={{ color: TEXT_LIGHT }}>🎤 POSITION TITLE</p>
+            <p className="text-xs font-bold" style={{ color: TEXT_DARK }}>{POLICY.position}</p>
           </div>
-          <div className="pt-2 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-            <p className="text-[9px]" style={{ color: MUTED }}>📍 DEPARTMENT</p>
+          <div className="pt-2 border-t" style={{ borderColor: "#F3F4F6" }}>
+            <p className="text-[9px] font-semibold" style={{ color: TEXT_LIGHT }}>📍 DEPARTMENT</p>
             <p className="text-xs font-bold" style={{ color: PINK }}>{POLICY.department}</p>
           </div>
-          <div className="pt-2 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-            <p className="text-[9px]" style={{ color: MUTED }}>📊 REPORTING TO</p>
+          <div className="pt-2 border-t" style={{ borderColor: "#F3F4F6" }}>
+            <p className="text-[9px] font-semibold" style={{ color: TEXT_LIGHT }}>📊 REPORTING TO</p>
             <p className="text-xs font-bold" style={{ color: GOLD }}>{POLICY.reportsTo}</p>
           </div>
         </div>
-      </GlassCard>
+      </Card>
 
       {/* Role Purpose */}
-      <GlassCard>
+      <Card>
         <div className="flex items-center gap-2 mb-2">
           <span className="text-lg">🎯</span>
-          <h3 className="text-sm font-bold text-white">Role Purpose</h3>
+          <h3 className="text-sm font-bold" style={{ color: TEXT_DARK }}>Role Purpose</h3>
         </div>
-        <p className="text-[11px] leading-relaxed" style={{ color: GRAY }}>{POLICY.purpose}</p>
-      </GlassCard>
+        <p className="text-[11px] leading-relaxed" style={{ color: TEXT_BODY }}>{POLICY.purpose}</p>
+      </Card>
 
       {/* Authority Level */}
-      <GlassCard>
+      <Card>
         <div className="flex items-center gap-2 mb-2">
           <span className="text-lg">🔐</span>
-          <h3 className="text-sm font-bold text-white">Authority Level</h3>
+          <h3 className="text-sm font-bold" style={{ color: TEXT_DARK }}>Authority Level</h3>
         </div>
-        <p className="text-[11px] mb-3" style={{ color: GRAY }}>{POLICY.authorityLevel}</p>
+        <p className="text-[11px] mb-3" style={{ color: TEXT_BODY }}>{POLICY.authorityLevel}</p>
 
         <p className="text-[10px] font-bold mb-2" style={{ color: "#10B981" }}>✅ HOSTS MAY:</p>
         <div className="space-y-1.5 mb-3">
           {POLICY.authorityMay.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               <Check size={11} style={{ color: "#10B981" }} />
-              <span className="text-[11px] text-white">{item}</span>
+              <span className="text-[11px]" style={{ color: TEXT_BODY }}>{item}</span>
             </div>
           ))}
         </div>
@@ -156,22 +156,22 @@ export default function HostPolicyTab() {
           {POLICY.authorityMayNot.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               <X size={11} style={{ color: "#EF4444" }} />
-              <span className="text-[11px] text-white">{item}</span>
+              <span className="text-[11px]" style={{ color: TEXT_BODY }}>{item}</span>
             </div>
           ))}
         </div>
-      </GlassCard>
+      </Card>
 
       <CollapsibleCard id="responsibilities" title="Primary Responsibilities" icon="📋" expanded={expanded} toggle={toggle} accent={PINK}>
         <div className="space-y-3">
           {POLICY.responsibilities.map((r, i) => (
-            <div key={i} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)" }}>
+            <div key={i} className="rounded-xl p-3" style={{ background: "#F9FAFB" }}>
               <p className="text-[10px] font-bold mb-2" style={{ color: PINK }}>{r.icon} {r.title.toUpperCase()}</p>
               <div className="space-y-1.5">
                 {r.items.map((item, j) => (
                   <div key={j} className="flex items-center gap-2">
                     <Check size={10} style={{ color: PINK }} />
-                    <span className="text-[11px]" style={{ color: GRAY }}>{item}</span>
+                    <span className="text-[11px]" style={{ color: TEXT_MUTED }}>{item}</span>
                   </div>
                 ))}
               </div>
@@ -185,7 +185,7 @@ export default function HostPolicyTab() {
           {POLICY.performanceExpectations.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               <Check size={11} style={{ color: "#10B981" }} />
-              <span className="text-[11px] text-white">{item}</span>
+              <span className="text-[11px]" style={{ color: TEXT_BODY }}>{item}</span>
             </div>
           ))}
         </div>
@@ -194,16 +194,16 @@ export default function HostPolicyTab() {
       <CollapsibleCard id="prohibited" title="Prohibited Activities" icon="⚠️" expanded={expanded} toggle={toggle} accent="#EF4444">
         <div className="space-y-3">
           {POLICY.prohibited.map((p, i) => (
-            <div key={i} className="rounded-xl p-3" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.1)" }}>
+            <div key={i} className="rounded-xl p-3" style={{ background: "#FEF2F2", border: "1px solid #FEE2E2" }}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">{p.icon}</span>
-                <p className="text-xs font-bold text-white">{p.title}</p>
+                <p className="text-xs font-bold" style={{ color: TEXT_DARK }}>{p.title}</p>
               </div>
               <div className="space-y-1.5">
                 {p.items.map((item, j) => (
                   <div key={j} className="flex items-center gap-2">
                     <X size={10} style={{ color: "#EF4444" }} />
-                    <span className="text-[11px]" style={{ color: GRAY }}>{item}</span>
+                    <span className="text-[11px]" style={{ color: TEXT_MUTED }}>{item}</span>
                   </div>
                 ))}
               </div>
@@ -213,56 +213,56 @@ export default function HostPolicyTab() {
       </CollapsibleCard>
 
       <CollapsibleCard id="earnings" title="Earnings & Rewards" icon="💰" expanded={expanded} toggle={toggle} accent={GOLD}>
-        <p className="text-[11px] mb-3" style={{ color: GRAY }}>Eligible Hosts may receive:</p>
+        <p className="text-[11px] mb-3" style={{ color: TEXT_BODY }}>Eligible Hosts may receive:</p>
         <div className="grid grid-cols-2 gap-2 mb-3">
           {POLICY.earnings.map((item, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-xl p-2" style={{ background: `${GOLD}08` }}>
+            <div key={i} className="flex items-center gap-2 rounded-xl p-2" style={{ background: `${GOLD}10` }}>
               <Check size={10} style={{ color: GOLD }} />
-              <span className="text-[11px] text-white">{item}</span>
+              <span className="text-[11px]" style={{ color: TEXT_BODY }}>{item}</span>
             </div>
           ))}
         </div>
-        <div className="rounded-xl p-3" style={{ background: `${GOLD}08`, border: `1px solid ${GOLD}15` }}>
-          <p className="text-[10px] leading-relaxed" style={{ color: GRAY }}>{POLICY.earningsNote}</p>
+        <div className="rounded-xl p-3" style={{ background: `${GOLD}08`, border: `1px solid ${GOLD}20` }}>
+          <p className="text-[10px] leading-relaxed" style={{ color: TEXT_MUTED }}>{POLICY.earningsNote}</p>
         </div>
       </CollapsibleCard>
 
       <CollapsibleCard id="benefits" title="Benefits" icon="🎁" expanded={expanded} toggle={toggle} accent={PURPLE}>
         <div className="grid grid-cols-2 gap-2 mb-3">
           {POLICY.benefits.map((item, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-xl p-2" style={{ background: `${PURPLE}08` }}>
+            <div key={i} className="flex items-center gap-2 rounded-xl p-2" style={{ background: `${PURPLE}10` }}>
               <Check size={10} style={{ color: PURPLE }} />
-              <span className="text-[11px] text-white">{item}</span>
+              <span className="text-[11px]" style={{ color: TEXT_BODY }}>{item}</span>
             </div>
           ))}
         </div>
-        <div className="rounded-xl p-3" style={{ background: `${PURPLE}08`, border: `1px solid ${PURPLE}15` }}>
-          <p className="text-[10px] leading-relaxed" style={{ color: GRAY }}>{POLICY.benefitsNote}</p>
+        <div className="rounded-xl p-3" style={{ background: `${PURPLE}08`, border: `1px solid ${PURPLE}20` }}>
+          <p className="text-[10px] leading-relaxed" style={{ color: TEXT_MUTED }}>{POLICY.benefitsNote}</p>
         </div>
       </CollapsibleCard>
 
       <CollapsibleCard id="security" title="Account Security" icon="🔒" expanded={expanded} toggle={toggle} accent={BLUE}>
-        <p className="text-[11px] mb-3" style={{ color: GRAY }}>Hosts are responsible for:</p>
+        <p className="text-[11px] mb-3" style={{ color: TEXT_BODY }}>Hosts are responsible for:</p>
         <div className="space-y-1.5 mb-3">
           {POLICY.accountSecurity.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               <Check size={11} style={{ color: BLUE }} />
-              <span className="text-[11px] text-white">{item}</span>
+              <span className="text-[11px]" style={{ color: TEXT_BODY }}>{item}</span>
             </div>
           ))}
         </div>
-        <div className="rounded-xl p-3" style={{ background: `${BLUE}08`, border: `1px solid ${BLUE}15` }}>
-          <p className="text-[10px] leading-relaxed" style={{ color: GRAY }}>{POLICY.securityNote}</p>
+        <div className="rounded-xl p-3" style={{ background: `${BLUE}08`, border: `1px solid ${BLUE}20` }}>
+          <p className="text-[10px] leading-relaxed" style={{ color: TEXT_MUTED }}>{POLICY.securityNote}</p>
         </div>
       </CollapsibleCard>
 
       <CollapsibleCard id="monitoring" title="Monitoring & Compliance" icon="📊" expanded={expanded} toggle={toggle} accent="#8B5CF6">
-        <p className="text-[11px] mb-3" style={{ color: GRAY }}>The platform reserves the right to:</p>
+        <p className="text-[11px] mb-3" style={{ color: TEXT_BODY }}>The platform reserves the right to:</p>
         <div className="space-y-1.5">
           {POLICY.monitoring.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               <Check size={11} style={{ color: "#8B5CF6" }} />
-              <span className="text-[11px] text-white">{item}</span>
+              <span className="text-[11px]" style={{ color: TEXT_BODY }}>{item}</span>
             </div>
           ))}
         </div>
@@ -271,34 +271,34 @@ export default function HostPolicyTab() {
       <CollapsibleCard id="disciplinary" title="Disciplinary Actions" icon="⚠️" expanded={expanded} toggle={toggle} accent="#EF4444">
         <div className="space-y-2 mb-3">
           {POLICY.disciplinary.map((d) => (
-            <div key={d.level} className="rounded-xl p-3 flex items-center gap-3" style={{ background: `${d.color}10`, border: `1px solid ${d.color}20` }}>
+            <div key={d.level} className="rounded-xl p-3 flex items-center gap-3" style={{ background: `${d.color}10`, border: `1px solid ${d.color}25` }}>
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{ background: d.color }}>
                 {d.level}
               </div>
               <div className="flex-1">
-                <p className="text-[9px]" style={{ color: GRAY }}>Level {d.level}</p>
+                <p className="text-[9px] font-semibold" style={{ color: TEXT_LIGHT }}>Level {d.level}</p>
                 <p className="text-xs font-bold" style={{ color: d.color }}>{d.action}</p>
               </div>
             </div>
           ))}
         </div>
-        <div className="rounded-xl p-3" style={{ background: "#EF444408", border: "1px solid #EF444415" }}>
-          <p className="text-[10px] leading-relaxed" style={{ color: GRAY }}>{POLICY.disciplinaryNote}</p>
+        <div className="rounded-xl p-3" style={{ background: "#FEF2F2", border: "1px solid #FEE2E2" }}>
+          <p className="text-[10px] leading-relaxed" style={{ color: TEXT_MUTED }}>{POLICY.disciplinaryNote}</p>
         </div>
       </CollapsibleCard>
 
       <CollapsibleCard id="confidentiality" title="Confidentiality" icon="🔒" expanded={expanded} toggle={toggle} accent="#06B6D4">
-        <p className="text-[11px] mb-3" style={{ color: GRAY }}>Hosts must not disclose:</p>
+        <p className="text-[11px] mb-3" style={{ color: TEXT_BODY }}>Hosts must not disclose:</p>
         <div className="space-y-1.5 mb-3">
           {POLICY.confidentiality.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               <X size={11} style={{ color: "#06B6D4" }} />
-              <span className="text-[11px] text-white">{item}</span>
+              <span className="text-[11px]" style={{ color: TEXT_BODY }}>{item}</span>
             </div>
           ))}
         </div>
-        <div className="rounded-xl p-3" style={{ background: "#06B6D408", border: "1px solid #06B6D415" }}>
-          <p className="text-[10px] leading-relaxed" style={{ color: GRAY }}>{POLICY.confidentialityNote}</p>
+        <div className="rounded-xl p-3" style={{ background: "#ECFEFF", border: "1px solid #CFFAFE" }}>
+          <p className="text-[10px] leading-relaxed" style={{ color: TEXT_MUTED }}>{POLICY.confidentialityNote}</p>
         </div>
       </CollapsibleCard>
 
@@ -307,45 +307,45 @@ export default function HostPolicyTab() {
           {POLICY.legalCompliance.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               <Check size={11} style={{ color: "#64748B" }} />
-              <span className="text-[11px] text-white">{item}</span>
+              <span className="text-[11px]" style={{ color: TEXT_BODY }}>{item}</span>
             </div>
           ))}
         </div>
       </CollapsibleCard>
 
       {/* Policy Updates */}
-      <GlassCard>
+      <Card>
         <div className="flex items-center gap-2 mb-2">
           <span className="text-lg">📜</span>
-          <h3 className="text-sm font-bold text-white">Policy Updates</h3>
+          <h3 className="text-sm font-bold" style={{ color: TEXT_DARK }}>Policy Updates</h3>
         </div>
-        <p className="text-[11px] leading-relaxed" style={{ color: GRAY }}>
+        <p className="text-[11px] leading-relaxed" style={{ color: TEXT_BODY }}>
           VYRO Live Connect reserves the right to update, modify, replace, or revise this policy at any time. Continued use of the platform constitutes acceptance of the latest version of this policy.
         </p>
-      </GlassCard>
+      </Card>
 
       {/* Agreement */}
       <div className="rounded-2xl p-4 text-center" style={{ background: "linear-gradient(135deg, #0F1B3D 0%, #1A2952 50%, #4C1D95 100%)" }}>
         <div className="text-2xl mb-2">📜</div>
         <h3 className="text-sm font-bold text-white mb-2">Agreement</h3>
-        <p className="text-[11px] text-white/60 leading-relaxed">
+        <p className="text-[11px] text-white/70 leading-relaxed">
           By operating as a Host on VYRO Live Connect, the Host confirms that they have read, understood, and agreed to comply with all platform policies, operational procedures, compliance requirements, security standards, community guidelines, and future policy updates issued by VYRO Live Connect.
         </p>
-        <p className="text-[10px] text-white/40 leading-relaxed mt-2">
+        <p className="text-[10px] text-white/50 leading-relaxed mt-2">
           Failure to comply may result in disciplinary action, suspension of rewards, account restrictions, permanent termination, or legal action where applicable.
         </p>
       </div>
 
       <div className="text-center pt-1">
-        <p className="text-[10px] font-bold tracking-wider" style={{ color: "rgba(255,255,255,0.3)" }}>END OF OFFICIAL HOST POLICY DOCUMENT</p>
+        <p className="text-[10px] font-bold tracking-wider" style={{ color: TEXT_LIGHT }}>END OF OFFICIAL HOST POLICY DOCUMENT</p>
       </div>
     </div>
   );
 }
 
-function GlassCard({ children, className = "" }) {
+function Card({ children }) {
   return (
-    <div className={`rounded-2xl p-4 ${className}`} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" }}>
+    <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid #F3F4F6", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
       {children}
     </div>
   );
@@ -354,13 +354,13 @@ function GlassCard({ children, className = "" }) {
 function CollapsibleCard({ id, title, icon, expanded, toggle, accent, children }) {
   const isOpen = expanded === id;
   return (
-    <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${accent}25`, backdropFilter: "blur(12px)" }}>
+    <div className="rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", border: `1px solid ${accent}30`, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
       <button onClick={() => toggle(id)} className="w-full p-4 flex items-center gap-3 active:scale-[0.98] transition">
         <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ background: `${accent}15` }}>
           {icon}
         </div>
-        <h3 className="flex-1 text-left text-sm font-bold text-white">{title}</h3>
-        <ChevronDown size={18} style={{ color: "rgba(255,255,255,0.4)" }} className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+        <h3 className="flex-1 text-left text-sm font-bold" style={{ color: TEXT_DARK }}>{title}</h3>
+        <ChevronDown size={18} style={{ color: TEXT_LIGHT }} className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
       </button>
       {isOpen && <div className="px-4 pb-4 animate-fadeIn">{children}</div>}
     </div>
