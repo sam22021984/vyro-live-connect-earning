@@ -1,25 +1,38 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import AppSettingsTab from "@/components/settings/AppSettingsTab";
 import DeviceSettingsTab from "@/components/settings/DeviceSettingsTab";
 import PrivacySettingsTab from "@/components/settings/PrivacySettingsTab";
+import LanguageSettingsTab from "@/components/settings/LanguageSettingsTab";
+import NotificationSettingsTab from "@/components/settings/NotificationSettingsTab";
+import StorageDataTab from "@/components/settings/StorageDataTab";
+import AboutTab from "@/components/settings/AboutTab";
+import AccountActionsTab from "@/components/settings/AccountActionsTab";
+import SecuritySettingsTab from "@/components/settings/SecuritySettingsTab";
+import LegalPoliciesTab from "@/components/settings/LegalPoliciesTab";
+import DeveloperOptionsTab from "@/components/settings/DeveloperOptionsTab";
 
 export default function SettingDetail() {
   const navigate = useNavigate();
   const location = useLocation();
   const { name, icon } = location.state || { name: "Settings", icon: "🔒" };
 
-  // Index 1 = Device Settings, Index 2 = Privacy Settings — connected to Supabase
   const pathSegments = location.pathname.split("/");
   const settingIndex = parseInt(pathSegments[pathSegments.length - 1], 10);
 
-  if (settingIndex === 1) {
-    return <DeviceSettingsTab />;
-  }
-
-  if (settingIndex === 2) {
-    return <PrivacySettingsTab />;
-  }
+  // All 11 settings tabs — all connected to Supabase
+  if (settingIndex === 0) return <AppSettingsTab />;
+  if (settingIndex === 1) return <DeviceSettingsTab />;
+  if (settingIndex === 2) return <PrivacySettingsTab />;
+  if (settingIndex === 3) return <LanguageSettingsTab />;
+  if (settingIndex === 4) return <NotificationSettingsTab />;
+  if (settingIndex === 5) return <StorageDataTab />;
+  if (settingIndex === 6) return <AboutTab />;
+  if (settingIndex === 7) return <AccountActionsTab />;
+  if (settingIndex === 8) return <SecuritySettingsTab />;
+  if (settingIndex === 9) return <LegalPoliciesTab />;
+  if (settingIndex === 10) return <DeveloperOptionsTab />;
 
   return (
     <div className="min-h-screen bg-[#F8F9FC]">

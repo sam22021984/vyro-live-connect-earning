@@ -1,0 +1,102 @@
+{
+  "name": "AppStorage",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "cache_size_mb": {
+      "type": "number",
+      "default": 0
+    },
+    "media_size_mb": {
+      "type": "number",
+      "default": 0
+    },
+    "downloads_size_mb": {
+      "type": "number",
+      "default": 0
+    },
+    "documents_size_mb": {
+      "type": "number",
+      "default": 0
+    },
+    "total_size_mb": {
+      "type": "number",
+      "default": 0
+    },
+    "auto_clear_cache": {
+      "type": "boolean",
+      "default": false
+    },
+    "auto_clear_interval_days": {
+      "type": "number",
+      "default": 7
+    },
+    "download_quality": {
+      "type": "string",
+      "enum": [
+        "auto",
+        "high",
+        "standard",
+        "low"
+      ],
+      "default": "auto"
+    },
+    "save_to_gallery": {
+      "type": "boolean",
+      "default": false
+    },
+    "wifi_only_downloads": {
+      "type": "boolean",
+      "default": true
+    },
+    "last_cleared_date": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id"
+  ],
+  "rls": {
+    "create": {
+      "data.user_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
