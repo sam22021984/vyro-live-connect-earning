@@ -7,7 +7,7 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { action, dashboard_type, params } = body;
+    const { action, payload, dashboard_type, params } = body;
 
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     const edgeUrl = 'https://zohtjywggezadhqwfzrh.supabase.co/functions/v1/dashboard-api';
@@ -20,8 +20,8 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         action,
+        payload: payload || params || {},
         dashboard_type,
-        params: params || {},
         user_id: user.id,
         _base44_user_email: user.email,
       }),

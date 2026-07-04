@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { callDashboardAPI } from "@/lib/dashboardApi";
 
 export function useDashboardApi() {
   const [loading, setLoading] = useState(false);
@@ -9,14 +9,10 @@ export function useDashboardApi() {
     setLoading(true);
     setError(null);
     try {
-      const res = await base44.functions.invoke("dashboardApi", {
-        action,
+      return await callDashboardAPI(action, {
+        ...params,
         dashboard_type: dashboardType,
-        params,
       });
-      const result = res.data || res;
-      if (result?.data?.error) throw new Error(result.data.error);
-      return result.data;
     } catch (err) {
       setError(err.message);
       throw err;
