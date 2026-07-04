@@ -54,14 +54,21 @@ export const AuthProvider = ({ children }) => {
         setUser(currentUser);
         setIsAuthenticated(true);
       } else {
-        setUser(null);
-        setIsAuthenticated(false);
+        // Only log out if the token was actually cleared (real 401 / refresh failed).
+        // If token still exists, me() returned null due to a transient error
+        // (backend redeploying, network hiccup) — keep previous auth state.
+        const tokenStillExists = supabaseAuth.getToken();
+        if (!tokenStillExists) {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+        // else: keep existing user/isAuthenticated as-is (don't flicker)
       }
       setIsLoadingAuth(false);
       setAuthChecked(true);
     } catch (error) {
+      // Transient error — don't clear auth state
       setIsLoadingAuth(false);
-      setIsAuthenticated(false);
       setAuthChecked(true);
     }
   };

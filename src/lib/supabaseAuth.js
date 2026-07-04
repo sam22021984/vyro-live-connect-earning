@@ -112,16 +112,44 @@ export const supabaseAuth = {
     return data;
   },
 
+  async refreshSession() {
+    const refreshToken = localStorage.getItem(REFRESH_KEY);
+    if (!refreshToken) return null;
+    try {
+      const res = await invoke({ action: "refresh", refresh_token: refreshToken });
+      const { data, ok } = res.data;
+      if (!ok || !data?.access_token) return null;
+      this.setToken(data.access_token, data.refresh_token);
+      return mapUser(data.user || data);
+    } catch {
+      return null;
+    }
+  },
+
   async me() {
     const token = this.getToken();
     if (!token) return null;
-    const res = await invoke({ action: "me", access_token: token });
-    const { data, ok, status } = res.data;
-    if (!ok || status === 401) {
-      this.clearToken();
+    try {
+      const res = await invoke({ action: "me", access_token: token });
+      const { data, ok, status } = res.data;
+      if (ok && status !== 401) {
+        return mapUser(data);
+      }
+      // 401 = token expired — try refresh before logging out
+      if (status === 401) {
+        const refreshed = await this.refreshSession();
+        if (refreshed) return refreshed;
+        // Refresh failed — only now clear the token
+        this.clearToken();
+        return null;
+      }
+      // Non-401 error (500, network, function redeploying) — DON'T clear token
+      // Return null so UI shows loading, but keep token for retry
+      return null;
+    } catch {
+      // Network/throw error — DON'T clear token, it's transient
       return null;
     }
-    return mapUser(data);
   },
 
   async loginWithProvider(provider, redirectTo = "/") {

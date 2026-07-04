@@ -279,6 +279,10 @@ Deno.serve(async (req) => {
         method = 'GET';
         extraHeaders['Authorization'] = `Bearer ${access_token}`;
         break;
+      case 'refresh':
+        endpoint = '/auth/v1/token?grant_type=refresh_token';
+        reqBody = { refresh_token: body.refresh_token };
+        break;
       case 'reset':
         endpoint = '/auth/v1/user';
         method = 'PUT';
