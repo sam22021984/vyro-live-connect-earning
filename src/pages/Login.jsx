@@ -15,6 +15,31 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [welcomeData, setWelcomeData] = useState(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Handle Google OAuth callback — runs on mount if ?code=...&state=google_* is in URL
+  useEffect(() => {
+    const code = supabaseAuth.getGoogleCallbackCode();
+    if (!code) return;
+    setGoogleLoading(true);
+    supabaseAuth.handleGoogleCallback(code)
+      .then(async () => {
+        try {
+          const res = await base44.functions.invoke("userOnboarding", { action: "getProfile" });
+          if (res.data?.profile?.global_id) {
+            setWelcomeData({ globalId: res.data.profile.global_id, username: res.data.profile.username, role: res.data.profile.role });
+          } else {
+            window.location.href = "/";
+          }
+        } catch {
+          window.location.href = "/";
+        }
+      })
+      .catch((err) => {
+        setError(err.message || "Google login failed");
+        setGoogleLoading(false);
+      });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,6 +81,24 @@ export default function Login() {
       return () => clearTimeout(timer);
     }
   }, [welcomeData]);
+
+  // Google login loading screen
+  if (googleLoading && !welcomeData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#1A0B2E] to-[#2D1B4E] flex flex-col items-center justify-center px-6">
+        <div className="w-full max-w-sm text-center">
+          <div className="relative inline-flex mb-6">
+            <div className="absolute inset-0 bg-purple-500/30 blur-3xl rounded-full" />
+            <div className="relative w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl">
+              <Loader2 size={36} className="animate-spin text-[#6F35E0]" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-1">Signing in with Google</h2>
+          <p className="text-sm text-white/50">Please wait...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Welcome back screen — shows Global ID briefly before redirect
   if (welcomeData) {

@@ -465,7 +465,11 @@ export default function UserDataSection() {
                       <Camera size={14} style={{ color: BLUE }} />
                       <h4 className="text-[10px] font-bold uppercase" style={{ color: DARK }}>{v.verification_type}</h4>
                     </div>
-                    {v.status === "verified" ? <CheckCircle size={14} style={{ color: GREEN }} /> : v.status === "failed" ? <XCircle size={14} style={{ color: RED }} /> : <Clock size={14} style={{ color: ORANGE } />}
+                    {(() => {
+                      if (v.status === "verified") return <CheckCircle size={14} style={{ color: GREEN }} />;
+                      if (v.status === "failed") return <XCircle size={14} style={{ color: RED }} />;
+                      return <Clock size={14} style={{ color: ORANGE }} />;
+                    })()}
                   </div>
                   <InfoRow label="Status" value={v.status?.toUpperCase()} color={v.status === "verified" ? GREEN : v.status === "failed" ? RED : ORANGE} />
                   <InfoRow label="Method" value={v.method} />

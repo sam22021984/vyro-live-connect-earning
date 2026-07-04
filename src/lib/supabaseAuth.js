@@ -124,11 +124,45 @@ export const supabaseAuth = {
   },
 
   async loginWithProvider(provider, redirectTo = "/") {
-    const res = await invoke({ action: "oauth-url", provider, redirect_to: redirectTo });
+    const res = await invoke({
+      action: "oauth-url",
+      provider,
+      redirect_to: redirectTo,
+      app_origin: typeof window !== "undefined" ? window.location.origin : "",
+    });
     const { data, ok } = res.data;
     if (ok && data?.url) {
       window.location.href = data.url;
     }
+  },
+
+  // Handle Google OAuth callback — called when Login page detects ?code=...&state=google_*
+  async handleGoogleCallback(code) {
+    const res = await invoke({
+      action: "oauth-callback",
+      code,
+      redirect_origin: window.location.origin,
+    });
+    const { data, ok } = res.data;
+    if (!ok) throw new Error(data?.error_description || data?.error || "Google login failed");
+    if (data.access_token) {
+      this.setToken(data.access_token, data.refresh_token);
+    }
+    return data;
+  },
+
+  // Check if current URL has Google OAuth callback params
+  getGoogleCallbackCode() {
+    if (typeof window === "undefined") return null;
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const state = params.get("state");
+    if (code && state && state.startsWith("google_")) {
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return code;
+    }
+    return null;
   },
 
   logout() {
