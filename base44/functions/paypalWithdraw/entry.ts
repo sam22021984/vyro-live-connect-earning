@@ -6,20 +6,46 @@ const PAYPAL_BASE = Deno.env.get("PAYPAL_MODE") === "live"
 
 const COINS_PER_USD = 20000;
 
+function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 15000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(timeout));
+}
+
 async function getAccessToken() {
   const clientId = Deno.env.get("PAYPAL_CLIENT_ID");
   const clientSecret = Deno.env.get("PAYPAL_CLIENT_SECRET");
+  if (!clientId || !clientSecret) {
+    throw new Error("PayPal credentials not configured");
+  }
   const auth = btoa(`${clientId}:${clientSecret}`);
-  const res = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
+  const res = await fetchWithTimeout(`${PAYPAL_BASE}/v1/oauth2/token`, {
     method: "POST",
     headers: {
       "Authorization": `Basic ${auth}`,
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: "grant_type=client_credentials",
-  });
+  }, 10000);
   const data = await res.json();
+  if (!data.access_token) {
+    throw new Error(data.error_description || data.error || "Failed to get PayPal access token");
+  }
   return data.access_token;
+}
+
+// Extract error message from any PayPal error response format
+function extractPayPalError(data: any): string {
+  if (!data) return "Unknown PayPal error";
+  if (data.error?.message) return data.error.message;
+  if (data.error_description) return data.error_description;
+  if (data.message) return data.message;
+  if (data.name && data.details?.length > 0) {
+    return `${data.name}: ${data.details.map((d: any) => d.description || d.issue).join(", ")}`;
+  }
+  if (data.name) return data.name;
+  return "PayPal API error";
 }
 
 Deno.serve(async (req) => {
@@ -70,10 +96,24 @@ Deno.serve(async (req) => {
     });
 
     // Create PayPal payout
-    const token = await getAccessToken();
+    let token;
+    try {
+      token = await getAccessToken();
+    } catch (e) {
+      // Refund coins if token fetch fails
+      await base44.asServiceRole.entities.UserProfile.update(profile.id, {
+        coins: profile.coins,
+      });
+      await base44.asServiceRole.entities.Transaction.update(txn.id, {
+        status: "failed",
+        description: `Failed: ${e.message}`,
+      });
+      return Response.json({ error: e.message }, { status: 400 });
+    }
+
     const senderBatchId = `withdraw_${txn.id}_${Date.now()}`;
 
-    const payoutRes = await fetch(`${PAYPAL_BASE}/v1/payments/payouts`, {
+    const payoutRes = await fetchWithTimeout(`${PAYPAL_BASE}/v1/payments/payouts`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -96,19 +136,20 @@ Deno.serve(async (req) => {
           sender_item_id: txn.id,
         }],
       }),
-    });
+    }, 15000);
     const payoutData = await payoutRes.json();
 
-    if (payoutData.error) {
+    if (!payoutRes.ok || payoutData.error || !payoutData.batch_header) {
       // Refund coins on failure
       await base44.asServiceRole.entities.UserProfile.update(profile.id, {
         coins: profile.coins,
       });
+      const errMsg = extractPayPalError(payoutData);
       await base44.asServiceRole.entities.Transaction.update(txn.id, {
         status: "failed",
-        description: `Failed: ${payoutData.error.message || "PayPal payout error"}`,
+        description: `Failed: ${errMsg}`,
       });
-      return Response.json({ error: payoutData.error.message || "Withdrawal failed" }, { status: 400 });
+      return Response.json({ error: errMsg }, { status: 400 });
     }
 
     const payoutBatchId = payoutData.batch_header?.payout_batch_id;

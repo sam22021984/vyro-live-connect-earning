@@ -46,24 +46,13 @@ export default function CoinsRecharge() {
 
   const handleReturnFromPayPal = async () => {
     const status = searchParams.get("status");
-    const orderId = searchParams.get("order_id");
+    const orderId = searchParams.get("order_id") || searchParams.get("token");
     if (status === "success" && orderId) {
-      const tierId = searchParams.get("tier_id");
-      const price = parseFloat(searchParams.get("price"));
-      const coins = parseInt(searchParams.get("coins"));
-      const bonus = parseInt(searchParams.get("bonus"));
-      const label = searchParams.get("label") || tierId;
-
       setCapturing(true);
       try {
         const res = await base44.functions.invoke("paypalRecharge", {
           action: "capture",
           order_id: orderId,
-          tier_id: tierId,
-          price,
-          coins,
-          bonus_coins: bonus,
-          tier_label: label,
         });
         if (res.data?.success) {
           setShowSuccess(true);
