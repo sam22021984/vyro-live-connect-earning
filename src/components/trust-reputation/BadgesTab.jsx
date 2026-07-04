@@ -3,7 +3,7 @@ import {
   Award, BadgeCheck, ShieldCheck, HandHeart, Mic, TrendingUp, Trophy,
   Gift, Gem, Shield, Crown, Building2, Sparkles, Star, Lock, X,
 } from "lucide-react";
-import { TRUST_BADGES } from "./trustData";
+import { Loader2 } from "lucide-react";
 
 const ICONS = {
   Award, BadgeCheck, ShieldCheck, HandHeart, Mic, TrendingUp, Trophy,
@@ -14,13 +14,28 @@ const WHITE = "#FFFFFF";
 const DARK = "#1F2937";
 const GRAY = "#6B7280";
 
-export default function BadgesTab({ onAction }) {
+export default function BadgesTab({ badges = [], loading = false, onAction }) {
   const [selected, setSelected] = useState(null);
-  const earned = TRUST_BADGES.filter(b => b.unlocked);
-  const locked = TRUST_BADGES.filter(b => !b.unlocked);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 size={24} className="animate-spin" style={{ color: "#2F80ED" }} />
+      </div>
+    );
+  }
+
+  const earned = badges.filter(b => b.unlocked);
+  const locked = badges.filter(b => !b.unlocked);
 
   return (
     <div className="space-y-4">
+      {/* Live indicator */}
+      <div className="flex items-center justify-end gap-1">
+        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+        <span className="text-[9px] font-semibold" style={{ color: "#10B981" }}>LIVE</span>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
         <div className="rounded-2xl p-3 text-center" style={{ background: WHITE, border: "1px solid #F0F1F5" }}>
@@ -32,49 +47,61 @@ export default function BadgesTab({ onAction }) {
           <p className="text-[9px]" style={{ color: GRAY }}>Locked</p>
         </div>
         <div className="rounded-2xl p-3 text-center" style={{ background: WHITE, border: "1px solid #F0F1F5" }}>
-          <p className="text-lg font-bold" style={{ color: "#2F80ED" }}>{TRUST_BADGES.length}</p>
+          <p className="text-lg font-bold" style={{ color: "#2F80ED" }}>{badges.length}</p>
           <p className="text-[9px]" style={{ color: GRAY }}>Total</p>
         </div>
       </div>
 
       {/* Earned Badges */}
-      <div>
-        <h3 className="text-xs font-bold mb-2" style={{ color: DARK }}>Earned Badges ({earned.length})</h3>
-        <div className="grid grid-cols-3 gap-2">
-          {earned.map((b, i) => {
-            const Icon = ICONS[b.icon] || Award;
-            return (
-              <button key={i} onClick={() => setSelected(b)} className="rounded-2xl p-3 flex flex-col items-center gap-1.5 active:scale-95 transition" style={{ background: WHITE, border: "1px solid #F0F1F5", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${b.color}, ${b.color}cc)`, boxShadow: `0 4px 12px ${b.color}30` }}>
-                  <Icon size={22} className="text-white" />
-                </div>
-                <span className="text-[9px] font-semibold text-center leading-tight" style={{ color: DARK }}>{b.name}</span>
-              </button>
-            );
-          })}
+      {earned.length > 0 && (
+        <div>
+          <h3 className="text-xs font-bold mb-2" style={{ color: DARK }}>Earned Badges ({earned.length})</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {earned.map((b, i) => {
+              const Icon = ICONS[b.icon] || Award;
+              return (
+                <button key={i} onClick={() => setSelected(b)} className="rounded-2xl p-3 flex flex-col items-center gap-1.5 active:scale-95 transition" style={{ background: WHITE, border: "1px solid #F0F1F5", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${b.color}, ${b.color}cc)`, boxShadow: `0 4px 12px ${b.color}30` }}>
+                    <Icon size={22} className="text-white" />
+                  </div>
+                  <span className="text-[9px] font-semibold text-center leading-tight" style={{ color: DARK }}>{b.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Locked Badges */}
-      <div>
-        <h3 className="text-xs font-bold mb-2" style={{ color: DARK }}>Locked ({locked.length})</h3>
-        <div className="grid grid-cols-3 gap-2">
-          {locked.map((b, i) => {
-            const Icon = ICONS[b.icon] || Award;
-            return (
-              <button key={i} onClick={() => setSelected(b)} className="rounded-2xl p-3 flex flex-col items-center gap-1.5 active:scale-95 transition relative overflow-hidden" style={{ background: "#F9FAFB", border: "1px solid #F0F1F5" }}>
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center relative" style={{ background: "#E5E7EB" }}>
-                  <Icon size={22} style={{ color: "#9CA3AF" }} />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Lock size={12} style={{ color: "#6B7280" }} />
+      {locked.length > 0 && (
+        <div>
+          <h3 className="text-xs font-bold mb-2" style={{ color: DARK }}>Locked ({locked.length})</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {locked.map((b, i) => {
+              const Icon = ICONS[b.icon] || Award;
+              return (
+                <button key={i} onClick={() => setSelected(b)} className="rounded-2xl p-3 flex flex-col items-center gap-1.5 active:scale-95 transition relative overflow-hidden" style={{ background: "#F9FAFB", border: "1px solid #F0F1F5" }}>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center relative" style={{ background: "#E5E7EB" }}>
+                    <Icon size={22} style={{ color: "#9CA3AF" }} />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Lock size={12} style={{ color: "#6B7280" }} />
+                    </div>
                   </div>
-                </div>
-                <span className="text-[9px] font-semibold text-center leading-tight" style={{ color: GRAY }}>{b.name}</span>
-              </button>
-            );
-          })}
+                  <span className="text-[9px] font-semibold text-center leading-tight" style={{ color: GRAY }}>{b.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
+
+      {earned.length === 0 && locked.length === 0 && (
+        <div className="rounded-2xl p-8 text-center" style={{ background: WHITE, border: "1px solid #F0F1F5" }}>
+          <span className="text-3xl block mb-2">🏅</span>
+          <p className="text-xs font-semibold" style={{ color: DARK }}>No badges available</p>
+          <p className="text-[10px] mt-1" style={{ color: GRAY }}>Badges will appear as they are configured</p>
+        </div>
+      )}
 
       {/* Badge Detail Sheet */}
       {selected && (
@@ -105,23 +132,29 @@ function BadgeDetailSheet({ badge, onClose, onAction }) {
               <Icon size={36} className="text-white" />
             </div>
             <h3 className="text-sm font-bold" style={{ color: DARK }}>{badge.name}</h3>
-            <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold mt-1 ${badge.unlocked ? "" : ""}`} style={{ background: badge.unlocked ? "#10B98110" : "#F3F4F6", color: badge.unlocked ? "#10B981" : GRAY }}>
+            <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold mt-1`} style={{ background: badge.unlocked ? "#10B98110" : "#F3F4F6", color: badge.unlocked ? "#10B981" : GRAY }}>
               {badge.unlocked ? "✓ Earned" : "🔒 Locked"}
             </span>
           </div>
           <div className="space-y-3">
-            <div className="rounded-2xl p-3" style={{ background: "#F9FAFB", border: "1px solid #F0F1F5" }}>
-              <p className="text-[10px] font-bold mb-1" style={{ color: GRAY }}>Description</p>
-              <p className="text-xs" style={{ color: DARK }}>{badge.description}</p>
-            </div>
-            <div className="rounded-2xl p-3" style={{ background: "#F9FAFB", border: "1px solid #F0F1F5" }}>
-              <p className="text-[10px] font-bold mb-1" style={{ color: GRAY }}>Unlock Requirements</p>
-              <p className="text-xs" style={{ color: DARK }}>{badge.requirement}</p>
-            </div>
-            <div className="rounded-2xl p-3" style={{ background: "#F9FAFB", border: "1px solid #F0F1F5" }}>
-              <p className="text-[10px] font-bold mb-1" style={{ color: GRAY }}>Benefits</p>
-              <p className="text-xs" style={{ color: DARK }}>{badge.benefits}</p>
-            </div>
+            {badge.description && (
+              <div className="rounded-2xl p-3" style={{ background: "#F9FAFB", border: "1px solid #F0F1F5" }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: GRAY }}>Description</p>
+                <p className="text-xs" style={{ color: DARK }}>{badge.description}</p>
+              </div>
+            )}
+            {badge.requirement && (
+              <div className="rounded-2xl p-3" style={{ background: "#F9FAFB", border: "1px solid #F0F1F5" }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: GRAY }}>Unlock Requirements</p>
+                <p className="text-xs" style={{ color: DARK }}>{badge.requirement}</p>
+              </div>
+            )}
+            {badge.benefits && (
+              <div className="rounded-2xl p-3" style={{ background: "#F9FAFB", border: "1px solid #F0F1F5" }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: GRAY }}>Benefits</p>
+                <p className="text-xs" style={{ color: DARK }}>{badge.benefits}</p>
+              </div>
+            )}
             {badge.date && (
               <div className="rounded-2xl p-3" style={{ background: "#F9FAFB", border: "1px solid #F0F1F5" }}>
                 <p className="text-[10px] font-bold mb-1" style={{ color: GRAY }}>Earned Date</p>

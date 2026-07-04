@@ -118,7 +118,7 @@ export default function ProfileStats() {
         {/* Content */}
         <div className="p-4">
           {activeTab === "badges" && <BadgeTab badges={badges} />}
-          {activeTab === "medals" && <MedalTab />}
+          {activeTab === "medals" && <MedalTab achievements={achievements} />}
           {activeTab === "level" && <LevelXPTab profile={profile} />}
           {activeTab === "history" && <HistoryTab transactions={transactions} />}
           {activeTab === "leaderboard" && <LeaderboardTab leaderboard={leaderboard} currentUserId={user?.id} />}

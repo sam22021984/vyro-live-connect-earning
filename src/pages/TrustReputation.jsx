@@ -11,6 +11,7 @@ import BadgesTab from "@/components/trust-reputation/BadgesTab";
 import LevelsTab from "@/components/trust-reputation/LevelsTab";
 import HistoryTab from "@/components/trust-reputation/HistoryTab";
 import { useServicesData } from "@/hooks/useServicesData";
+import { useTrustReputation } from "@/hooks/useTrustReputation";
 import { useBackNav } from "@/hooks/useBackNav";
 
 const ICONS = {
@@ -28,19 +29,27 @@ export default function TrustReputation() {
   const handleBack = useBackNav("/more-services");
   const { toast } = useToast();
   const { data } = useServicesData();
+  const { data: trustRepData, loading: trustLoading } = useTrustReputation();
   const [activeTab, setActiveTab] = useState("overview");
 
   const trustData = data?.trust;
-  const realTrustOverview = trustData ? {
-    trustScore: trustData.trustScore,
-    trustScoreMax: trustData.trustScoreMax,
-    trustPercentage: trustData.trustPercentage,
-    reputationLevel: trustData.reputationLevel,
-    verificationStatus: trustData.verificationStatus,
-    safetyStatus: trustData.safetyStatus,
-    isVerified: trustData.isVerified,
-    profileCompletion: trustData.profileCompletion,
-    activityScore: trustData.activityScore,
+  const realTrustOverview = (trustRepData || trustData) ? {
+    trustScore: trustRepData?.trustScore ?? trustData?.trustScore ?? 0,
+    trustScoreMax: 100,
+    trustPercentage: trustRepData?.trustPercentage ?? trustData?.trustPercentage ?? 0,
+    reputationLevel: trustRepData?.reputationLevel ?? trustData?.reputationLevel ?? "Bronze Trusted",
+    trustTier: trustRepData?.trustTier ?? "Bronze Tier",
+    communityStatus: trustRepData?.communityStatus ?? "Trusted by the community",
+    reputationRank: trustRepData?.reputationRank ?? "—",
+    overallPerformance: trustRepData?.overallPerformance ?? "Good",
+    verificationStatus: trustRepData?.verificationStatus ?? trustData?.verificationStatus ?? "unverified",
+    safetyStatus: trustRepData?.safetyStatus ?? trustData?.safetyStatus ?? "medium",
+    isVerified: trustRepData?.isVerified ?? trustData?.isVerified ?? false,
+    profileCompletion: trustRepData?.profileCompletion ?? trustData?.profileCompletion ?? 0,
+    activityScore: trustRepData?.activityScore ?? trustData?.activityScore ?? 0,
+    reputationRating: trustRepData?.reputationRating ?? trustData?.reputationRating ?? 0,
+    summary: trustRepData?.summary ?? [],
+    scoreBreakdown: trustRepData?.scoreBreakdown ?? [],
   } : null;
 
   const handleAction = (action) => {
@@ -122,9 +131,9 @@ export default function TrustReputation() {
         {/* Tab Content */}
         <div className="px-4 pt-4">
           {activeTab === "overview" && <OverviewTab onAction={handleAction} realData={realTrustOverview} />}
-          {activeTab === "badges" && <BadgesTab onAction={handleAction} />}
+          {activeTab === "badges" && <BadgesTab badges={trustRepData?.badges || []} loading={trustLoading} onAction={handleAction} />}
           {activeTab === "levels" && <LevelsTab onAction={handleAction} />}
-          {activeTab === "history" && <HistoryTab onAction={handleAction} />}
+          {activeTab === "history" && <HistoryTab history={trustRepData?.history || []} loading={trustLoading} onAction={handleAction} />}
         </div>
       </div>
     </div>

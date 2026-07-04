@@ -1,20 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { X, Calendar, Gift } from "lucide-react";
-import { medalCategories, medals, COLORS } from "./profileStatsData";
+import { X, Calendar, Gift, Lock } from "lucide-react";
+import { COLORS } from "./profileStatsData";
 import MedalCard from "./MedalCard";
 
-export default function MedalTab() {
-  const [cat, setCat] = useState("daily");
-  const [medalList, setMedalList] = useState(medals);
+const defaultMedals = [
+  { id: "d1", name: "No Medals Yet", rank: "—", icon: "🎖️", reward: "Complete tasks to earn medals", earned_date: "Locked", equipped: false },
+];
+
+export default function MedalTab({ achievements = [] }) {
   const [detail, setDetail] = useState(null);
+  const [medalList, setMedalList] = useState([]);
   const { toast } = useToast();
 
-  const handleEquip = (medal) => {
-    setMedalList((prev) => ({
-      ...prev,
-      [cat]: prev[cat].map((m) => (m.id === medal.id ? { ...m, equipped: true } : { ...m, equipped: false })),
+  useEffect(() => {
+    // Map Achievement records to medal display format
+    if (!achievements || achievements.length === 0) {
+      setMedalList(defaultMedals);
+      return;
+    }
+
+    const mapped = achievements.map((a, i) => ({
+      id: a.id || `m${i}`,
+      name: a.name || "Medal",
+      rank: a.is_unlocked ? `#${i + 1}` : "Locked",
+      icon: a.icon || "🎖️",
+      reward: a.description || "Achievement reward",
+      earned_date: a.is_unlocked && a.created_date ? new Date(a.created_date).toLocaleDateString() : "Locked",
+      equipped: false,
+      is_unlocked: a.is_unlocked || false,
+      color: a.color || COLORS.gold,
     }));
+
+    // Show earned first, then locked
+    mapped.sort((a, b) => (b.is_unlocked ? 1 : 0) - (a.is_unlocked ? 1 : 0));
+    setMedalList(mapped);
+  }, [achievements]);
+
+  const handleEquip = (medal) => {
+    setMedalList((prev) => prev.map((m) => (m.id === medal.id ? { ...m, equipped: true } : { ...m, equipped: false })));
     toast({ title: "🎖️ Medal Equipped!", description: `${medal.name} is now active.` });
   };
 
@@ -22,23 +46,40 @@ export default function MedalTab() {
     toast({ title: "📢 Shared to Feed!", description: `${medal.name} shared.` });
   };
 
+  const earned = medalList.filter((m) => m.is_unlocked);
+  const locked = medalList.filter((m) => !m.is_unlocked);
+
   return (
     <div>
-      <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide">
-        {medalCategories.map((c) => (
-          <button key={c.key} onClick={() => setCat(c.key)}
-            className={`py-2 px-3.5 rounded-xl text-xs font-bold whitespace-nowrap active:scale-95 transition flex items-center gap-1.5 ${cat === c.key ? "text-white" : ""}`}
-            style={cat === c.key ? { background: COLORS.primary } : { background: COLORS.cardBg, color: COLORS.muted, border: "1px solid #EEF0F4" }}>
-            <span>{c.icon}</span> {c.label}
-          </button>
-        ))}
+      {/* Stats summary */}
+      <div className="grid grid-cols-3 gap-2 mb-3">
+        <div className="rounded-2xl p-2.5 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <p className="text-base font-bold" style={{ color: COLORS.gold }}>{earned.length}</p>
+          <p className="text-[8px]" style={{ color: COLORS.muted }}>Earned</p>
+        </div>
+        <div className="rounded-2xl p-2.5 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <p className="text-base font-bold" style={{ color: COLORS.muted }}>{locked.length}</p>
+          <p className="text-[8px]" style={{ color: COLORS.muted }}>Locked</p>
+        </div>
+        <div className="rounded-2xl p-2.5 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <p className="text-base font-bold" style={{ color: COLORS.primary }}>{medalList.length}</p>
+          <p className="text-[8px]" style={{ color: COLORS.muted }}>Total</p>
+        </div>
       </div>
 
-      <div className="space-y-2.5">
-        {medalList[cat].map((m) => (
-          <MedalCard key={m.id} medal={m} onView={setDetail} onEquip={handleEquip} onShare={handleShare} />
-        ))}
-      </div>
+      {medalList.length === 0 || (medalList.length === 1 && medalList[0].id === "d1") ? (
+        <div className="rounded-2xl p-8 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <span className="text-3xl block mb-2">🎖️</span>
+          <p className="text-xs font-bold" style={{ color: COLORS.navy }}>No Medals Yet</p>
+          <p className="text-[10px] mt-1" style={{ color: COLORS.muted }}>Complete tasks and activities to earn medals</p>
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {medalList.map((m) => (
+            <MedalCard key={m.id} medal={m} onView={setDetail} onEquip={handleEquip} onShare={handleShare} />
+          ))}
+        </div>
+      )}
 
       {detail && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
@@ -56,7 +97,7 @@ export default function MedalTab() {
             <div className="px-4 pb-6">
               <div className="flex flex-col items-center py-4">
                 <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-3"
-                  style={{ background: `${COLORS.gold}15`, border: `1px solid ${COLORS.gold}30` }}>
+                  style={{ background: `${detail.color || COLORS.gold}15`, border: `1px solid ${detail.color || COLORS.gold}30` }}>
                   {detail.icon}
                 </div>
                 <h3 className="text-base font-bold" style={{ color: COLORS.navy }}>{detail.name}</h3>
@@ -67,8 +108,17 @@ export default function MedalTab() {
                 <span className="text-xs font-bold" style={{ color: COLORS.gold }}>{detail.reward}</span>
               </div>
               <div className="rounded-2xl p-3 flex items-center gap-2" style={{ background: COLORS.cardBg }}>
-                <Calendar size={14} style={{ color: COLORS.primary }} />
-                <span className="text-[11px] font-bold" style={{ color: COLORS.primary }}>Earned: {detail.earned_date}</span>
+                {detail.is_unlocked ? (
+                  <>
+                    <Calendar size={14} style={{ color: COLORS.primary }} />
+                    <span className="text-[11px] font-bold" style={{ color: COLORS.primary }}>Earned: {detail.earned_date}</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock size={14} style={{ color: COLORS.muted }} />
+                    <span className="text-[11px] font-bold" style={{ color: COLORS.muted }}>Not yet earned</span>
+                  </>
+                )}
               </div>
             </div>
           </div>

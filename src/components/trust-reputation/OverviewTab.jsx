@@ -3,7 +3,6 @@ import {
   Award, AlertTriangle, Crown, Calendar, ThumbsUp, ThumbsDown, Star,
   BadgeCheck, TrendingUp, ShieldCheck, Sparkles,
 } from "lucide-react";
-import { TRUST_OVERVIEW } from "./trustData";
 
 const ICONS = {
   Award, AlertTriangle, Crown, Calendar, ThumbsUp, ThumbsDown, Star, BadgeCheck,
@@ -14,12 +13,31 @@ const WHITE = "#FFFFFF";
 const DARK = "#1F2937";
 const GRAY = "#6B7280";
 
+const FALLBACK_BREAKDOWN = [
+  { label: "Account Verification", weight: 20, score: 0, max: 20, suggestion: "Complete phone and email verification." },
+  { label: "Identity Verification", weight: 20, score: 0, max: 20, suggestion: "Upload a government-issued ID." },
+  { label: "Profile Completion", weight: 15, score: 0, max: 15, suggestion: "Add a bio and profile photo." },
+  { label: "Activity & Engagement", weight: 15, score: 0, max: 15, suggestion: "Log in daily and join live rooms." },
+  { label: "Community Behavior", weight: 10, score: 0, max: 10, suggestion: "Maintain a clean record." },
+  { label: "Content Quality", weight: 10, score: 0, max: 10, suggestion: "Host quality live streams." },
+  { label: "Payment Reliability", weight: 5, score: 0, max: 5, suggestion: "Make your first recharge." },
+  { label: "Security Status", weight: 5, score: 0, max: 5, suggestion: "Enable 2FA to stay protected." },
+];
+
 export default function OverviewTab({ onAction, realData }) {
-  const o = { ...TRUST_OVERVIEW, ...realData };
+  const o = realData || {};
+  const scoreBreakdown = o.scoreBreakdown?.length ? o.scoreBreakdown : FALLBACK_BREAKDOWN;
+  const summary = o.summary?.length ? o.summary : [];
   const scoreColor = o.trustScore >= 85 ? "#10B981" : o.trustScore >= 60 ? "#F59E0B" : "#EF4444";
 
   return (
     <div className="space-y-4">
+      {/* Live indicator */}
+      <div className="flex items-center justify-end gap-1">
+        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+        <span className="text-[9px] font-semibold" style={{ color: "#10B981" }}>LIVE</span>
+      </div>
+
       {/* Trust Score Hero */}
       <div className="rounded-3xl p-5 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${scoreColor}, ${scoreColor}cc)`, boxShadow: `0 8px 24px ${scoreColor}30` }}>
         <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-20" style={{ background: "radial-gradient(circle, #FFFFFF, transparent 70%)", transform: "translate(30%, -30%)" }} />
@@ -31,58 +49,53 @@ export default function OverviewTab({ onAction, realData }) {
               <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${2 * Math.PI * 42 * (o.trustPercentage / 100)} ${2 * Math.PI * 42}`} />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-2xl font-bold text-white">{o.trustScore}</span>
-              <span className="text-[9px] text-white/80">/ {o.trustScoreMax}</span>
+              <span className="text-2xl font-bold text-white">{o.trustScore || 0}</span>
+              <span className="text-[9px] text-white/80">/ {o.trustScoreMax || 100}</span>
             </div>
           </div>
           <div className="flex-1">
             <p className="text-[10px] text-white/80 uppercase tracking-wider">Trust Score</p>
-            <h3 className="text-lg font-bold text-white">{o.reputationLevel}</h3>
+            <h3 className="text-lg font-bold text-white">{o.reputationLevel || "Bronze Trusted"}</h3>
             <div className="flex items-center gap-2 mt-1">
               <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(255,255,255,0.2)", color: "#FFF" }}>
-                <Crown size={10} /> {o.trustTier}
+                <Crown size={10} /> {o.trustTier || "Bronze Tier"}
               </span>
-              <span className="text-[10px] text-white/80">Rank {o.reputationRank}</span>
+              <span className="text-[10px] text-white/80">Rank {o.reputationRank || "—"}</span>
             </div>
-            <p className="text-[11px] text-white/90 mt-2">💬 {o.communityStatus}</p>
+            <p className="text-[11px] text-white/90 mt-2">💬 {o.communityStatus || "Trusted by the community"}</p>
           </div>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div>
-        <h3 className="text-xs font-bold mb-2" style={{ color: DARK }}>Summary</h3>
-        <div className="grid grid-cols-2 gap-2">
-          {[
-            { label: "Verification", value: o.verificationStatus ? (o.verificationStatus.charAt(0).toUpperCase() + o.verificationStatus.slice(1)) : "Unverified", icon: "BadgeCheck", color: "#2F80ED" },
-            { label: "Safety Status", value: o.safetyStatus ? (o.safetyStatus.charAt(0).toUpperCase() + o.safetyStatus.slice(1)) : "Medium", icon: "ShieldCheck", color: "#10B981" },
-            { label: "Profile Completion", value: `${o.profileCompletion || 0}%`, icon: "TrendingUp", color: "#8B5CF6" },
-            { label: "Activity Score", value: String(o.activityScore || 0), icon: "Sparkles", color: "#F59E0B" },
-            { label: "Reputation Rating", value: (o.reputationRating || 0).toFixed(1), icon: "Star", color: "#F59E0B" },
-            { label: "Trust Tier", value: o.reputationLevel || "Bronze", icon: "Crown", color: "#D4AF37" },
-          ].map((s, i) => {
-            const Icon = ICONS[s.icon] || Award;
-            return (
-              <div key={i} className="rounded-2xl p-3 flex items-center gap-2.5" style={{ background: WHITE, border: "1px solid #F0F1F5", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${s.color}12` }}>
-                  <Icon size={16} style={{ color: s.color }} />
+      {summary.length > 0 && (
+        <div>
+          <h3 className="text-xs font-bold mb-2" style={{ color: DARK }}>Summary</h3>
+          <div className="grid grid-cols-2 gap-2">
+            {summary.map((s, i) => {
+              const Icon = ICONS[s.icon] || Award;
+              return (
+                <div key={i} className="rounded-2xl p-3 flex items-center gap-2.5" style={{ background: WHITE, border: "1px solid #F0F1F5", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${s.color}12` }}>
+                    <Icon size={16} style={{ color: s.color }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold" style={{ color: DARK }}>{s.value}</p>
+                    <p className="text-[9px]" style={{ color: GRAY }}>{s.label}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold" style={{ color: DARK }}>{s.value}</p>
-                  <p className="text-[9px]" style={{ color: GRAY }}>{s.label}</p>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Score Breakdown */}
       <div>
         <h3 className="text-xs font-bold mb-2" style={{ color: DARK }}>Score Breakdown</h3>
         <div className="space-y-2">
-          {o.scoreBreakdown.map((b, i) => {
-            const pct = (b.score / b.max) * 100;
+          {scoreBreakdown.map((b, i) => {
+            const pct = b.max > 0 ? (b.score / b.max) * 100 : 0;
             const isFull = b.score >= b.max;
             return (
               <div key={i} className="rounded-2xl p-3" style={{ background: WHITE, border: "1px solid #F0F1F5", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>

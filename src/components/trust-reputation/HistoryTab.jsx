@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   TrendingUp, TrendingDown, Sparkles, BadgeCheck, AlertTriangle,
-  CheckCircle, ThumbsUp, Crown, Star, History as HistoryIcon, Download, Search,
+  CheckCircle, ThumbsUp, Crown, Star, History as HistoryIcon, Download, Search, Loader2,
 } from "lucide-react";
-import { TRUST_HISTORY } from "./trustData";
 
 const ICONS = {
   TrendingUp, TrendingDown, Sparkles, BadgeCheck, AlertTriangle,
@@ -16,18 +15,39 @@ const GRAY = "#6B7280";
 
 const FILTERS = ["All", "Score Changes", "Badges", "Warnings", "Verification", "Reports"];
 
-export default function HistoryTab({ onAction }) {
+export default function HistoryTab({ history = [], loading = false, onAction }) {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
 
-  const filtered = TRUST_HISTORY.filter(h => {
-    const matchesSearch = !search || h.title.toLowerCase().includes(search.toLowerCase()) || h.detail.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === "All" || h.type.toLowerCase().includes(filter.toLowerCase().slice(0, -1));
-    return matchesSearch && matchesFilter;
-  });
+  const filtered = useMemo(() => {
+    return (history || []).filter(h => {
+      const matchesSearch = !search || h.title?.toLowerCase().includes(search.toLowerCase()) || h.detail?.toLowerCase().includes(search.toLowerCase());
+      const matchesFilter = filter === "All" ||
+        (filter === "Score Changes" && (h.type === "Score Increased" || h.type === "Score Decreased")) ||
+        (filter === "Badges" && h.type === "Badge Earned") ||
+        (filter === "Warnings" && (h.type === "Warning Issued" || h.type === "Enforcement Issued")) ||
+        (filter === "Verification" && h.type?.includes("Verification")) ||
+        (filter === "Reports" && (h.type === "Reports Resolved" || h.type === "Action Lifted"));
+      return matchesSearch && matchesFilter;
+    });
+  }, [history, filter, search]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 size={24} className="animate-spin" style={{ color: "#2F80ED" }} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
+      {/* Live indicator */}
+      <div className="flex items-center justify-end gap-1">
+        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+        <span className="text-[9px] font-semibold" style={{ color: "#10B981" }}>LIVE</span>
+      </div>
+
       {/* Actions */}
       <div className="flex gap-2">
         <button onClick={() => onAction("Export History")} className="flex-1 py-2.5 rounded-2xl text-[11px] font-bold active:scale-95 transition flex items-center justify-center gap-1.5" style={{ background: WHITE, border: "1px solid #F0F1F5", color: DARK }}>
@@ -65,7 +85,7 @@ export default function HistoryTab({ onAction }) {
           <div className="rounded-2xl p-8 text-center" style={{ background: WHITE, border: "1px solid #F0F1F5" }}>
             <HistoryIcon size={32} style={{ color: "#D1D5DB" }} className="mx-auto mb-2" />
             <p className="text-xs font-semibold" style={{ color: DARK }}>No history found</p>
-            <p className="text-[10px]" style={{ color: GRAY }}>Try a different search or filter</p>
+            <p className="text-[10px]" style={{ color: GRAY }}>{search || filter !== "All" ? "Try a different search or filter" : "Your trust history will appear here"}</p>
           </div>
         ) : (
           filtered.map((h, i) => {
