@@ -49,6 +49,9 @@ export default function LiveRoom() {
   const [lastSentGift, setLastSentGift] = useState(null);
   const [summary, setSummary] = useState(null);
   const [endingRoom, setEndingRoom] = useState(false);
+  const [joinBlock, setJoinBlock] = useState(null);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [joiningRoom, setJoiningRoom] = useState(true);
 
   // Refs for dynamic seat positioning — replaces static SEAT_POSITIONS
   const containerRef = useRef(null);
@@ -71,6 +74,60 @@ export default function LiveRoom() {
     const y = ((seatRect.top + seatRect.height / 2 - contRect.top) / contRect.height) * 100;
     return { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
   }, []);
+
+  // Join security check — call joinLiveRoom on mount
+  useEffect(() => {
+    if (!roomId || !currentUser?.id) return;
+    let cancelled = false;
+    setJoiningRoom(true);
+
+    const attemptJoin = (pw) => {
+      base44.functions.invoke("joinLiveRoom", { room_id: roomId, password: pw })
+        .then((res) => {
+          if (cancelled) return;
+          const data = res.data || res;
+          if (data.error) {
+            if (data.require_password) {
+              setJoinBlock({ type: 'password', message: data.error });
+            } else if (data.require_ticket) {
+              setJoinBlock({ type: 'ticket', message: data.error, price: data.ticket_price });
+            } else if (data.require_vip) {
+              setJoinBlock({ type: 'vip', message: data.error });
+            } else if (data.require_follow) {
+              setJoinBlock({ type: 'follow', message: data.error });
+            } else if (data.require_friend) {
+              setJoinBlock({ type: 'friend', message: data.error });
+            } else if (data.require_agency) {
+              setJoinBlock({ type: 'agency', message: data.error });
+            } else if (data.blocked) {
+              setJoinBlock({ type: 'banned', message: data.error });
+            } else {
+              setJoinBlock({ type: 'denied', message: data.error });
+            }
+            setJoiningRoom(false);
+          } else {
+            setJoinBlock(null);
+            setJoiningRoom(false);
+          }
+        })
+        .catch(() => {
+          if (cancelled) return;
+          // Backend error — allow entry in demo mode
+          setJoinBlock(null);
+          setJoiningRoom(false);
+        });
+    };
+
+    attemptJoin();
+    // Store for password retry
+    window.__retryJoin = attemptJoin;
+
+    return () => { cancelled = true; };
+  }, [roomId, currentUser?.id]);
+
+  const handlePasswordSubmit = () => {
+    if (window.__retryJoin) window.__retryJoin(passwordInput);
+  };
 
   // Merge Supabase chat messages into local chat — keep local seed messages, add new supabase ones
   useEffect(() => {
@@ -415,12 +472,12 @@ export default function LiveRoom() {
       {/* Profile popup */}
       {activeProfileSeat && (
         <SeatProfilePopup
-          seat={activeProfileSeat}
+          seat={{ ...activeProfileSeat, room_id: roomId }}
           userRole={userRole === "owner" ? "owner" : userRole === "admin" ? "admin" : "audience"}
           onClose={() => { setProfileSeatId(null); setTempProfileUser(null); }}
           onSendGift={(seatId) => { setProfileSeatId(null); setTempProfileUser(null); setPanelTargetId(seatId); setPanelType("gift"); }}
           onSendEmoji={(seatId, emoji) => handleQuickEmoji(seatId, emoji)}
-          onAction={(action) => { toast({ title: action }); setProfileSeatId(null); setTempProfileUser(null); }}
+          onAction={() => { setProfileSeatId(null); setTempProfileUser(null); }}
         />
       )}
 
@@ -469,6 +526,84 @@ export default function LiveRoom() {
       {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} onScheduler={runScheduler} onEndRoom={handleEndRoom} endingRoom={endingRoom} giftStats={giftStats} roomScore={roomScore} aiStats={aiStats} seatCount={seatCount} onSeatCountChange={setSeatCount} userRole={userRole} />}
 
       {summary && <PostLiveSummary summary={summary} onClose={handleCloseSummary} />}
+
+      {/* Join security overlay */}
+      {joinBlock && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-6" style={{ background: theme.bg }}>
+          <div className="max-w-sm w-full text-center space-y-4 animate-fadeIn">
+            <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center" style={{ background: `${COLORS.crimson}20`, border: `1px solid ${COLORS.crimson}40` }}>
+              <X size={28} style={{ color: COLORS.crimson }} />
+            </div>
+            <p className="text-sm font-bold text-white">{joinBlock.message || 'Access denied'}</p>
+
+            {joinBlock.type === 'password' && (
+              <div className="space-y-2">
+                <input
+                  type="password"
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handlePasswordSubmit(); }}
+                  placeholder="Enter room password"
+                  className="w-full px-4 py-2.5 rounded-xl text-sm text-white text-center outline-none"
+                  style={{ background: '#0A2A2D', border: `1px solid ${COLORS.gold}40` }}
+                  autoFocus
+                />
+                <button
+                  onClick={handlePasswordSubmit}
+                  className="w-full py-2.5 rounded-xl text-sm font-bold text-black"
+                  style={{ background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldDark})` }}
+                >
+                  Join Room
+                </button>
+              </div>
+            )}
+
+            {joinBlock.type === 'ticket' && (
+              <button
+                onClick={() => navigate('/coins-recharge')}
+                className="w-full py-2.5 rounded-xl text-sm font-bold text-black"
+                style={{ background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldDark})` }}
+              >
+                Buy Ticket — {joinBlock.price} 🪙
+              </button>
+            )}
+
+            {(joinBlock.type === 'vip') && (
+              <button
+                onClick={() => navigate('/vip-membership')}
+                className="w-full py-2.5 rounded-xl text-sm font-bold text-black"
+                style={{ background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldDark})` }}
+              >
+                Get VIP Membership
+              </button>
+            )}
+
+            {joinBlock.type === 'follow' && (
+              <button
+                onClick={() => navigate(-1)}
+                className="w-full py-2.5 rounded-xl text-sm font-bold text-white"
+                style={{ background: COLORS.electricBlue }}
+              >
+                Go Back & Follow Host
+              </button>
+            )}
+
+            <button onClick={handleExit} className="w-full py-2 text-xs" style={{ color: COLORS.softGray }}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Joining loading overlay */}
+      {joiningRoom && !joinBlock && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center" style={{ background: theme.bg }}>
+          <div className="text-center space-y-3">
+            <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-xs" style={{ color: COLORS.softGray }}>Joining room…</p>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes pulse {

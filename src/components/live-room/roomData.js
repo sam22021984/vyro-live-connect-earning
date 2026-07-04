@@ -149,3 +149,37 @@ export const ADMIN_CONTROLS = {
     { id: "remove_admin", label: "Remove Admin", icon: "Crown", color: "#F59E0B" },
   ],
 };
+
+// Role permission matrix — maps each role to the admin control IDs it can use.
+// owner = room creator; admin/co_host/moderator have progressively fewer powers.
+export const ROLE_PERMISSIONS = {
+  owner: [
+    "mute", "unmute", "remove_seat", "move_seat", "kick_audience", "lock_seat", "unlock_seat",
+    "kick_room", "ban_24h", "ban_7d", "ban_permanent", "block_speaking", "clear_messages",
+    "promote_mod", "remove_mod", "promote_admin", "remove_admin", "promote_co_host", "assign_seat",
+  ],
+  admin: [
+    "mute", "unmute", "remove_seat", "move_seat", "kick_audience", "lock_seat", "unlock_seat",
+    "kick_room", "ban_24h", "ban_7d", "block_speaking", "clear_messages", "promote_mod", "remove_mod",
+  ],
+  co_host: [
+    "mute", "unmute", "remove_seat", "move_seat", "kick_audience", "lock_seat", "unlock_seat",
+    "kick_room", "ban_24h",
+  ],
+  moderator: [
+    "mute", "unmute", "kick_audience", "kick_room", "ban_24h", "block_speaking", "clear_messages",
+  ],
+  speaker: [],
+  viewer: [],
+};
+
+// Helper: filter ADMIN_CONTROLS sections by role permissions
+export function getControlsForRole(role) {
+  const allowed = ROLE_PERMISSIONS[role] || [];
+  const filterControls = (controls) => controls.filter((c) => allowed.includes(c.id));
+  return {
+    seat_management: filterControls(ADMIN_CONTROLS.seat_management),
+    room_moderation: filterControls(ADMIN_CONTROLS.room_moderation),
+    role_management: filterControls(ADMIN_CONTROLS.role_management),
+  };
+}

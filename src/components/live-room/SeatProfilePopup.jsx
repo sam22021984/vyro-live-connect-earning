@@ -4,8 +4,9 @@ import {
   Crown, Shield, ShieldOff, Ban, Lock, Unlock, Users, ArrowRightLeft,
   DoorOpen, Clock, Calendar, Eraser, ExternalLink, Sparkles, Circle,
 } from "lucide-react";
-import { COLORS, ADMIN_CONTROLS } from "./roomData";
+import { COLORS, ADMIN_CONTROLS, getControlsForRole } from "./roomData";
 import { useToast } from "@/components/ui/use-toast";
+import { base44 } from "@/api/base44Client";
 
 const ICONS = {
   MicOff, Mic, UserMinus, ArrowRightLeft, Users, Lock, Unlock, DoorOpen,
@@ -55,10 +56,36 @@ function AdminSection({ title, controls, onAction }) {
 export default function SeatProfilePopup({ seat, userRole, onClose, onSendGift, onSendEmoji, onAction }) {
   const { toast } = useToast();
   const [isFollowing, setIsFollowing] = useState(false);
+  const [acting, setActing] = useState(false);
   const u = seat.user;
   if (!u) return null;
 
-  const isAdmin = userRole === "admin" || userRole === "owner" || userRole === "moderator";
+  const isAdmin = userRole === "admin" || userRole === "owner" || userRole === "moderator" || userRole === "co_host";
+  const controls = getControlsForRole(userRole);
+
+  const handleModeration = async (control) => {
+    if (acting) return;
+    setActing(true);
+    try {
+      const res = await base44.functions.invoke("moderateRoom", {
+        room_id: seat.room_id,
+        target_user_id: u.user_id,
+        action: control.id,
+        reason: control.label,
+      });
+      const data = res.data || res;
+      if (data.error) {
+        toast({ title: data.error, variant: "destructive" });
+      } else {
+        toast({ title: `${control.label} — done`, description: `Applied to ${u.name}` });
+        onAction(control.label);
+      }
+    } catch (err) {
+      toast({ title: "Action failed", description: err.message, variant: "destructive" });
+    } finally {
+      setActing(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
@@ -163,9 +190,9 @@ export default function SeatProfilePopup({ seat, userRole, onClose, onSendGift, 
                   </span>
                 </div>
               </div>
-              <AdminSection title="Seat Management" controls={ADMIN_CONTROLS.seat_management} onAction={onAction} />
-              <AdminSection title="Room Moderation" controls={ADMIN_CONTROLS.room_moderation} onAction={onAction} />
-              <AdminSection title="Role Management" controls={ADMIN_CONTROLS.role_management} onAction={onAction} />
+              {controls.seat_management.length > 0 && <AdminSection title="Seat Management" controls={controls.seat_management} onAction={(label) => { const c = ADMIN_CONTROLS.seat_management.find((x) => x.label === label); if (c) handleModeration(c); }} />}
+              {controls.room_moderation.length > 0 && <AdminSection title="Room Moderation" controls={controls.room_moderation} onAction={(label) => { const c = ADMIN_CONTROLS.room_moderation.find((x) => x.label === label); if (c) handleModeration(c); }} />}
+              {controls.role_management.length > 0 && <AdminSection title="Role Management" controls={controls.role_management} onAction={(label) => { const c = ADMIN_CONTROLS.role_management.find((x) => x.label === label); if (c) handleModeration(c); }} />}
             </>
           )}
         </div>
