@@ -563,7 +563,7 @@ export default function UserDataSection() {
                 <Card key={e.id || i}>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-1.5">
-                      <Ban size={14} style={{ color: severityColor(e.severity)} />
+                      <Ban size={14} style={{ color: severityColor(e.severity) }} />
                       <h4 className="text-[10px] font-bold uppercase" style={{ color: DARK }}>{e.action_type?.replace(/_/g, " ")}</h4>
                     </div>
                     <Badge label={(e.severity || "low").toUpperCase()} color={severityColor(e.severity)} />
