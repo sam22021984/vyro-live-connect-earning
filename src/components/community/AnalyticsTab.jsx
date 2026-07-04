@@ -1,8 +1,10 @@
 import React from "react";
-import { COLORS, ANALYTICS_DATA, formatNum } from "./communityData";
+import { Loader2 } from "lucide-react";
+import { COLORS, formatNum } from "./communityData";
+import { useCommunityAnalytics } from "@/hooks/useCommunityAnalytics";
 
 function Chart({ data, color, labels, height = 120 }) {
-  const max = Math.max(...data);
+  const max = Math.max(...data, 1);
   return (
     <div>
       <div className="flex items-end justify-between gap-1.5" style={{ height }}>
@@ -30,28 +32,55 @@ function AnalyticsCard({ title, value, growth, data, color, labels }) {
       <div className="flex items-center justify-between mb-2">
         <div>
           <p className="text-[10px]" style={{ color: COLORS.textSecondary }}>{title}</p>
-          <p className="text-base font-bold" style={{ color: COLORS.textPrimary }}>{formatNum(value)}</p>
+          <p className="text-base font-bold" style={{ color: COLORS.textPrimary }}>{typeof value === "string" ? value : formatNum(value)}</p>
         </div>
-        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${COLORS.emerald}15`, color: COLORS.emerald }}>+{growth}%</span>
+        {growth !== undefined && (
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${COLORS.emerald}15`, color: COLORS.emerald }}>
+            {growth >= 0 ? "+" : ""}{growth}%
+          </span>
+        )}
       </div>
-      <Chart data={data} color={color} labels={ANALYTICS_DATA.weeklyLabels} height={80} />
+      <Chart data={data} color={color} labels={labels} height={80} />
     </div>
   );
 }
 
+function computeGrowth(arr) {
+  if (!arr || arr.length < 2) return 0;
+  const last = arr[arr.length - 1];
+  const prev = arr[arr.length - 2];
+  if (prev === 0) return last > 0 ? 100 : 0;
+  return Math.round(((last - prev) / prev) * 1000) / 10;
+}
+
 export default function AnalyticsTab() {
-  const d = ANALYTICS_DATA;
+  const { data: d, loading } = useCommunityAnalytics();
+
+  if (loading || !d) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 size={24} className="animate-spin" style={{ color: COLORS.royalBlue }} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
-      <h3 className="text-xs font-bold px-1" style={{ color: COLORS.textPrimary }}>📈 Community Analytics</h3>
+      <div className="flex items-center justify-between px-1">
+        <h3 className="text-xs font-bold" style={{ color: COLORS.textPrimary }}>📈 Community Analytics</h3>
+        <div className="flex items-center gap-1">
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: COLORS.emerald }} />
+          <span className="text-[9px] font-semibold" style={{ color: COLORS.emerald }}>LIVE</span>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <AnalyticsCard title="Daily Active Users" value={d.dailyActive[6]} growth={15.3} data={d.dailyActive} color={COLORS.royalBlue} />
-        <AnalyticsCard title="New Members" value={d.newMembers[6]} growth={22.1} data={d.newMembers} color={COLORS.emerald} />
-        <AnalyticsCard title="Post Activity" value={d.postActivity[6]} growth={18.5} data={d.postActivity} color={COLORS.skyBlue} />
-        <AnalyticsCard title="Engagement Rate" value={d.engagement[6] + "%"} growth={7.8} data={d.engagement} color={COLORS.gold} />
-        <AnalyticsCard title="Coin Transactions" value={d.coinTransactions[6]} growth={25.7} data={d.coinTransactions} color={COLORS.amber} />
-        <AnalyticsCard title="Community Growth" value={1248} growth={12.5} data={[800, 900, 1000, 1050, 1100, 1200, 1248]} color={COLORS.crimson} />
+        <AnalyticsCard title="Daily Active Users" value={d.dailyActive[6]} growth={computeGrowth(d.dailyActive)} data={d.dailyActive} color={COLORS.royalBlue} labels={d.weeklyLabels} />
+        <AnalyticsCard title="New Members" value={d.newMembers[6]} growth={computeGrowth(d.newMembers)} data={d.newMembers} color={COLORS.emerald} labels={d.weeklyLabels} />
+        <AnalyticsCard title="Post Activity" value={d.postActivity[6]} growth={computeGrowth(d.postActivity)} data={d.postActivity} color={COLORS.skyBlue} labels={d.weeklyLabels} />
+        <AnalyticsCard title="Engagement Rate" value={d.engagement[6] + "%"} growth={computeGrowth(d.engagement)} data={d.engagement} color={COLORS.gold} labels={d.weeklyLabels} />
+        <AnalyticsCard title="Coin Transactions" value={d.coinTransactions[6]} growth={computeGrowth(d.coinTransactions)} data={d.coinTransactions} color={COLORS.amber} labels={d.weeklyLabels} />
+        <AnalyticsCard title="Community Growth" value={d.totalCommunities} growth={computeGrowth(d.postActivity)} data={d.postActivity} color={COLORS.crimson} labels={d.weeklyLabels} />
       </div>
 
       {/* Summary metrics */}
@@ -59,9 +88,9 @@ export default function AnalyticsTab() {
         <p className="text-[10px] font-bold mb-2" style={{ color: COLORS.textSecondary }}>📊 Weekly Summary</p>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: "User Retention", value: "87.2%", color: COLORS.emerald },
-            { label: "Group Performance", value: "92.5%", color: COLORS.royalBlue },
-            { label: "Gift Statistics", value: "78K", color: COLORS.amber },
+            { label: "User Retention", value: `${d.userRetention}%`, color: COLORS.emerald },
+            { label: "Group Performance", value: `${d.groupPerformance}`, color: COLORS.royalBlue },
+            { label: "Gift Statistics", value: formatNum(d.giftStatistics), color: COLORS.amber },
           ].map((m) => (
             <div key={m.label} className="text-center p-2 rounded-xl" style={{ background: COLORS.bgPrimary }}>
               <p className="text-sm font-bold" style={{ color: m.color }}>{m.value}</p>
