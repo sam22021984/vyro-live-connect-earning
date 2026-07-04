@@ -292,7 +292,7 @@ Deno.serve(async (req) => {
       if (bio !== undefined) updates.bio = bio;
       if (birthday) { updates.birthday = birthday; updates.zodiac = getZodiac(birthday); }
       if (gender) updates.gender = gender;
-      if (avatar_url) updates.avatar_url = avatar_url;
+      if (avatar_url !== undefined) updates.avatar_url = avatar_url;
       if (cover_url !== undefined) updates.cover_url = cover_url;
       if (country) updates.country = country;
       if (language) updates.language = language;

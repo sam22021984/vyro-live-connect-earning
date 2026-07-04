@@ -36,24 +36,25 @@ export default function MyProfileHeader({ profile, onMoreMenu }) {
         try {
           const { file_url } = await base44.integrations.Core.UploadFile({ file });
           const field = type === "avatar" ? "avatar_url" : "cover_url";
-          let myProfiles = await base44.entities.UserProfile.filter({ user_id: profile.user_id });
-          if (myProfiles.length > 0) {
-            await base44.entities.UserProfile.update(myProfiles[0].id, { [field]: file_url });
-            toast({ title: `${type === "avatar" ? "Profile photo" : "Cover"} updated` });
-            window.location.reload();
-          }
+          // Route through backend function — it uses asServiceRole, bypassing RLS
+          await base44.functions.invoke("userOnboarding", {
+            action: "updateProfile",
+            [field]: file_url,
+          });
+          toast({ title: `${type === "avatar" ? "Profile photo" : "Cover"} updated` });
+          window.location.reload();
         } catch (e) { toast({ title: "Upload failed", variant: "destructive" }); }
       };
       input.click();
     }
     if (action === "remove") {
       const field = type === "avatar" ? "avatar_url" : "cover_url";
-      let myProfiles = await base44.entities.UserProfile.filter({ user_id: profile.user_id });
-      if (myProfiles.length > 0) {
-        await base44.entities.UserProfile.update(myProfiles[0].id, { [field]: "" });
-        toast({ title: `${type === "avatar" ? "Profile photo" : "Cover"} removed` });
-        window.location.reload();
-      }
+      await base44.functions.invoke("userOnboarding", {
+        action: "updateProfile",
+        [field]: "",
+      });
+      toast({ title: `${type === "avatar" ? "Profile photo" : "Cover"} removed` });
+      window.location.reload();
     }
     if (action === "preview") {
       setShowPhotoViewer(type);
