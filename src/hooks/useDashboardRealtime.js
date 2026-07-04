@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { getSupabase } from "@/lib/supabaseClient";
 
-export function useDashboardRealtime() {
+export function useDashboardRealtime(tableName = "dashboard_data") {
   const [dashboardData, setDashboardData] = useState(null);
   const [status, setStatus] = useState("idle");
   const channelRef = useRef(null);
@@ -15,10 +15,10 @@ export function useDashboardRealtime() {
         const supabase = await getSupabase();
 
         const channel = supabase
-          .channel("live-dashboard")
+          .channel(`live-dashboard-${tableName}`)
           .on(
             "postgres_changes",
-            { event: "*", schema: "public", table: "dashboard_data" },
+            { event: "*", schema: "public", table: tableName },
             (payload) => {
               const newRow = payload.new;
               setDashboardData(newRow);
