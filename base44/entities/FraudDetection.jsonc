@@ -1,0 +1,148 @@
+{
+  "name": "FraudDetection",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "fraud_type": {
+      "type": "string",
+      "enum": [
+        "fake_account",
+        "account_farming",
+        "multiple_account_abuse",
+        "device_manipulation",
+        "emulator_usage",
+        "automated_registration",
+        "suspicious_network",
+        "vpn_risk",
+        "proxy_risk",
+        "fake_gps",
+        "reward_abuse",
+        "coin_abuse",
+        "referral_abuse",
+        "spam",
+        "bot_activity",
+        "ai_generated_face",
+        "stolen_identity",
+        "account_takeover",
+        "payment_fraud",
+        "other"
+      ]
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "low"
+    },
+    "risk_score": {
+      "type": "number",
+      "default": 0
+    },
+    "indicators": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "evidence": {
+      "type": "object"
+    },
+    "detected_by": {
+      "type": "string",
+      "enum": [
+        "ai_system",
+        "automated_rule",
+        "manual_review",
+        "user_report",
+        "external_signal"
+      ],
+      "default": "ai_system"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "detected",
+        "investigating",
+        "confirmed",
+        "false_positive",
+        "resolved",
+        "escalated"
+      ],
+      "default": "detected"
+    },
+    "reviewed_by": {
+      "type": "string"
+    },
+    "reviewed_date": {
+      "type": "string"
+    },
+    "action_taken": {
+      "type": "string"
+    },
+    "related_event_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "device_fingerprint": {
+      "type": "string"
+    },
+    "ip_address": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "fraud_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}

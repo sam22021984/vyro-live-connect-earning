@@ -1,0 +1,170 @@
+{
+  "name": "IncidentRecord",
+  "type": "object",
+  "properties": {
+    "incident_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "incident_type": {
+      "type": "string",
+      "enum": [
+        "fraud",
+        "abuse",
+        "harassment",
+        "security_breach",
+        "child_safety",
+        "hate_speech",
+        "account_takeover",
+        "payment_fraud",
+        "data_leak",
+        "coordinated_attack",
+        "policy_violation",
+        "legal_request",
+        "compliance_review",
+        "other"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "risk_classification": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "investigating",
+        "escalated",
+        "resolved",
+        "closed",
+        "archived"
+      ],
+      "default": "open"
+    },
+    "related_user_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "related_event_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "related_alert_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "investigation_notes": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "default": []
+    },
+    "evidence": {
+      "type": "object"
+    },
+    "created_by": {
+      "type": "string"
+    },
+    "assigned_to": {
+      "type": "string"
+    },
+    "assigned_role": {
+      "type": "string"
+    },
+    "resolution": {
+      "type": "string"
+    },
+    "resolved_date": {
+      "type": "string"
+    },
+    "resolved_by": {
+      "type": "string"
+    },
+    "room_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "is_legal_case": {
+      "type": "boolean",
+      "default": false
+    },
+    "legal_reference": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "incident_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "name": "VerificationRecord",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "verification_type": {
+      "type": "string",
+      "enum": [
+        "phone",
+        "email",
+        "face",
+        "identity",
+        "age",
+        "device",
+        "social"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "verified",
+        "failed",
+        "expired",
+        "revoked"
+      ],
+      "default": "pending"
+    },
+    "method": {
+      "type": "string"
+    },
+    "liveness_checks": {
+      "type": "object"
+    },
+    "face_detection_passed": {
+      "type": "boolean",
+      "default": false
+    },
+    "eye_blink_verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "head_movement_verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "anti_spoof_passed": {
+      "type": "boolean",
+      "default": false
+    },
+    "anti_replay_passed": {
+      "type": "boolean",
+      "default": false
+    },
+    "ai_fraud_check_passed": {
+      "type": "boolean",
+      "default": false
+    },
+    "risk_score": {
+      "type": "number",
+      "default": 0
+    },
+    "verified_by": {
+      "type": "string"
+    },
+    "verified_date": {
+      "type": "string"
+    },
+    "expires_date": {
+      "type": "string"
+    },
+    "failure_reason": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "attempt_count": {
+      "type": "number",
+      "default": 1
+    }
+  },
+  "required": [
+    "user_id",
+    "verification_type"
+  ],
+  "rls": {
+    "create": {
+      "data.user_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}

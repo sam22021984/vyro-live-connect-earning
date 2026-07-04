@@ -1,0 +1,155 @@
+{
+  "name": "DeviceRecord",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "device_fingerprint": {
+      "type": "string"
+    },
+    "device_name": {
+      "type": "string"
+    },
+    "device_category": {
+      "type": "string",
+      "enum": [
+        "trusted",
+        "new",
+        "suspicious",
+        "blocked"
+      ],
+      "default": "new"
+    },
+    "platform": {
+      "type": "string"
+    },
+    "os": {
+      "type": "string"
+    },
+    "os_version": {
+      "type": "string"
+    },
+    "browser": {
+      "type": "string"
+    },
+    "browser_version": {
+      "type": "string"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "first_seen": {
+      "type": "string"
+    },
+    "last_seen": {
+      "type": "string"
+    },
+    "last_active": {
+      "type": "string"
+    },
+    "trust_score": {
+      "type": "number",
+      "default": 50
+    },
+    "login_count": {
+      "type": "number",
+      "default": 1
+    },
+    "is_blocked": {
+      "type": "boolean",
+      "default": false
+    },
+    "block_reason": {
+      "type": "string"
+    },
+    "blocked_by": {
+      "type": "string"
+    },
+    "blocked_date": {
+      "type": "string"
+    },
+    "is_emulator": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_rooted": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_vpn": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_proxy": {
+      "type": "boolean",
+      "default": false
+    },
+    "screen_resolution": {
+      "type": "string"
+    },
+    "timezone": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "device_fingerprint"
+  ],
+  "rls": {
+    "create": {
+      "data.user_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}

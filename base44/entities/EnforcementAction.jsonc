@@ -1,0 +1,152 @@
+{
+  "name": "EnforcementAction",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "warning",
+        "temporary_mute",
+        "temporary_restriction",
+        "temporary_suspension",
+        "permanent_ban",
+        "content_removal",
+        "session_pause",
+        "chat_restriction",
+        "visibility_limit",
+        "feature_restriction"
+      ],
+      "default": "warning"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "violation_type": {
+      "type": "string"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "low"
+    },
+    "step_number": {
+      "type": "number",
+      "default": 1
+    },
+    "duration_hours": {
+      "type": "number",
+      "default": 0
+    },
+    "start_date": {
+      "type": "string"
+    },
+    "end_date": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "lifted",
+        "escalated",
+        "appealed"
+      ],
+      "default": "active"
+    },
+    "issued_by": {
+      "type": "string"
+    },
+    "issued_by_role": {
+      "type": "string"
+    },
+    "lifted_by": {
+      "type": "string"
+    },
+    "lifted_date": {
+      "type": "string"
+    },
+    "lift_reason": {
+      "type": "string"
+    },
+    "room_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "object"
+    },
+    "appeal_status": {
+      "type": "string",
+      "enum": [
+        "none",
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "none"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "action_type",
+    "reason"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}

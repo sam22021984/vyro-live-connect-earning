@@ -1,0 +1,101 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "actor_id": {
+      "type": "string"
+    },
+    "actor_role": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "view_user_profile",
+        "view_verification_status",
+        "view_login_history",
+        "view_security_events",
+        "view_risk_scores",
+        "view_device_info",
+        "view_account_activity",
+        "view_investigation_records",
+        "view_fraud_reports",
+        "view_moderation_records",
+        "issue_enforcement",
+        "lift_enforcement",
+        "resolve_incident",
+        "escalate_incident",
+        "modify_risk_level",
+        "ban_user",
+        "unban_user",
+        "device_block",
+        "device_unblock",
+        "data_export",
+        "config_change",
+        "policy_update",
+        "other"
+      ]
+    },
+    "resource_type": {
+      "type": "string"
+    },
+    "resource_id": {
+      "type": "string"
+    },
+    "target_user_id": {
+      "type": "string"
+    },
+    "details": {
+      "type": "object"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "user_agent": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "is_sensitive": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "actor_id",
+    "action"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.actor_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "owner"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}

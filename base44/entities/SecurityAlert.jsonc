@@ -1,0 +1,149 @@
+{
+  "name": "SecurityAlert",
+  "type": "object",
+  "properties": {
+    "alert_type": {
+      "type": "string",
+      "enum": [
+        "fraud_detection",
+        "account_takeover_risk",
+        "security_breach_attempt",
+        "high_risk_activity",
+        "critical_abuse_event",
+        "child_safety_violation",
+        "mass_registration",
+        "coordinated_attack",
+        "payment_fraud",
+        "data_breach",
+        "system_anomaly",
+        "other"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "target_user_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "acknowledged",
+        "investigating",
+        "resolved",
+        "false_alarm"
+      ],
+      "default": "active"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "assigned_to": {
+      "type": "string"
+    },
+    "assigned_role": {
+      "type": "string"
+    },
+    "acknowledged_by": {
+      "type": "string"
+    },
+    "acknowledged_date": {
+      "type": "string"
+    },
+    "resolved_by": {
+      "type": "string"
+    },
+    "resolved_date": {
+      "type": "string"
+    },
+    "resolution": {
+      "type": "string"
+    },
+    "related_event_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "related_incident_id": {
+      "type": "string"
+    },
+    "room_id": {
+      "type": "string"
+    },
+    "notifications_sent": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "alert_type",
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.target_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}

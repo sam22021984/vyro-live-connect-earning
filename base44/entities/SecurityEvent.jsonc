@@ -1,0 +1,173 @@
+{
+  "name": "SecurityEvent",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "login",
+        "logout",
+        "registration",
+        "face_verification",
+        "device_change",
+        "password_change",
+        "suspicious_activity",
+        "fraud_detected",
+        "account_takeover",
+        "policy_violation",
+        "vpn_detected",
+        "proxy_detected",
+        "emulator_detected",
+        "fake_gps",
+        "multiple_accounts",
+        "reward_abuse",
+        "coin_abuse",
+        "referral_abuse",
+        "spam_detected",
+        "bot_detected",
+        "content_violation",
+        "harassment",
+        "hate_speech",
+        "threat",
+        "child_safety",
+        "session_paused",
+        "session_suspended",
+        "account_banned",
+        "security_breach",
+        "other"
+      ],
+      "default": "login"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "low"
+    },
+    "description": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "device_fingerprint": {
+      "type": "string"
+    },
+    "device_info": {
+      "type": "string"
+    },
+    "user_agent": {
+      "type": "string"
+    },
+    "network_info": {
+      "type": "object"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "low"
+    },
+    "risk_score": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "investigating",
+        "resolved",
+        "escalated",
+        "closed"
+      ],
+      "default": "active"
+    },
+    "resolved_by": {
+      "type": "string"
+    },
+    "resolved_date": {
+      "type": "string"
+    },
+    "resolution_notes": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "room_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "event_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}
