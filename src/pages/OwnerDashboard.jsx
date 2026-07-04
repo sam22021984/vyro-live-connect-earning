@@ -25,6 +25,7 @@ import {
   OWNER_POWERS, TIME_FILTERS,
 } from "@/components/owner-dashboard/ownerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import UserDataSection from "@/components/owner-dashboard/UserDataSection";
 
 const ICONS = {
   LayoutDashboard, Globe, Users, FileText, DollarSign, Gift, Coins, Trophy,
@@ -692,6 +693,7 @@ function SectionContent({ sectionId }) {
     case "ai": return <AIMonitoringSection />;
     case "security": return <SecuritySection />;
     case "finance": return <FinanceSection />;
+    case "userdata": return <UserDataSection />;
     case "audit": return <AuditSection />;
     case "broadcast": return <BroadcastCenter />;
     case "automation": return <AutomationSection />;

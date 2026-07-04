@@ -18,6 +18,7 @@ export const OWNER_SECTIONS = [
   { id: "broadcast", label: "Broadcast", icon: "Megaphone", color: "#F2994A" },
   { id: "automation", label: "Automation", icon: "Cpu", color: "#A78BFA" },
   { id: "bi", label: "BI Center", icon: "TrendingUp", color: "#2F80ED" },
+  { id: "userdata", label: "User Data", icon: "Smartphone", color: "#2F80ED" },
   { id: "settings", label: "Settings", icon: "Settings", color: "#6B7280" },
   { id: "powers", label: "Owner Powers", icon: "Crown", color: "#D4AF37" },
 ];
