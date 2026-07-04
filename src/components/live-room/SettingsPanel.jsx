@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { X, ChevronUp, ChevronDown, Search } from "lucide-react";
+import { X, ChevronUp, ChevronDown, Search, Power } from "lucide-react";
 import { COLORS, FUNCTION_ITEMS, ENTERTAINMENT_ITEMS } from "./roomData";
 import SeatManagementSection from "./SeatManagementSection";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function SettingsPanel({ onClose, onArchive, onBackup, onScheduler, giftStats, roomScore, aiStats, seatCount, onSeatCountChange, userRole = "viewer" }) {
+export default function SettingsPanel({ onClose, onArchive, onBackup, onScheduler, onEndRoom, endingRoom, giftStats, roomScore, aiStats, seatCount, onSeatCountChange, userRole = "viewer" }) {
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
   const [search, setSearch] = useState("");
@@ -214,6 +214,21 @@ export default function SettingsPanel({ onClose, onArchive, onBackup, onSchedule
                 <MgmtButton icon="📦" label="Archive" color="#FF6B6B" bg="rgba(255,107,107,0.1)" border="rgba(255,107,107,0.3)" onClick={isOwner ? handleArchive : restrictedToast} disabled={!isOwner} />
               </div>
             </section>
+
+            {/* End Room — host only */}
+            {isOwner && (
+              <section>
+                <button
+                  onClick={onEndRoom}
+                  disabled={endingRoom}
+                  className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-white transition active:scale-95 disabled:opacity-60"
+                  style={{ background: "linear-gradient(135deg, #EF4444, #DC2626)", boxShadow: "0 4px 12px rgba(239,68,68,0.3)" }}
+                >
+                  <Power size={14} />
+                  {endingRoom ? "Ending Room…" : "End Live Room"}
+                </button>
+              </section>
+            )}
           </div>
         </div>
       </div>

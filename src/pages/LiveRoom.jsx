@@ -14,6 +14,7 @@ import AnimationLayer from "@/components/live-room/AnimationLayer";
 import RoomUserList from "@/components/live-room/RoomUserList";
 import MessageArea from "@/components/live-room/MessageArea";
 import BottomNav from "@/components/live-room/BottomNav";
+import PostLiveSummary from "@/components/live-room/PostLiveSummary";
 import { COLORS, ROOM_THEMES, WARNING_TEXT, SEAT_POSITIONS, GIFT_CATALOG, EMOJIS_3D } from "@/components/live-room/roomData";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -46,6 +47,8 @@ export default function LiveRoom() {
   const [showChatInput, setShowChatInput] = useState(false);
   const [tempProfileUser, setTempProfileUser] = useState(null);
   const [lastSentGift, setLastSentGift] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [endingRoom, setEndingRoom] = useState(false);
 
   // Refs for dynamic seat positioning — replaces static SEAT_POSITIONS
   const containerRef = useRef(null);
@@ -284,6 +287,32 @@ export default function LiveRoom() {
     navigate(-1);
   };
 
+  const handleEndRoom = async () => {
+    if (userRole !== "owner") {
+      toast({ title: "Only the host can end this room", variant: "destructive" });
+      return;
+    }
+    setEndingRoom(true);
+    try {
+      const res = await base44.functions.invoke("endLiveRoom", { room_id: roomId });
+      const data = res.data || res;
+      if (data.error) {
+        toast({ title: data.error, variant: "destructive" });
+        setEndingRoom(false);
+        return;
+      }
+      setSummary(data.summary);
+    } catch (err) {
+      toast({ title: "Failed to end room", description: err.message, variant: "destructive" });
+      setEndingRoom(false);
+    }
+  };
+
+  const handleCloseSummary = () => {
+    setSummary(null);
+    navigate("/");
+  };
+
   return (
     <div ref={containerRef} className="fixed inset-0 overflow-hidden flex flex-col" style={{ background: theme.bg }}>
       {/* Radial glow */}
@@ -437,7 +466,9 @@ export default function LiveRoom() {
       )}
 
       {/* Settings */}
-      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} onScheduler={runScheduler} giftStats={giftStats} roomScore={roomScore} aiStats={aiStats} seatCount={seatCount} onSeatCountChange={setSeatCount} userRole={userRole} />}
+      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} onScheduler={runScheduler} onEndRoom={handleEndRoom} endingRoom={endingRoom} giftStats={giftStats} roomScore={roomScore} aiStats={aiStats} seatCount={seatCount} onSeatCountChange={setSeatCount} userRole={userRole} />}
+
+      {summary && <PostLiveSummary summary={summary} onClose={handleCloseSummary} />}
 
       <style>{`
         @keyframes pulse {
