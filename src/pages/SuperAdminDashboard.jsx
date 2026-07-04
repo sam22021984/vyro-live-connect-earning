@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, ChevronRight, Shield,
+  ArrowLeft, ChevronRight, ChevronDown, Shield,
   LayoutDashboard, Building2, Handshake, Mic, UserCog, FileText,
   TrendingUp, DollarSign, PartyPopper, Swords, AlertTriangle,
   ShieldCheck, Megaphone, BarChart3, ScrollText, Settings,
@@ -9,13 +9,11 @@ import {
   LogIn, Smartphone, Globe, ShieldOff, Lock, Snowflake, LogOut,
   Activity, Heart,
 } from "lucide-react";
+import { useAdminDashboard } from "@/hooks/useAdminDashboard";
+import { mapSuperAdminData } from "@/lib/adminDashboardData";
 import {
-  SUPERADMIN_SECTIONS, SUPERADMIN_KPIS, SUPERADMIN_QUICK_ACTIONS,
-  SUPERADMIN_REALTIME_COUNTERS, SUPERADMIN_LIVE_STREAM,
-  AGENCIES, AGENTS, HOSTS, ADMINS, APPLICATIONS, APPLICATION_LIST,
-  PERFORMANCE_DATA, REVENUE_DATA, REVENUE_PERIODS, PK_BATTLES,
-  VIOLATIONS, SECURITY_DATA, SECURITY_ACTIONS, COMM_TARGETS, COMM_TYPES,
-  ANALYTICS_DATA, AUDIT_LOGS, SETTINGS_GROUPS, EVENTS,
+  SUPERADMIN_SECTIONS, SUPERADMIN_QUICK_ACTIONS,
+  SECURITY_ACTIONS, COMM_TARGETS, COMM_TYPES, SETTINGS_GROUPS,
 } from "@/components/super-admin/superAdminData";
 import ReportToSection from "@/components/shared/ReportToSection";
 import SuperAdminPolicyTab from "@/components/super-admin/SuperAdminPolicyTab";
@@ -73,7 +71,16 @@ function StatusBadge({ status, color }) {
   return <span className="px-2 py-0.5 rounded-full text-[8px] font-bold" style={{ background: `${color}15`, color }}>{status}</span>;
 }
 
-function HomeSection({ onNavigate }) {
+function LoadingSpinner() {
+  return <div className="flex items-center justify-center py-20"><div className="w-6 h-6 border-2 border-slate-200 border-t-slate-500 rounded-full animate-spin" /></div>;
+}
+
+function EmptyState({ icon = "📊", label = "No data available" }) {
+  return <div className="text-center py-8"><span className="text-2xl">{icon}</span><p className="text-[10px] mt-1" style={{ color: GRAY }}>{label}</p></div>;
+}
+
+function HomeSection({ onNavigate, data, loading }) {
+  if (loading) return <LoadingSpinner />;
   return (
     <div className="space-y-4">
       <div className="rounded-2xl p-4 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0F1B3D 0%, #1A2952 50%, #1E3A5F 100%)", boxShadow: "0 8px 24px rgba(15,27,61,0.2)" }}>
@@ -92,7 +99,7 @@ function HomeSection({ onNavigate }) {
       <div>
         <SectionHeader title="Real-Time Counters" subtitle="Live operational monitoring" />
         <div className="grid grid-cols-3 gap-2">
-          {SUPERADMIN_REALTIME_COUNTERS.map((c, i) => {
+          {data.REALTIME_COUNTERS.map((c, i) => {
             const Icon = ICONS[c.icon] || BarChart3;
             return (
               <Card key={i} className="text-center">
@@ -110,7 +117,7 @@ function HomeSection({ onNavigate }) {
       <div>
         <SectionHeader title="Executive KPIs" subtitle="Operational overview metrics" />
         <div className="grid grid-cols-2 gap-2">
-          {SUPERADMIN_KPIS.map((k, i) => <KpiCard key={i} kpi={k} />)}
+          {data.KPIS.map((k, i) => <KpiCard key={i} kpi={k} />)}
         </div>
       </div>
 
@@ -134,15 +141,17 @@ function HomeSection({ onNavigate }) {
       <div>
         <SectionHeader title="Live Operations Activity" subtitle="Real-time event stream" />
         <Card>
-          <div className="space-y-2">
-            {SUPERADMIN_LIVE_STREAM.map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: item.status === "success" ? "#27AE60" : item.status === "warning" ? "#F2994A" : item.status === "error" ? "#EB5757" : "#2F80ED" }} />
-                <p className="text-[11px] flex-1" style={{ color: DARK }}>{item.text}</p>
-                <span className="text-[9px]" style={{ color: GRAY }}>{item.time}</span>
-              </div>
-            ))}
-          </div>
+          {data.LIVE_STREAM.length === 0 ? <EmptyState icon="📡" label="No live activity yet" /> : (
+            <div className="space-y-2">
+              {data.LIVE_STREAM.map((item, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: item.status === "success" ? "#27AE60" : item.status === "warning" ? "#F2994A" : item.status === "error" ? "#EB5757" : "#2F80ED" }} />
+                  <p className="text-[11px] flex-1" style={{ color: DARK }}>{item.text}</p>
+                  <span className="text-[9px]" style={{ color: GRAY }}>{item.time}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
 
@@ -166,143 +175,65 @@ function HomeSection({ onNavigate }) {
   );
 }
 
-function AgenciesSection() {
+function ListSection({ title, subtitle, icon: Icon, items, color, renderExtra, actions, emptyIcon }) {
   return (
     <div className="space-y-3">
-      <SectionHeader title="🏢 Agency Management" subtitle="Manage all registered agencies" />
-      <div className="space-y-2">
-        {AGENCIES.map((a, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${a.color}10` }}>
-                <Building2 size={16} style={{ color: a.color }} />
+      <SectionHeader title={title} subtitle={subtitle} />
+      {items.length === 0 ? <EmptyState icon={emptyIcon || "📋"} label="No records found" /> : (
+        <div className="space-y-2">
+          {items.map((a, i) => (
+            <Card key={i}>
+              <div className="flex items-center gap-3">
+                {a.avatar ? (
+                  <img src={a.avatar} alt={a.name} className="w-10 h-10 rounded-full object-cover" />
+                ) : (
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${a.color || color}10` }}>
+                    <Icon size={16} style={{ color: a.color || color }} />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <p className="text-sm font-bold" style={{ color: DARK }}>{a.name} {a.id && <span className="text-[9px]" style={{ color: GRAY }}>({a.id})</span>}</p>
+                  {renderExtra ? renderExtra(a) : <p className="text-[10px]" style={{ color: GRAY }}>{a.country || a.agency || a.status || ''}</p>}
+                </div>
+                {a.status && <StatusBadge status={a.status} color={a.color} />}
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{a.name} <span className="text-[9px]" style={{ color: GRAY }}>({a.id})</span></p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{a.owner} • {a.country}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{a.hosts} hosts • {a.agents} agents</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs font-bold" style={{ color: "#27AE60" }}>{a.revenue}</p>
-                <StatusBadge status={a.status} color={a.color} />
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["View Profile", "Approve", "Suspend", "Reactivate", "Review Revenue", "Send Warning", "Contact", "Export"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
+      {actions && (
+        <div className="flex flex-wrap gap-2">
+          {actions.map((a, i) => (
+            <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function AgentsSection() {
-  return (
-    <div className="space-y-3">
-      <SectionHeader title="🤝 Agent Management" subtitle="Manage all talent agents and recruitment" />
-      <div className="space-y-2">
-        {AGENTS.map((a, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ background: `linear-gradient(135deg, ${a.color}, ${a.color}cc)` }}>
-                {a.name.split(" ").map(n => n[0]).join("")}
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{a.name} <span className="text-[9px]" style={{ color: GRAY }}>({a.id})</span></p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{a.agency} • {a.hosts} hosts managed</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs font-bold" style={{ color: "#27AE60" }}>{a.revenue}</p>
-                <p className="text-[9px]" style={{ color: a.color }}>{a.rating} rating</p>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Approve", "Suspend", "Reactivate", "View Performance", "Review Earnings", "Send Notice", "Report"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
-    </div>
-  );
+function AgenciesSection({ data }) {
+  return <ListSection title="🏢 Agency Management" subtitle="Manage all registered agencies" icon={Building2} color="#8B5CF6" items={data.AGENCIES} emptyIcon="🏢" actions={["View Profile", "Approve", "Suspend", "Reactivate", "Review Revenue", "Send Warning", "Contact", "Export"]} />;
 }
 
-function HostsSection() {
-  return (
-    <div className="space-y-3">
-      <SectionHeader title="🎙️ Host Management" subtitle="Manage all hosts and streaming activities" />
-      <div className="space-y-2">
-        {HOSTS.map((h, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${h.color}10` }}>
-                <Mic size={16} style={{ color: h.color }} />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{h.name} <span className="text-[9px]" style={{ color: GRAY }}>({h.id})</span></p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{h.agency} • Agent: {h.agent}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{h.level} • {h.followers} followers • {h.liveHours} live</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs font-bold" style={{ color: "#27AE60" }}>{h.revenue}</p>
-                <StatusBadge status={h.status} color={h.color} />
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Approve", "Suspend", "Reactivate", "Review Performance", "Monitor Live", "View Revenue", "Violations", "Warning", "Report"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
-    </div>
-  );
+function AgentsSection({ data }) {
+  return <ListSection title="🤝 Agent Management" subtitle="Manage all talent agents and recruitment" icon={Handshake} color="#A78BFA" items={data.AGENTS} emptyIcon="🤝" actions={["Approve", "Suspend", "Reactivate", "View Performance", "Review Earnings", "Send Notice", "Report"]} />;
 }
 
-function AdminsSection() {
-  return (
-    <div className="space-y-3">
-      <SectionHeader title="👨‍💼 Admin Management" subtitle="Manage operational administrators" />
-      <div className="space-y-2">
-        {ADMINS.map((a, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ background: `linear-gradient(135deg, ${a.color}, ${a.color}cc)` }}>
-                {a.name.split(" ").map(n => n[0]).join("")}
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{a.name} <span className="text-[9px]" style={{ color: GRAY }}>({a.id})</span></p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{a.department} • {a.tasks} tasks</p>
-                <p className="text-[9px]" style={{ color: GRAY }}>Last active: {a.lastActive}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs font-bold" style={{ color: a.color }}>{a.score}</p>
-                <StatusBadge status={a.status} color={a.color} />
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Create Admin", "Edit", "Assign Permissions", "Assign Tasks", "Suspend", "Reactivate", "Review", "Report"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
-    </div>
-  );
+function HostsSection({ data }) {
+  return <ListSection title="🎙️ Host Management" subtitle="Manage all hosts and streaming activities" icon={Mic} color="#EB5757" items={data.HOSTS} emptyIcon="🎙️" actions={["Approve", "Suspend", "Reactivate", "Review Performance", "Monitor Live", "View Revenue", "Violations", "Warning", "Report"]} />;
 }
 
-function ApplicationsSection() {
+function AdminsSection({ data }) {
+  return <ListSection title="👨‍💼 Admin Management" subtitle="Manage operational administrators" icon={UserCog} color="#2F80ED" items={data.ADMINS} emptyIcon="👨‍💼" actions={["Create Admin", "Edit", "Assign Permissions", "Assign Tasks", "Suspend", "Reactivate", "Review", "Report"]} />;
+}
+
+function ApplicationsSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="📋 Application Management" subtitle="Review and process applications" />
       <div className="grid grid-cols-1 gap-2">
-        {APPLICATIONS.map((a, i) => {
+        {data.APPLICATIONS.length === 0 ? <EmptyState icon="📋" label="No applications yet" /> : data.APPLICATIONS.map((a, i) => {
           const Icon = ICONS[a.icon] || FileText;
           return (
             <Card key={i}>
@@ -324,7 +255,7 @@ function ApplicationsSection() {
         })}
       </div>
       <div className="space-y-2">
-        {APPLICATION_LIST.map((a, i) => (
+        {data.APPLICATION_LIST.length === 0 ? <EmptyState icon="📝" label="No pending applications" /> : data.APPLICATION_LIST.map((a, i) => (
           <Card key={i}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${a.color}10` }}>
@@ -348,12 +279,12 @@ function ApplicationsSection() {
   );
 }
 
-function PerformanceSection() {
+function PerformanceSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="📈 Performance Monitoring" subtitle="Track performance across all teams" />
       <div className="grid grid-cols-2 gap-2">
-        {PERFORMANCE_DATA.map((p, i) => {
+        {data.PERFORMANCE_DATA.length === 0 ? <EmptyState icon="📈" /> : data.PERFORMANCE_DATA.map((p, i) => {
           const Icon = ICONS[p.icon] || TrendingUp;
           return (
             <Card key={i}>
@@ -373,12 +304,12 @@ function PerformanceSection() {
   );
 }
 
-function RevenueSection() {
+function RevenueSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="💰 Revenue Monitoring" subtitle="Track revenue across all operations" />
       <div className="grid grid-cols-4 gap-2">
-        {REVENUE_PERIODS.map((p, i) => (
+        {data.REVENUE_PERIODS.map((p, i) => (
           <Card key={i} className="text-center">
             <p className="text-[9px]" style={{ color: GRAY }}>{p.label}</p>
             <p className="text-xs font-bold" style={{ color: "#27AE60" }}>{p.value}</p>
@@ -386,7 +317,7 @@ function RevenueSection() {
         ))}
       </div>
       <div className="space-y-2">
-        {REVENUE_DATA.map((r, i) => {
+        {data.REVENUE_DATA.length === 0 ? <EmptyState icon="💰" label="No revenue data yet" /> : data.REVENUE_DATA.map((r, i) => {
           const Icon = ICONS[r.icon] || DollarSign;
           return (
             <Card key={i}>
@@ -417,67 +348,58 @@ function EventsSection() {
   return (
     <div className="space-y-3">
       <SectionHeader title="🎉 Event Monitoring" subtitle="Monitor events involving hosts, agencies, agents" />
-      <div className="space-y-2">
-        {EVENTS.map((e, i) => (
-          <Card key={i}>
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{ background: `${e.color}10` }}>🎉</div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{e.name}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{e.type} • {e.participants} participants</p>
-              </div>
-              <StatusBadge status={e.status} color={e.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
+      <EmptyState icon="🎉" label="No events configured yet" />
     </div>
   );
 }
 
-function PKSection() {
+function PKSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="⚔️ PK Battle Monitoring" subtitle="Monitor PK battles and competitions" />
-      <div className="space-y-2">
-        {PK_BATTLES.map((p, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <Swords size={20} style={{ color: p.color }} />
-              <div className="flex-1">
-                <p className="text-xs font-bold" style={{ color: DARK }}>{p.id}</p>
-                <p className="text-[11px]" style={{ color: DARK }}>{p.hostA} <span style={{ color: GRAY }}>vs</span> {p.hostB}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{p.scoreA} — {p.scoreB}</p>
+      {data.PK_BATTLES.length === 0 ? <EmptyState icon="⚔️" label="No active PK battles" /> : (
+        <div className="space-y-2">
+          {data.PK_BATTLES.map((p, i) => (
+            <Card key={i}>
+              <div className="flex items-center gap-3">
+                <Swords size={20} style={{ color: p.color }} />
+                <div className="flex-1">
+                  <p className="text-xs font-bold" style={{ color: DARK }}>{p.id}</p>
+                  <p className="text-[11px]" style={{ color: DARK }}>{p.hostA} <span style={{ color: GRAY }}>vs</span> {p.hostB}</p>
+                  <p className="text-[10px]" style={{ color: GRAY }}>{p.viewers} viewers • {p.revenue}</p>
+                </div>
+                <StatusBadge status={p.status} color={p.color} />
               </div>
-              <StatusBadge status={p.status} color={p.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function ViolationsSection() {
+function ViolationsSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="🚨 Reports & Violations" subtitle="Manage reports and disciplinary actions" />
-      <div className="space-y-2">
-        {VIOLATIONS.map((v, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${v.color}10` }}>
-                <AlertTriangle size={16} style={{ color: v.color }} />
+      {data.VIOLATIONS.length === 0 ? <EmptyState icon="🚨" label="No violations reported" /> : (
+        <div className="space-y-2">
+          {data.VIOLATIONS.map((v, i) => (
+            <Card key={i}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${v.color}10` }}>
+                  <AlertTriangle size={16} style={{ color: v.color }} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-bold" style={{ color: DARK }}>{v.id} — {v.target}</p>
+                  <p className="text-[10px]" style={{ color: GRAY }}>{v.type} • Severity: {v.severity} • {v.date}</p>
+                </div>
+                <StatusBadge status={v.status} color={v.color} />
               </div>
-              <div className="flex-1">
-                <p className="text-xs font-bold" style={{ color: DARK }}>{v.id} — {v.target}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{v.type} • Severity: {v.severity} • {v.date}</p>
-              </div>
-              <StatusBadge status={v.status} color={v.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
       <div className="flex flex-wrap gap-2">
         {["Review", "Investigate", "Issue Warning", "Suspend", "Close Case"].map((a, i) => (
           <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
@@ -487,12 +409,12 @@ function ViolationsSection() {
   );
 }
 
-function SecuritySection() {
+function SecuritySection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="🛡️ Security Monitoring" subtitle="Monitor security and access logs" />
       <div className="grid grid-cols-2 gap-2">
-        {SECURITY_DATA.map((s, i) => {
+        {data.SECURITY_DATA.length === 0 ? <EmptyState icon="🛡️" label="No security data" /> : data.SECURITY_DATA.map((s, i) => {
           const Icon = ICONS[s.icon] || ShieldCheck;
           return (
             <Card key={i}>
@@ -564,12 +486,12 @@ function CommunicationSection() {
   );
 }
 
-function AnalyticsSection() {
+function AnalyticsSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="📊 Analytics Center" subtitle="Business intelligence & growth analytics" />
       <div className="grid grid-cols-2 gap-2">
-        {ANALYTICS_DATA.map((a, i) => {
+        {data.ANALYTICS_DATA.length === 0 ? <EmptyState icon="📊" /> : data.ANALYTICS_DATA.map((a, i) => {
           const Icon = ICONS[a.icon] || BarChart3;
           return (
             <Card key={i}>
@@ -589,24 +511,26 @@ function AnalyticsSection() {
   );
 }
 
-function AuditSection() {
+function AuditSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="📋 Audit Log Center" subtitle="Track all operational activities" />
-      <div className="space-y-2">
-        {AUDIT_LOGS.map((l, i) => (
-          <Card key={i}>
-            <div className="flex items-start gap-3">
-              <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: l.color }} />
-              <div className="flex-1">
-                <p className="text-[11px] font-bold" style={{ color: DARK }}>{l.actor}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{l.action} — {l.target}</p>
+      {data.AUDIT_LOGS.length === 0 ? <EmptyState icon="📋" label="No audit logs yet" /> : (
+        <div className="space-y-2">
+          {data.AUDIT_LOGS.map((l, i) => (
+            <Card key={i}>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: l.color }} />
+                <div className="flex-1">
+                  <p className="text-[11px] font-bold" style={{ color: DARK }}>{l.actor}</p>
+                  <p className="text-[10px]" style={{ color: GRAY }}>{l.action} — {l.target}</p>
+                </div>
+                <span className="text-[9px]" style={{ color: GRAY }}>{l.time}</span>
               </div>
-              <span className="text-[9px]" style={{ color: GRAY }}>{l.time}</span>
-            </div>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -650,9 +574,22 @@ export default function SuperAdminDashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("overview");
   const [showSidebar, setShowSidebar] = useState(false);
+  const { stats, loading } = useAdminDashboard();
+  const data = mapSuperAdminData(stats) || { KPIS: [], REALTIME_COUNTERS: [], LIVE_STREAM: [], AGENCIES: [], AGENTS: [], HOSTS: [], ADMINS: [], APPLICATIONS: [], APPLICATION_LIST: [], PERFORMANCE_DATA: [], REVENUE_DATA: [], REVENUE_PERIODS: [], VIOLATIONS: [], SECURITY_DATA: [], AUDIT_LOGS: [], PK_BATTLES: [], ANALYTICS_DATA: [] };
 
   const ActiveComponent = SECTIONS[activeSection] || HomeSection;
   const activeSectionData = SUPERADMIN_SECTIONS.find(s => s.id === activeSection) || SUPERADMIN_SECTIONS[0];
+
+  const renderSection = () => {
+    if (activeSection === "policy") return <SuperAdminPolicyTab />;
+    if (activeSection === "overview") {
+      return <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} data={data} loading={loading} />;
+    }
+    if (activeSection === "events" || activeSection === "communication" || activeSection === "settings") {
+      return <ActiveComponent />;
+    }
+    return <ActiveComponent data={data} loading={loading} />;
+  };
 
   return (
     <div className="min-h-screen" style={{ background: SOFT_BG }}>
@@ -708,7 +645,7 @@ export default function SuperAdminDashboard() {
         </div>
 
         <div className="px-4 pt-3">
-          <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />
+          {renderSection()}
         </div>
       </div>
     </div>

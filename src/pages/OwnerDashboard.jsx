@@ -12,17 +12,14 @@ import {
   ArrowRightLeft, MapPin, Activity, Zap, Eye, Clock,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { useAdminDashboard } from "@/hooks/useAdminDashboard";
+import { mapOwnerData } from "@/lib/adminDashboardData";
 import OwnerGlobe from "@/components/owner-dashboard/OwnerGlobe";
 import GlobalSearch from "@/components/owner-dashboard/GlobalSearch";
 import BroadcastCenter from "@/components/owner-dashboard/BroadcastCenter";
 import {
-  OWNER_SECTIONS, LIVE_DATA_STREAM,
-  COUNTRIES, ROLES, APPLICATIONS, REVENUE_BREAKDOWN, REVENUE_PERIODS,
-  GIFT_STATS, COIN_STATS, RANKINGS, LIVE_STREAMS, AI_DETECTIONS,
-  SECURITY_DATA, SECURITY_ACTIONS, FINANCE_DATA, FINANCE_ACTIONS,
-  AUDIT_LOGS, AUTOMATION_RULES, BI_INSIGHTS, SETTINGS_GROUPS,
-  OWNER_POWERS, TIME_FILTERS,
+  OWNER_SECTIONS, SECURITY_ACTIONS, FINANCE_ACTIONS,
+  AUTOMATION_RULES, SETTINGS_GROUPS, OWNER_POWERS, TIME_FILTERS,
 } from "@/components/owner-dashboard/ownerData";
 import ReportToSection from "@/components/shared/ReportToSection";
 import UserDataSection from "@/components/owner-dashboard/UserDataSection";
@@ -78,22 +75,24 @@ function SectionHeader({ title, subtitle }) {
   );
 }
 
+function LoadingSpinner() {
+  return <div className="flex items-center justify-center py-20"><div className="w-6 h-6 border-3 border-blue-200 border-t-blue-500 rounded-full animate-spin" /></div>;
+}
+
+function EmptyState({ icon = "📊", label = "No data available" }) {
+  return <div className="text-center py-8"><span className="text-2xl">{icon}</span><p className="text-[10px] mt-1" style={{ color: GRAY }}>{label}</p></div>;
+}
+
 function formatStat(n) {
   if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
   if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
-  return String(n);
+  return String(Math.round(n));
 }
 
 function HomeSection() {
-  const { stats, loading } = usePlatformStats();
+  const { stats, loading } = useAdminDashboard();
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-3 border-blue-200 border-t-blue-500 rounded-full animate-spin" />
-      </div>
-    );
-  }
+  if (loading) return <LoadingSpinner />;
 
   const s = stats || {};
   const summaryKpis = [
@@ -113,7 +112,7 @@ function HomeSection() {
 
   const realtimeCounters = [
     { label: "Online Users", value: formatStat(s.onlineUsers || 0), icon: "Wifi", color: "#27AE60" },
-    { label: "Live Streams", value: formatStat(s.activeStreams || 0), icon: "Mic", color: "#EB5757" },
+    { label: "Live Hosts", value: formatStat(s.activeStreams || 0), icon: "Mic", color: "#EB5757" },
     { label: "Party Rooms", value: formatStat(s.totalPartyRooms || 0), icon: "PartyPopper", color: "#A78BFA" },
     { label: "Community Posts", value: formatStat(s.totalCommunityPosts || 0), icon: "FileText", color: "#2F80ED" },
     { label: "Support Tickets", value: formatStat(s.pendingTickets || 0), icon: "LifeBuoy", color: "#F2994A" },
@@ -156,34 +155,42 @@ function HomeSection() {
           })}
         </div>
       </div>
-      <LiveDataStream />
+      <LiveDataStream data={s.liveActivity || []} />
     </div>
   );
 }
 
-function LiveDataStream() {
+function LiveDataStream({ data }) {
   const statusColors = { success: "#27AE60", info: "#2F80ED", warning: "#F2994A", error: "#EB5757" };
   return (
     <div>
       <h4 className="text-xs font-bold mb-2 px-1" style={{ color: DARK }}>Live Data Stream</h4>
-      <Card className="space-y-2">
-        {LIVE_DATA_STREAM.map((item, i) => (
-          <div key={i} className="flex items-center gap-2 pb-2 border-b last:border-0 last:pb-0" style={{ borderColor: "#F0F0F0" }}>
-            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: statusColors[item.status] }} />
-            <p className="text-[10px] flex-1" style={{ color: DARK }}>{item.text}</p>
-            <span className="text-[8px]" style={{ color: GRAY }}>{item.time}</span>
+      <Card>
+        {data.length === 0 ? <EmptyState icon="📡" label="No live activity yet" /> : (
+          <div className="space-y-2">
+            {data.map((item, i) => (
+              <div key={i} className="flex items-center gap-2 pb-2 border-b last:border-0 last:pb-0" style={{ borderColor: "#F0F0F0" }}>
+                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: statusColors[item.status] || "#2F80ED" }} />
+                <p className="text-[10px] flex-1" style={{ color: DARK }}>{item.text}</p>
+                <span className="text-[8px]" style={{ color: GRAY }}>{item.time}</span>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </Card>
     </div>
   );
 }
 
 function CountriesSection() {
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.COUNTRIES || data.COUNTRIES.length === 0) return <EmptyState icon="🌍" label="No country data yet" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Global Country Control" subtitle="Complete country-level monitoring" />
-      {COUNTRIES.map((c, i) => (
+      {data.COUNTRIES.map((c, i) => (
         <Card key={i}>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold" style={{ background: "linear-gradient(135deg, #2F80ED, #56CCF2)", color: "#fff" }}>
@@ -191,9 +198,9 @@ function CountriesSection() {
             </div>
             <div className="flex-1">
               <h4 className="text-sm font-bold" style={{ color: DARK }}>{c.name}</h4>
-              <p className="text-[9px]" style={{ color: GRAY }}>Manager: {c.manager}</p>
+              <p className="text-[9px]" style={{ color: GRAY }}>Live data</p>
             </div>
-            <span className="text-[9px] font-bold" style={{ color: "#27AE60" }}>{c.growth}</span>
+            <span className="text-[9px] font-bold" style={{ color: "#27AE60" }}>live</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             <div className="text-center rounded-lg p-1.5" style={{ background: SOFT_BG }}>
@@ -216,11 +223,15 @@ function CountriesSection() {
 }
 
 function RolesSection() {
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.ROLES || data.ROLES.length === 0) return <EmptyState icon="👥" label="No role data" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Global Role Management" subtitle="Manage every role within the platform" />
       <div className="grid grid-cols-2 gap-2">
-        {ROLES.map((r, i) => (
+        {data.ROLES.map((r, i) => (
           <Card key={i}>
             <div className="flex items-center justify-between">
               <div>
@@ -240,10 +251,14 @@ function RolesSection() {
 
 function ApplicationsSection() {
   const { toast } = useToast();
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.APPLICATIONS || data.APPLICATIONS.length === 0) return <EmptyState icon="📋" label="No applications yet" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Global Applications Center" subtitle="All role applications and requests" />
-      {APPLICATIONS.map((a, i) => (
+      {data.APPLICATIONS.map((a, i) => (
         <Card key={i}>
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-xs font-bold" style={{ color: DARK }}>{a.type}</h4>
@@ -277,11 +292,15 @@ function ApplicationsSection() {
 }
 
 function RevenueSection() {
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data) return <EmptyState icon="💰" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Global Revenue Center" subtitle="Complete financial visibility" />
       <div className="grid grid-cols-3 gap-2">
-        {REVENUE_PERIODS.map((p, i) => (
+        {data.REVENUE_PERIODS.map((p, i) => (
           <Card key={i} className="text-center">
             <p className="text-[8px]" style={{ color: GRAY }}>{p.label}</p>
             <p className="text-sm font-bold" style={{ color: "#27AE60" }}>{p.value}</p>
@@ -290,7 +309,7 @@ function RevenueSection() {
       </div>
       <div>
         <h4 className="text-xs font-bold mb-2 px-1" style={{ color: DARK }}>Revenue Breakdown</h4>
-        {REVENUE_BREAKDOWN.map((r, i) => (
+        {data.REVENUE_BREAKDOWN.length === 0 ? <EmptyState icon="📊" label="No revenue breakdown" /> : data.REVENUE_BREAKDOWN.map((r, i) => (
           <Card key={i} className="mb-2">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] font-bold" style={{ color: DARK }}>{r.source}</span>
@@ -308,11 +327,15 @@ function RevenueSection() {
 }
 
 function GiftSection() {
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.GIFT_STATS || data.GIFT_STATS.length === 0) return <EmptyState icon="🎁" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Global Gift Center" subtitle="Gift system management and analytics" />
       <div className="grid grid-cols-2 gap-2">
-        {GIFT_STATS.map((g, i) => {
+        {data.GIFT_STATS.map((g, i) => {
           const Icon = ICONS[g.icon] || Gift;
           return (
             <Card key={i}>
@@ -330,11 +353,15 @@ function GiftSection() {
 }
 
 function CoinSection() {
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.COIN_STATS || data.COIN_STATS.length === 0) return <EmptyState icon="🪙" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Coin Economy Center" subtitle="Virtual currency management" />
       <div className="grid grid-cols-2 gap-2">
-        {COIN_STATS.map((c, i) => {
+        {data.COIN_STATS.map((c, i) => {
           const Icon = ICONS[c.icon] || Coins;
           return (
             <Card key={i}>
@@ -360,6 +387,10 @@ function CoinSection() {
 
 function RankingsSection() {
   const [filter, setFilter] = useState("Daily");
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.RANKINGS || data.RANKINGS.length === 0) return <EmptyState icon="🏆" label="No ranking data" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Global Rankings Center" subtitle="Top performers across the platform" />
@@ -370,7 +401,7 @@ function RankingsSection() {
           </button>
         ))}
       </div>
-      {RANKINGS.map((r, i) => {
+      {data.RANKINGS.map((r, i) => {
         const Icon = ICONS[r.icon] || Trophy;
         return (
           <Card key={i}>
@@ -381,12 +412,12 @@ function RankingsSection() {
               <h4 className="text-xs font-bold" style={{ color: DARK }}>{r.category}</h4>
             </div>
             <div className="space-y-1">
-              {r.top.map((name, idx) => (
+              {r.top && r.top.length > 0 ? r.top.map((name, idx) => (
                 <div key={idx} className="flex items-center gap-2 py-1">
                   <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold" style={{ background: idx === 0 ? "#D4AF37" : idx === 1 ? "#C0C0C0" : "#CD7F32", color: "#fff" }}>{idx + 1}</span>
                   <span className="text-[10px] font-bold" style={{ color: DARK }}>{name}</span>
                 </div>
-              ))}
+              )) : <p className="text-[10px]" style={{ color: GRAY }}>No data yet</p>}
             </div>
           </Card>
         );
@@ -397,10 +428,14 @@ function RankingsSection() {
 
 function LiveMonitoringSection() {
   const { toast } = useToast();
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.LIVE_STREAMS || data.LIVE_STREAMS.length === 0) return <EmptyState icon="📡" label="No active live streams" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Global Live Monitoring" subtitle="Monitor all live activities in real time" />
-      {LIVE_STREAMS.map((s, i) => (
+      {data.LIVE_STREAMS.map((s, i) => (
         <Card key={i}>
           <div className="flex items-center justify-between mb-2">
             <div>
@@ -444,11 +479,15 @@ function LiveMonitoringSection() {
 }
 
 function AIMonitoringSection() {
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.AI_DETECTIONS || data.AI_DETECTIONS.length === 0) return <EmptyState icon="🤖" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="AI Monitoring Center" subtitle="AI-powered platform monitoring" />
       <div className="grid grid-cols-2 gap-2">
-        {AI_DETECTIONS.map((d, i) => {
+        {data.AI_DETECTIONS.map((d, i) => {
           const Icon = ICONS[d.icon] || Bot;
           return (
             <Card key={i}>
@@ -477,11 +516,15 @@ function AIMonitoringSection() {
 
 function SecuritySection() {
   const { toast } = useToast();
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.SECURITY_DATA || data.SECURITY_DATA.length === 0) return <EmptyState icon="🔒" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Security Command Center" subtitle="Platform-wide security management" />
       <div className="grid grid-cols-2 gap-2">
-        {SECURITY_DATA.map((s, i) => {
+        {data.SECURITY_DATA.map((s, i) => {
           const Icon = ICONS[s.icon] || ShieldCheck;
           return (
             <Card key={i}>
@@ -513,10 +556,14 @@ function SecuritySection() {
 
 function FinanceSection() {
   const { toast } = useToast();
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.FINANCE_DATA || data.FINANCE_DATA.length === 0) return <EmptyState icon="💰" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Global Finance Center" subtitle="Manage all financial operations" />
-      {FINANCE_DATA.map((f, i) => (
+      {data.FINANCE_DATA.map((f, i) => (
         <Card key={i}>
           <div className="flex items-center justify-between">
             <div>
@@ -545,14 +592,18 @@ function FinanceSection() {
 }
 
 function AuditSection() {
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.AUDIT_LOGS || data.AUDIT_LOGS.length === 0) return <EmptyState icon="📋" label="No audit logs yet" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Global Audit Center" subtitle="Track every action across the platform" />
-      {AUDIT_LOGS.map((log, i) => (
+      {data.AUDIT_LOGS.map((log, i) => (
         <Card key={i}>
           <div className="flex items-center justify-between mb-1">
             <div>
-              <h4 className="text-xs font-bold" style={{ color: DARK }}>{log.user}</h4>
+              <h4 className="text-xs font-bold" style={{ color: DARK }}>{log.actor}</h4>
               <p className="text-[9px]" style={{ color: GRAY }}>{log.role} · {log.time}</p>
             </div>
             <span className="text-[8px] px-2 py-0.5 rounded-full font-bold" style={{ background: "#2F80ED10", color: "#2F80ED" }}>{log.role}</span>
@@ -601,10 +652,14 @@ function AutomationSection() {
 }
 
 function BISection() {
+  const { stats, loading } = useAdminDashboard();
+  if (loading) return <LoadingSpinner />;
+  const data = mapOwnerData(stats);
+  if (!data || !data.BI_INSIGHTS || data.BI_INSIGHTS.length === 0) return <EmptyState icon="📈" />;
   return (
     <div className="space-y-3">
       <SectionHeader title="Business Intelligence Center" subtitle="Executive insights and forecasting" />
-      {BI_INSIGHTS.map((b, i) => (
+      {data.BI_INSIGHTS.map((b, i) => (
         <Card key={i}>
           <div className="flex items-center justify-between">
             <div>
@@ -712,7 +767,6 @@ export default function OwnerDashboard() {
   return (
     <div className="min-h-screen" style={{ background: SOFT_BG }}>
       <div className="max-w-md mx-auto pb-8">
-        {/* Top Header Bar */}
         <div className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3" style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid #E5E7EB" }}>
           <button onClick={() => navigate("/creator-center")} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: SOFT_BG }}>
             <ArrowLeft size={18} style={{ color: DARK }} />
@@ -730,7 +784,6 @@ export default function OwnerDashboard() {
           </div>
         </div>
 
-        {/* Section Navigation */}
         <div className="sticky top-[57px] z-20 px-4 py-2.5" style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid #E5E7EB" }}>
           <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
             {OWNER_SECTIONS.map((s) => {
@@ -751,7 +804,6 @@ export default function OwnerDashboard() {
           </div>
         </div>
 
-        {/* Active Section Title */}
         <div className="px-4 pt-4">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${currentSection.color}10` }}>
@@ -761,12 +813,10 @@ export default function OwnerDashboard() {
           </div>
         </div>
 
-        {/* Report To Section */}
         <div className="px-4 pt-3">
           <ReportToSection roleKey="owner" theme="light" />
         </div>
 
-        {/* Section Content */}
         <div className="px-4 pt-3">
           <SectionContent sectionId={activeSection} />
         </div>
