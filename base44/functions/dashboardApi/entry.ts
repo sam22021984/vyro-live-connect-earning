@@ -9,9 +9,8 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { action, dashboard_type, params } = body;
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL').replace(/\/$/, '');
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const edgeUrl = `${supabaseUrl}/functions/v1/dashboard-api`;
+    const edgeUrl = 'https://zohtjywggezadhqwfzrh.supabase.co/functions/v1/dashboard-api';
 
     const response = await fetch(edgeUrl, {
       method: 'POST',
