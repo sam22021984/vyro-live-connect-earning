@@ -25,7 +25,11 @@ export default function Login() {
     supabaseAuth.handleGoogleCallback(code)
       .then(async () => {
         try {
-          const res = await base44.functions.invoke("userOnboarding", { action: "getProfile" });
+          let res = await base44.functions.invoke("userOnboarding", { action: "getProfile" });
+          // New Google user — profile doesn't exist yet, create it now
+          if (!res.data?.profile?.global_id) {
+            res = await base44.functions.invoke("userOnboarding", { action: "initProfile", country: "QAT" });
+          }
           if (res.data?.profile?.global_id) {
             setWelcomeData({ globalId: res.data.profile.global_id, username: res.data.profile.username, role: res.data.profile.role });
           } else {
