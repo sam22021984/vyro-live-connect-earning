@@ -25,12 +25,14 @@ export default function CreatorCenter() {
   const userRole = profile?.role || "user";
   const { visible: visibleDashboards, locked: lockedDashboards } = getCreatorCenterDashboards(dashboards, userRole);
 
-  // Move seller dashboard from locked to visible if user has an approved coins_seller application
+  // Seller dashboard: accessible to the App Owner OR users with an approved coins_seller application
+  const isAppOwner = profile?.is_app_owner === true || profile?.role === "owner";
   const isApprovedSeller = approvedApplications.includes("coins_seller");
-  const finalVisible = isApprovedSeller
+  const canAccessSeller = isAppOwner || isApprovedSeller;
+  const finalVisible = canAccessSeller
     ? [...visibleDashboards, ...lockedDashboards.filter((d) => d.id === "seller")]
     : visibleDashboards;
-  const finalLocked = isApprovedSeller
+  const finalLocked = canAccessSeller
     ? lockedDashboards.filter((d) => d.id !== "seller")
     : lockedDashboards;
 
