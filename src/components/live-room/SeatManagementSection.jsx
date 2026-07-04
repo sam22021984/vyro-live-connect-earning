@@ -2,12 +2,12 @@ import React from "react";
 import { Armchair, Check } from "lucide-react";
 import { COLORS, GRID_LAYOUTS } from "./roomData";
 
-export default function SeatManagementSection({ seatCount, onSeatCountChange }) {
+export default function SeatManagementSection({ seatCount, onSeatCountChange, readOnly = false }) {
   const seatOptions = [4, 6, 8, 10, 15, 20];
 
   return (
     <div>
-      <p className="text-[10px] font-bold mb-2 px-1" style={{ color: COLORS.gold }}>🪑 Seat Management</p>
+      <p className="text-[10px] font-bold mb-2 px-1" style={{ color: COLORS.gold }}>🪑 Seat Management {readOnly && <span style={{ color: COLORS.softGray }}>(Owner only)</span>}</p>
       <p className="text-[9px] mb-2 px-1" style={{ color: COLORS.softGray }}>
         Choose how many seats your room has. Current: {seatCount} seats (1 host + {seatCount - 1} speakers).
       </p>
@@ -19,7 +19,8 @@ export default function SeatManagementSection({ seatCount, onSeatCountChange }) 
             <button
               key={count}
               onClick={() => onSeatCountChange(count)}
-              className="flex flex-col items-center gap-1 py-2.5 rounded-xl transition active:scale-95 relative"
+              disabled={readOnly}
+              className={`flex flex-col items-center gap-1 py-2.5 rounded-xl transition relative ${readOnly ? "opacity-50" : "active:scale-95"}`}
               style={isActive
                 ? { background: `${COLORS.gold}20`, border: `1px solid ${COLORS.gold}50`, boxShadow: `0 0 10px ${COLORS.gold}30` }
                 : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}

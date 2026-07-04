@@ -4,8 +4,13 @@ import { COLORS, FUNCTION_ITEMS, ENTERTAINMENT_ITEMS } from "./roomData";
 import SeatManagementSection from "./SeatManagementSection";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function SettingsPanel({ onClose, onArchive, onBackup, onScheduler, giftStats, roomScore, aiStats, seatCount, onSeatCountChange }) {
+export default function SettingsPanel({ onClose, onArchive, onBackup, onScheduler, giftStats, roomScore, aiStats, seatCount, onSeatCountChange, userRole = "viewer" }) {
   const { toast } = useToast();
+  const isOwner = userRole === "owner";
+  const isAdmin = userRole === "owner" || userRole === "admin";
+  const isViewer = !isAdmin;
+
+  const restrictedToast = () => toast({ title: "⛔ Only the room owner can change this setting", variant: "destructive" });
 
   const isFailed = (res) => res?.success === false || (!!res?.error && !res?.success);
 
@@ -43,7 +48,15 @@ export default function SettingsPanel({ onClose, onArchive, onBackup, onSchedule
         <div className="sticky top-0 z-10 pt-3 pb-2" style={{ background: COLORS.tealDeep }}>
           <div className="w-10 h-1 rounded-full mx-auto mb-2" style={{ background: `${COLORS.gold}40` }} />
           <div className="flex items-center justify-between px-4">
-            <h2 className="text-sm font-bold text-white">Room Settings</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-bold text-white">Room Settings</h2>
+              <span className="text-[8px] px-2 py-0.5 rounded-full font-bold" style={{
+                background: isOwner ? `${COLORS.gold}20` : isAdmin ? "rgba(59,130,246,0.2)" : "rgba(255,255,255,0.08)",
+                color: isOwner ? COLORS.gold : isAdmin ? "#60A5FA" : COLORS.softGray,
+              }}>
+                {isOwner ? "👑 OWNER" : isAdmin ? "🛡️ ADMIN" : "👁️ VIEWER"}
+              </span>
+            </div>
             <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
               <X size={16} style={{ color: COLORS.softGray }} />
             </button>
@@ -51,18 +64,19 @@ export default function SettingsPanel({ onClose, onArchive, onBackup, onSchedule
         </div>
 
         <div className="px-4 pb-6 space-y-4">
-          {/* Seat Management */}
-          <SeatManagementSection seatCount={seatCount || 10} onSeatCountChange={onSeatCountChange || (() => {})} />
+          {/* Seat Management — owner only can change */}
+          <SeatManagementSection seatCount={seatCount || 10} onSeatCountChange={isOwner ? (onSeatCountChange || (() => {})) : () => toast({ title: "⛔ Only the room owner can change seats", variant: "destructive" })} readOnly={!isOwner} />
 
-          {/* Entertainment quick actions */}
+          {/* Entertainment quick actions — admin+ only */}
           <div>
-            <p className="text-[10px] font-bold mb-2" style={{ color: COLORS.gold }}>🎉 Entertainment</p>
+            <p className="text-[10px] font-bold mb-2" style={{ color: COLORS.gold }}>🎉 Entertainment {!isAdmin && <span style={{ color: COLORS.softGray }}>(Admin only)</span>}</p>
             <div className="grid grid-cols-3 gap-2">
               {ENTERTAINMENT_ITEMS.map((item, i) => (
                 <button
                   key={i}
-                  onClick={() => toast({ title: item.label + " activated" })}
-                  className="flex flex-col items-center gap-1 py-2.5 rounded-xl transition active:scale-95"
+                  onClick={() => isAdmin ? toast({ title: item.label + " activated" }) : restrictedToast()}
+                  disabled={!isAdmin}
+                  className={`flex flex-col items-center gap-1 py-2.5 rounded-xl transition ${isAdmin ? "active:scale-95" : "opacity-40"}`}
                   style={{ background: item.gradient, boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
                 >
                   <span className="text-xl">{item.icon}</span>
@@ -72,15 +86,16 @@ export default function SettingsPanel({ onClose, onArchive, onBackup, onSchedule
             </div>
           </div>
 
-          {/* Function grid (5x3) */}
+          {/* Function grid (5x3) — admin+ only */}
           <div>
-            <p className="text-[10px] font-bold mb-2" style={{ color: COLORS.gold }}>⚙️ Room Functions</p>
+            <p className="text-[10px] font-bold mb-2" style={{ color: COLORS.gold }}>⚙️ Room Functions {!isAdmin && <span style={{ color: COLORS.softGray }}>(Admin only)</span>}</p>
             <div className="grid grid-cols-5 gap-2">
               {FUNCTION_ITEMS.map((item, i) => (
                 <button
                   key={i}
-                  onClick={() => toast({ title: item.label })}
-                  className="flex flex-col items-center gap-1 p-1.5 rounded-xl transition active:scale-90"
+                  onClick={() => isAdmin ? toast({ title: item.label }) : restrictedToast()}
+                  disabled={!isAdmin}
+                  className={`flex flex-col items-center gap-1 p-1.5 rounded-xl transition ${isAdmin ? "active:scale-90" : "opacity-40"}`}
                   style={{
                     background: "rgba(14, 69, 72, 0.5)",
                     border: `1px solid ${COLORS.gold}30`,
@@ -143,29 +158,32 @@ export default function SettingsPanel({ onClose, onArchive, onBackup, onSchedule
             )}
           </div>
 
-          {/* Room management: scheduler + backup + archive */}
+          {/* Room management: scheduler + backup + archive — owner only */}
           <div>
-            <p className="text-[10px] font-bold mb-2" style={{ color: COLORS.gold }}>🗄️ Room Management</p>
+            <p className="text-[10px] font-bold mb-2" style={{ color: COLORS.gold }}>🗄️ Room Management {!isOwner && <span style={{ color: COLORS.softGray }}>(Owner only)</span>}</p>
             <div className="grid grid-cols-3 gap-2">
               <button
-                onClick={handleScheduler}
-                className="flex flex-col items-center justify-center gap-1 py-3 rounded-xl transition active:scale-95"
+                onClick={isOwner ? handleScheduler : restrictedToast}
+                disabled={!isOwner}
+                className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl transition ${isOwner ? "active:scale-95" : "opacity-40"}`}
                 style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.3)" }}
               >
                 <span className="text-base">⏰</span>
                 <span className="text-[9px] font-bold" style={{ color: "#3B82F6" }}>Scheduler</span>
               </button>
               <button
-                onClick={handleBackup}
-                className="flex flex-col items-center justify-center gap-1 py-3 rounded-xl transition active:scale-95"
+                onClick={isOwner ? handleBackup : restrictedToast}
+                disabled={!isOwner}
+                className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl transition ${isOwner ? "active:scale-95" : "opacity-40"}`}
                 style={{ background: `${COLORS.gold}15`, border: `1px solid ${COLORS.gold}40` }}
               >
                 <span className="text-base">💾</span>
                 <span className="text-[9px] font-bold" style={{ color: COLORS.gold }}>Backup</span>
               </button>
               <button
-                onClick={handleArchive}
-                className="flex flex-col items-center justify-center gap-1 py-3 rounded-xl transition active:scale-95"
+                onClick={isOwner ? handleArchive : restrictedToast}
+                disabled={!isOwner}
+                className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl transition ${isOwner ? "active:scale-95" : "opacity-40"}`}
                 style={{ background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.3)" }}
               >
                 <span className="text-base">📦</span>

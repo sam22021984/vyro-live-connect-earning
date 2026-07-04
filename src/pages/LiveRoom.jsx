@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useLiveRoomApi } from "@/hooks/useLiveRoomApi";
 import { useLiveRoomData } from "@/hooks/useLiveRoomData";
+import { useAuth } from "@/lib/AuthContext";
 import { ArrowLeft, Settings, X, Power, Trophy, Users, Send } from "lucide-react";
 import SeatArea from "@/components/live-room/SeatArea";
 import SettingsPanel from "@/components/live-room/SettingsPanel";
@@ -19,6 +20,7 @@ import { useToast } from "@/components/ui/use-toast";
 export default function LiveRoom() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
   const { id: urlRoomId } = useParams();
   const [sessionId] = useState(() => urlRoomId || (crypto?.randomUUID?.() || `room-${Date.now()}-${Math.random().toString(36).slice(2)}`));
   const roomId = sessionId;
@@ -61,8 +63,29 @@ export default function LiveRoom() {
 
   const theme = ROOM_THEMES[themeIndex];
   const currentUserSeatId = 0;
-  const userRole = "owner";
   const hostUser = SEATS[0].user;
+
+  // Determine the current user's role in this room
+  const [userRole, setUserRole] = useState("viewer");
+  useEffect(() => {
+    if (!liveRoom || !currentUser?.id) return;
+    // Owner = room creator
+    if (liveRoom.created_by_id === currentUser.id) {
+      setUserRole("owner");
+      return;
+    }
+    // Check RoomParticipant for admin/co_host role
+    base44.entities.RoomParticipant.filter({ room_id: roomId, user_id: currentUser.id })
+      .then((participants) => {
+        const p = participants?.[0];
+        if (p && (p.role === "admin" || p.role === "co_host" || p.role === "moderator")) {
+          setUserRole("admin");
+        } else {
+          setUserRole("viewer");
+        }
+      })
+      .catch(() => setUserRole("viewer"));
+  }, [liveRoom?.id, liveRoom?.created_by_id, currentUser?.id, roomId]);
 
   const profileSeat = SEATS.find((s) => s.id === profileSeatId);
 
@@ -330,7 +353,7 @@ export default function LiveRoom() {
       {activeProfileSeat && (
         <SeatProfilePopup
           seat={activeProfileSeat}
-          userRole={userRole}
+          userRole={userRole === "owner" ? "owner" : userRole === "admin" ? "admin" : "audience"}
           onClose={() => { setProfileSeatId(null); setTempProfileUser(null); }}
           onSendGift={(seatId) => { setProfileSeatId(null); setTempProfileUser(null); setPanelTargetId(seatId); setPanelType("gift"); }}
           onSendEmoji={(seatId, emoji) => handleQuickEmoji(seatId, emoji)}
@@ -361,7 +384,7 @@ export default function LiveRoom() {
       )}
 
       {/* Settings */}
-      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} onScheduler={runScheduler} giftStats={giftStats} roomScore={roomScore} aiStats={aiStats} seatCount={seatCount} onSeatCountChange={setSeatCount} />}
+      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} onScheduler={runScheduler} giftStats={giftStats} roomScore={roomScore} aiStats={aiStats} seatCount={seatCount} onSeatCountChange={setSeatCount} userRole={userRole} />}
 
       <style>{`
         @keyframes pulse {
