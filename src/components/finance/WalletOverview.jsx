@@ -1,5 +1,6 @@
 import React from "react";
-import { FINANCE_COLORS, WALLET_SUMMARY, WITHDRAWALS } from "./financeData";
+import { Loader2 } from "lucide-react";
+import { FINANCE_COLORS } from "./financeData";
 
 const COLOR_MAP = {
   emerald: { bg: `${FINANCE_COLORS.emerald}10`, text: FINANCE_COLORS.emerald },
@@ -10,12 +11,15 @@ const COLOR_MAP = {
   info: { bg: `${FINANCE_COLORS.info}10`, text: FINANCE_COLORS.info },
 };
 
-export default function WalletOverview() {
+export default function WalletOverview({ walletSummary, withdrawals, loading }) {
+  const summary = walletSummary || [];
+  const wdList = withdrawals || [];
+
   return (
     <div className="space-y-4">
       {/* Wallet summary cards */}
       <div className="grid grid-cols-2 gap-3">
-        {WALLET_SUMMARY.map((item, i) => {
+        {summary.map((item, i) => {
           const c = COLOR_MAP[item.color] || COLOR_MAP.emerald;
           return (
             <div
@@ -56,28 +60,39 @@ export default function WalletOverview() {
         <div className="px-4 py-3" style={{ borderBottom: `1px solid ${FINANCE_COLORS.border}` }}>
           <h3 className="text-sm font-bold" style={{ color: FINANCE_COLORS.textPrimary }}>Withdrawal History</h3>
         </div>
-        <div className="divide-y" style={{ borderColor: FINANCE_COLORS.border }}>
-          {WITHDRAWALS.map((wd) => {
-            const status = wd.status;
-            const statusColor = status === "completed" ? FINANCE_COLORS.success : status === "pending" ? FINANCE_COLORS.warning : status === "processing" ? FINANCE_COLORS.info : FINANCE_COLORS.error;
-            return (
-              <div key={wd.id} className="px-4 py-3" style={{ background: "rgba(245,247,250,0.5)" }}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold" style={{ color: FINANCE_COLORS.textPrimary }}>{wd.id}</span>
-                  <span className="text-xs font-bold" style={{ color: FINANCE_COLORS.textPrimary }}>${wd.amount.toLocaleString()}</span>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin" style={{ color: FINANCE_COLORS.royalBlue }} />
+          </div>
+        ) : wdList.length === 0 ? (
+          <div className="text-center py-8">
+            <span className="text-2xl">🏦</span>
+            <p className="text-[10px] mt-2" style={{ color: FINANCE_COLORS.textSecondary }}>No withdrawals yet</p>
+          </div>
+        ) : (
+          <div className="divide-y" style={{ borderColor: FINANCE_COLORS.border }}>
+            {wdList.map((wd) => {
+              const status = wd.status;
+              const statusColor = status === "completed" ? FINANCE_COLORS.success : status === "pending" ? FINANCE_COLORS.warning : status === "processing" ? FINANCE_COLORS.info : FINANCE_COLORS.error;
+              return (
+                <div key={wd.id} className="px-4 py-3" style={{ background: "rgba(245,247,250,0.5)" }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-bold" style={{ color: FINANCE_COLORS.textPrimary }}>{wd.id}</span>
+                    <span className="text-xs font-bold" style={{ color: FINANCE_COLORS.textPrimary }}>${wd.amount.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px]" style={{ color: FINANCE_COLORS.textSecondary }}>
+                      {wd.user} · {wd.method} · {wd.account}
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded-full text-[8px] font-bold" style={{ background: `${statusColor}15`, color: statusColor }}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[9px]" style={{ color: FINANCE_COLORS.textSecondary }}>
-                    {wd.user} · {wd.method} · {wd.account}
-                  </span>
-                  <span className="px-1.5 py-0.5 rounded-full text-[8px] font-bold" style={{ background: `${statusColor}15`, color: statusColor }}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

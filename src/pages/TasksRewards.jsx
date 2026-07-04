@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { COLORS } from "@/components/tasks-rewards/tasksData";
 import TaskCenterTab from "@/components/tasks-rewards/TaskCenterTab";
 import RewardCenterTab from "@/components/tasks-rewards/RewardCenterTab";
@@ -20,7 +22,24 @@ const tabs = [
 export default function TasksRewards() {
   const navigate = useNavigate();
   const handleBack = useBackNav("/more-services");
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("task-center");
+  const [coins, setCoins] = useState(0);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const loadProfile = async () => {
+      try {
+        let p = await base44.entities.UserProfile.filter({ user_id: user.id });
+        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+        if (p.length > 0) setCoins(p[0].coins || 0);
+      } catch (e) {}
+    };
+    loadProfile();
+    let unsub;
+    try { unsub = base44.entities.UserProfile?.subscribe?.(() => loadProfile()); } catch (e) {}
+    return () => { try { unsub?.(); } catch (e) {} };
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen" style={{ background: COLORS.white }}>
@@ -36,7 +55,7 @@ export default function TasksRewards() {
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: `${COLORS.gold}15` }}>
             <span className="text-sm">🪙</span>
-            <span className="text-xs font-bold" style={{ color: COLORS.gold }}>12,450</span>
+            <span className="text-xs font-bold" style={{ color: COLORS.gold }}>{coins.toLocaleString()}</span>
           </div>
         </div>
 

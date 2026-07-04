@@ -1,6 +1,6 @@
 import React from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { FINANCE_COLORS, STATS_CARDS } from "./financeData";
+import { FINANCE_COLORS } from "./financeData";
 
 const COLOR_MAP = {
   emerald: { bg: `${FINANCE_COLORS.emerald}10`, border: `${FINANCE_COLORS.emerald}30`, text: FINANCE_COLORS.emerald },
@@ -9,10 +9,13 @@ const COLOR_MAP = {
   error: { bg: `${FINANCE_COLORS.error}10`, border: `${FINANCE_COLORS.error}30`, text: FINANCE_COLORS.error },
 };
 
-export default function StatsCards() {
+export default function StatsCards({ stats }) {
+  const cards = stats || [];
+  if (cards.length === 0) return null;
+
   return (
     <div className="grid grid-cols-2 gap-3">
-      {STATS_CARDS.map((stat) => {
+      {cards.map((stat) => {
         const c = COLOR_MAP[stat.color] || COLOR_MAP.emerald;
         return (
           <div

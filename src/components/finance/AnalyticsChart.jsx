@@ -1,8 +1,9 @@
 import React from "react";
-import { FINANCE_COLORS, REVENUE_DATA } from "./financeData";
+import { FINANCE_COLORS } from "./financeData";
 
-export default function AnalyticsChart() {
-  const maxVal = Math.max(...REVENUE_DATA.map((d) => d.revenue));
+export default function AnalyticsChart({ revenueData }) {
+  const data = revenueData || [];
+  const maxVal = Math.max(...data.map((d) => d.revenue), 1);
 
   return (
     <div
@@ -32,7 +33,7 @@ export default function AnalyticsChart() {
 
       {/* Chart */}
       <div className="flex items-end justify-between gap-1 h-32">
-        {REVENUE_DATA.map((d, i) => (
+        {data.map((d, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-1">
             <div className="w-full flex items-end justify-center gap-0.5 h-24">
               <div

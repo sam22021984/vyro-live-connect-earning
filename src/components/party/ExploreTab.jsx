@@ -1,11 +1,13 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
-import { COLORS, CATEGORIES, EXPLORE_COUNTRIES } from "./partyData";
+import { COLORS } from "./partyData";
+import { usePartySocial } from "@/hooks/usePartySocial";
 import PartyRoomCard from "./PartyRoomCard";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function ExploreTab({ rooms = [], loading, onSelect }) {
   const { toast } = useToast();
+  const { exploreCountries, categories } = usePartySocial();
 
   return (
     <div className="space-y-4">
@@ -13,38 +15,46 @@ export default function ExploreTab({ rooms = [], loading, onSelect }) {
 
       <div>
         <p className="text-[10px] font-bold mb-2 px-1" style={{ color: COLORS.textSecondary }}>🌍 By Country</p>
-        <div className="grid grid-cols-4 gap-2">
-          {EXPLORE_COUNTRIES.map((c, i) => (
-            <button
-              key={i}
-              onClick={() => toast({ title: `Exploring ${c.name}...` })}
-              className="rounded-xl p-2 flex flex-col items-center transition active:scale-95"
-              style={{ background: "rgba(255,255,255,0.7)", border: `1px solid ${COLORS.border}` }}
-            >
-              <span className="text-lg">{c.flag}</span>
-              <span className="text-[8px] font-bold mt-0.5" style={{ color: COLORS.textPrimary }}>{c.name}</span>
-              <span className="text-[7px]" style={{ color: COLORS.textSecondary }}>{c.rooms} rooms</span>
-            </button>
-          ))}
-        </div>
+        {exploreCountries.length === 0 ? (
+          <p className="text-[10px] text-center py-2" style={{ color: COLORS.textSecondary }}>No country data yet</p>
+        ) : (
+          <div className="grid grid-cols-4 gap-2">
+            {exploreCountries.map((c, i) => (
+              <button
+                key={i}
+                onClick={() => toast({ title: `Exploring ${c.name}...` })}
+                className="rounded-xl p-2 flex flex-col items-center transition active:scale-95"
+                style={{ background: "rgba(255,255,255,0.7)", border: `1px solid ${COLORS.border}` }}
+              >
+                <span className="text-lg">{c.flag}</span>
+                <span className="text-[8px] font-bold mt-0.5" style={{ color: COLORS.textPrimary }}>{c.name}</span>
+                <span className="text-[7px]" style={{ color: COLORS.textSecondary }}>{c.rooms} rooms</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>
         <p className="text-[10px] font-bold mb-2 px-1" style={{ color: COLORS.textSecondary }}>📂 Party Categories</p>
-        <div className="grid grid-cols-4 gap-2">
-          {CATEGORIES.map((c, i) => (
-            <button
-              key={i}
-              onClick={() => toast({ title: `Browsing ${c.name}...` })}
-              className="rounded-xl p-2 flex flex-col items-center transition active:scale-95"
-              style={{ background: `${c.color}10`, border: `1px solid ${c.color}25` }}
-            >
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-base" style={{ background: `${c.color}20` }}>{c.icon}</div>
-              <span className="text-[8px] font-bold mt-1" style={{ color: COLORS.textPrimary }}>{c.name}</span>
-              <span className="text-[7px]" style={{ color: COLORS.textSecondary }}>{c.count}</span>
-            </button>
-          ))}
-        </div>
+        {categories.length === 0 ? (
+          <p className="text-[10px] text-center py-2" style={{ color: COLORS.textSecondary }}>No categories yet</p>
+        ) : (
+          <div className="grid grid-cols-4 gap-2">
+            {categories.map((c, i) => (
+              <button
+                key={i}
+                onClick={() => toast({ title: `Browsing ${c.name}...` })}
+                className="rounded-xl p-2 flex flex-col items-center transition active:scale-95"
+                style={{ background: `${COLORS.royalBlue}10`, border: `1px solid ${COLORS.royalBlue}25` }}
+              >
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-base" style={{ background: `${COLORS.royalBlue}20` }}>{c.icon}</div>
+                <span className="text-[8px] font-bold mt-1" style={{ color: COLORS.textPrimary }}>{c.name}</span>
+                <span className="text-[7px]" style={{ color: COLORS.textSecondary }}>{c.count}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>

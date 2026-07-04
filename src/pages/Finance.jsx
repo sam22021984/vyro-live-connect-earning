@@ -8,10 +8,12 @@ import TransactionsList from "@/components/finance/TransactionsList";
 import WalletOverview from "@/components/finance/WalletOverview";
 import ReportsView from "@/components/finance/ReportsView";
 import { FINANCE_COLORS, FINANCE_TABS } from "@/components/finance/financeData";
+import { useFinanceData } from "@/hooks/useFinanceData";
 
 export default function Finance() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const { statsCards, revenueData, recentTransactions, walletSummary, withdrawals, reportCategories, financeNotifications, heroStats, loading } = useFinanceData();
 
   return (
     <div className="min-h-screen" style={{ background: FINANCE_COLORS.bg }}>
@@ -76,7 +78,7 @@ export default function Finance() {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <p className="text-[10px] text-white/60">Total Financial Overview</p>
-                  <h2 className="text-xl font-bold">$4,496,440</h2>
+                  <h2 className="text-xl font-bold">{heroStats.totalOverview}</h2>
                 </div>
                 <div
                   className="px-3 py-1.5 rounded-full"
@@ -88,15 +90,15 @@ export default function Finance() {
               <div className="flex items-center gap-4">
                 <div className="flex-1">
                   <p className="text-[8px] text-white/50">Monthly Growth</p>
-                  <p className="text-sm font-bold" style={{ color: FINANCE_COLORS.emerald }}>+18.3% ↑</p>
+                  <p className="text-sm font-bold" style={{ color: FINANCE_COLORS.emerald }}>{heroStats.monthlyGrowth > 0 ? "+" : ""}{heroStats.monthlyGrowth}% ↑</p>
                 </div>
                 <div className="flex-1">
                   <p className="text-[8px] text-white/50">Active Accounts</p>
-                  <p className="text-sm font-bold">12,450</p>
+                  <p className="text-sm font-bold">{heroStats.activeAccounts.toLocaleString()}</p>
                 </div>
                 <div className="flex-1">
                   <p className="text-[8px] text-white/50">Pending</p>
-                  <p className="text-sm font-bold" style={{ color: FINANCE_COLORS.warning }}>23</p>
+                  <p className="text-sm font-bold" style={{ color: FINANCE_COLORS.warning }}>{heroStats.pendingCount}</p>
                 </div>
               </div>
             </div>
@@ -149,28 +151,28 @@ export default function Finance() {
               </div>
             </button>
 
-            <StatsCards />
-            <AnalyticsChart />
-            <TransactionsList />
+            <StatsCards stats={statsCards} />
+            <AnalyticsChart revenueData={revenueData} />
+            <TransactionsList transactions={recentTransactions} loading={loading} />
           </>
         )}
 
         {/* Transactions tab */}
         {activeTab === "transactions" && (
           <>
-            <StatsCards />
-            <TransactionsList />
+            <StatsCards stats={statsCards} />
+            <TransactionsList transactions={recentTransactions} loading={loading} />
           </>
         )}
 
         {/* Wallet tab */}
-        {activeTab === "wallet" && <WalletOverview />}
+        {activeTab === "wallet" && <WalletOverview walletSummary={walletSummary} withdrawals={withdrawals} loading={loading} />}
 
         {/* Withdrawals tab */}
-        {activeTab === "withdrawals" && <WalletOverview />}
+        {activeTab === "withdrawals" && <WalletOverview walletSummary={walletSummary} withdrawals={withdrawals} loading={loading} />}
 
         {/* Reports tab */}
-        {activeTab === "reports" && <ReportsView />}
+        {activeTab === "reports" && <ReportsView reportCategories={reportCategories} notifications={financeNotifications} />}
       </div>
     </div>
   );
