@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Building2, User, Radio, ChevronRight, Shield, Sparkles, Lock, Store } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { callDashboardAPI } from "@/lib/dashboardApi";
 import { useAuth } from "@/lib/AuthContext";
 import { getControlCenterDashboards } from "@/lib/roleUtils";
 
@@ -23,10 +23,8 @@ export default function ControlCenter() {
     if (!user?.id) { setLoading(false); return; }
     (async () => {
       try {
-        const res = await base44.functions.invoke("dashboardData", {
-          action: "getProfile",
-        });
-        if (res.data?.profile) setProfile(res.data.profile);
+        const profile = await callDashboardAPI("dashboard_get", { type: "profile" });
+        if (profile) setProfile(profile);
       } catch (e) {
         // profile may not exist yet
       }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { callDashboardAPI } from "@/lib/dashboardApi";
 
 /**
  * Loads dashboard data (info, stats, modules) for the current user from the
@@ -20,26 +20,23 @@ export function useDashboardData(dashboardType, defaults) {
     let cancelled = false;
     const load = async () => {
       try {
-        const res = await base44.functions.invoke("dashboardData", {
-          action: "load",
+        const stored = await callDashboardAPI("dashboard_get", {
           dashboard_type: dashboardType,
         });
-        const stored = res.data?.data;
         if (cancelled) return;
-        if (res.data?.exists && stored) {
+        if (stored && Object.keys(stored).length > 0) {
           setInfo(stored.info || defaults.info || {});
           setStats(stored.stats || defaults.stats || []);
           setModules(stored.modules || defaults.modules || []);
           setQuickActions(stored.quickActions || defaults.quickActions || []);
         } else {
           // first access — persist the defaults to the database
-          const saveRes = await base44.functions.invoke("dashboardData", {
-            action: "save",
+          const seeded = await callDashboardAPI("dashboard_event", {
+            event: "save",
             dashboard_type: dashboardType,
             data: defaults,
           });
           if (cancelled) return;
-          const seeded = saveRes.data?.data;
           setInfo(seeded?.info || defaults.info || {});
           setStats(seeded?.stats || defaults.stats || []);
           setModules(seeded?.modules || defaults.modules || []);

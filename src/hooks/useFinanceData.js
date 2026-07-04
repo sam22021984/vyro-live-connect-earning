@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { callDashboardAPI } from "@/lib/dashboardApi";
 import { useAuth } from "@/lib/AuthContext";
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -22,24 +23,11 @@ export function useFinanceData() {
     try {
       setLoading(true);
 
-      // Fetch transactions (RLS scopes: user sees own, admin sees all)
-      const txns = await base44.entities.Transaction.list("-created_date", 200);
-      setTransactions(txns || []);
-
-      // Fetch user profile for wallet balance
-      try {
-        let p = await base44.entities.UserProfile.filter({ user_id: user.id });
-        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: user.id });
-        if (p.length > 0) setProfile(p[0]);
-      } catch (e) {}
-
-      // Fetch finance-related notifications
-      try {
-        const notifs = await base44.entities.Notification.filter({ user_id: user.id, type: "wallet" });
-        setNotifications(notifs || []);
-      } catch (e) {
-        setNotifications([]);
-      }
+      // All wallet/finance data fetched through the dashboard-api proxy
+      const data = await callDashboardAPI("wallet_get", { user_id: user.id });
+      setTransactions(data?.transactions || []);
+      setProfile(data?.profile || null);
+      setNotifications(data?.notifications || []);
     } catch (err) {
       console.error("Failed to fetch finance data:", err);
     } finally {
@@ -49,17 +37,6 @@ export function useFinanceData() {
 
   useEffect(() => {
     fetchData();
-
-    let unsubTxn, unsubNotif, unsubProfile;
-    try { unsubTxn = base44.entities.Transaction.subscribe(() => fetchData()); } catch (e) {}
-    try { unsubNotif = base44.entities.Notification.subscribe(() => fetchData()); } catch (e) {}
-    try { unsubProfile = base44.entities.UserProfile.subscribe(() => fetchData()); } catch (e) {}
-
-    return () => {
-      try { unsubTxn?.(); } catch (e) {}
-      try { unsubNotif?.(); } catch (e) {}
-      try { unsubProfile?.(); } catch (e) {}
-    };
   }, [fetchData]);
 
   // Compute stats from transactions

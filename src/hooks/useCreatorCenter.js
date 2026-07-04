@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { callDashboardAPI } from "@/lib/dashboardApi";
 import { useAuth } from "@/lib/AuthContext";
 
 export function useCreatorCenter() {
@@ -15,9 +16,8 @@ export function useCreatorCenter() {
       const me = authUser;
       if (!me?.id) return null;
       setUser(me);
-      // Use backend function to resolve profile — it correctly maps JWT sub to user_id
-      const res = await base44.functions.invoke("dashboardData", { action: "getProfile" });
-      const profile = res.data?.profile;
+      // Route through dashboard-api proxy — server injects user context
+      const profile = await callDashboardAPI("dashboard_get", { type: "profile" });
       if (profile) {
         setProfile(profile);
         return profile;
@@ -31,51 +31,7 @@ export function useCreatorCenter() {
 
   const loadStats = useCallback(async () => {
     try {
-      const [
-        users,
-        partyRooms,
-        liveRooms,
-        transactions,
-        gifts,
-        posts,
-        groups,
-        channels,
-      ] = await Promise.all([
-        base44.entities.UserProfile.list("-created_date", 500),
-        base44.entities.PartyRoom.list("-created_date", 500),
-        base44.entities.PartyRoom.filter({ status: "live" }, "-created_date", 200),
-        base44.entities.Transaction.filter({ status: "completed" }, "-created_date", 500),
-        base44.entities.Gift.list("-created_date", 200),
-        base44.entities.CommunityPost.list("-created_date", 200),
-        base44.entities.CommunityGroup.list("-created_date", 200),
-        base44.entities.CommunityChannel.list("-created_date", 200),
-      ]);
-
-      const totalRevenue = transactions.reduce((sum, t) => sum + (t.amount_usd || 0), 0);
-      const totalCoins = transactions.reduce((sum, t) => sum + (t.coins || 0), 0);
-      const totalViewers = partyRooms.reduce((sum, r) => sum + (r.viewers || 0), 0);
-      const totalMembers = partyRooms.reduce((sum, r) => sum + (r.members || 0), 0);
-      const vipUsers = users.filter((u) => u.is_vip).length;
-      const verifiedUsers = users.filter((u) => u.verification_status === "verified").length;
-      const hosts = users.filter((u) => u.is_host).length;
-
-      return {
-        totalUsers: users.length,
-        totalRooms: partyRooms.length,
-        liveRooms: liveRooms.length,
-        totalViewers,
-        totalMembers,
-        totalRevenue,
-        totalCoins,
-        totalTransactions: transactions.length,
-        totalGifts: gifts.length,
-        totalPosts: posts.length,
-        totalGroups: groups.length,
-        totalChannels: channels.length,
-        vipUsers,
-        verifiedUsers,
-        hosts,
-      };
+      return await callDashboardAPI("dashboard_get", { type: "platform_stats" });
     } catch (e) {
       console.error("Failed to load stats:", e);
       return null;
@@ -84,10 +40,13 @@ export function useCreatorCenter() {
 
   const loadApprovedApplications = useCallback(async (userId) => {
     try {
-      const apps = await base44.entities.RoleApplication.filter({ user_id: userId });
-      const approved = apps.filter((a) => a.status === "approved");
-      setApprovedApplications(approved.map((a) => a.application_type));
-      return approved;
+      const approved = await callDashboardAPI("dashboard_get", {
+        type: "approved_applications",
+        user_id: userId,
+      });
+      const list = Array.isArray(approved) ? approved : [];
+      setApprovedApplications(list.map((a) => a.application_type));
+      return list;
     } catch (e) {
       setApprovedApplications([]);
       return [];
