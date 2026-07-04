@@ -77,6 +77,8 @@ import AiTools from '@/pages/AiTools';
 import RoomManagement from '@/pages/RoomManagement';
 import ApplicationIdSystem from '@/pages/ApplicationIdSystem';
 import LuckyIdStore from '@/pages/LuckyIdStore';
+import FaceVerification from '@/pages/FaceVerification';
+import VerificationAdmin from '@/pages/VerificationAdmin';
 import SplashScreen from '@/pages/SplashScreen';
 import WelcomeScreen from '@/pages/WelcomeScreen';
 import LanguageSelection from '@/pages/LanguageSelection';
@@ -126,6 +128,8 @@ const AuthenticatedApp = () => {
       <Route path="/create-password" element={<CreatePassword />} />
       <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="/welcome-animation" element={<WelcomeAnimation />} />
+      <Route path="/face-verification" element={<FaceVerification />} />
+      <Route path="/verification-admin" element={<VerificationAdmin />} />
       <Route path="/profile-dashboard" element={<ProfileDashboard />} />
       <Route path="/discover" element={<Navigate to="/community-dashboard" replace />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/splash" replace />} />}>

@@ -79,14 +79,17 @@ export default function AccountCreationStep({ data, onContinue }) {
         </div>
       </div>
       <h3 className="text-xl font-bold text-[#2D1B4E] mb-2">Your account has been created successfully!</h3>
-      <p className="text-sm text-gray-400 mb-8">Welcome to VYRO, {data.full_name || data.username}!</p>
+      <p className="text-sm text-gray-500 mb-2">Welcome to VYRO, {data.full_name || data.username}!</p>
+      <p className="text-sm text-gray-400 mb-8 max-w-xs">
+        To activate your ID and access all platform features, you must complete Face Verification.
+      </p>
 
       <button
-        onClick={onContinue}
+        onClick={() => { window.location.href = "/face-verification"; }}
         className="w-full max-w-xs rounded-2xl bg-gradient-to-r from-[#6F35E0] to-[#C135E0] text-white font-bold text-sm shadow-lg shadow-purple-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
         style={{ height: "52px" }}
       >
-        Continue <ArrowRight size={16} />
+        Activate My ID <ArrowRight size={16} />
       </button>
     </div>
   );

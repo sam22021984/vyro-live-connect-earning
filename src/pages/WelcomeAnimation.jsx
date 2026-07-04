@@ -19,7 +19,12 @@ export default function WelcomeAnimation() {
   }, []);
 
   const handleStart = () => {
-    navigate("/");
+    // Check if user is verified — if not, go to face verification
+    if (profile?.verification_status !== 'verified') {
+      window.location.href = "/face-verification";
+    } else {
+      navigate("/");
+    }
   };
 
   return (
@@ -81,6 +86,9 @@ export default function WelcomeAnimation() {
         {profile?.global_id && (
           <p className="text-[10px] text-white/30 font-mono">ID: {profile.global_id}</p>
         )}
+        {profile?.verification_status !== 'verified' && (
+          <p className="text-[10px] text-yellow-400/70 mt-1 font-semibold">⚠ ID activation required</p>
+        )}
       </motion.div>
 
       {/* Welcome bonus badge */}
@@ -105,7 +113,7 @@ export default function WelcomeAnimation() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2 }}
       >
-        Start Exploring <ArrowRight size={16} />
+        {profile?.verification_status === 'verified' ? 'Start Exploring' : 'Activate My ID'} <ArrowRight size={16} />
       </motion.button>
     </div>
   );
