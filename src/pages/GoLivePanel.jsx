@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Video, Mic, PartyPopper, Users, Swords, Calendar, Dumbbell, Camera, X, ChevronRight } from "lucide-react";
+import { ArrowLeft, Mic, PartyPopper, Users, Swords, Calendar, Dumbbell, Camera, X, ChevronRight } from "lucide-react";
 import { COLORS, ROOM_TAGS } from "@/components/live-room/roomData";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
 const LIVE_TYPES = [
-  { id: "video", label: "Video Live", desc: "Go live with your camera", icon: Video, color: "#8B5CF6" },
   { id: "audio", label: "Audio Live", desc: "Start a voice chat room", icon: Mic, color: "#3B82F6" },
   { id: "party", label: "Party Room", desc: "Multi-guest party room", icon: PartyPopper, color: "#EC4899" },
   { id: "multi", label: "Multi-Guest", desc: "Invite multiple guests on screen", icon: Users, color: "#10B981" },
