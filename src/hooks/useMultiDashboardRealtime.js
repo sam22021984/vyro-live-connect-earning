@@ -15,6 +15,16 @@ export function useMultiDashboardRealtime(tableNames = []) {
         const supabase = await getSupabase();
         const channels = [];
 
+        // Initial fetch for all tables
+        const initialData = {};
+        await Promise.all(
+          tableNames.map(async (table) => {
+            const { data: rows } = await supabase.from(table).select("*");
+            initialData[table] = rows || [];
+          })
+        );
+        if (active) setData(initialData);
+
         tableNames.forEach((table) => {
           const channel = supabase
             .channel(`live-dashboard-${table}`)
@@ -23,7 +33,17 @@ export function useMultiDashboardRealtime(tableNames = []) {
               { event: "*", schema: "public", table },
               (payload) => {
                 if (!active) return;
-                setData((prev) => ({ ...prev, [table]: payload.new }));
+                const { eventType, new: newRow, old: oldRow } = payload;
+                setData((prev) => {
+                  const arr = prev[table] || [];
+                  let next = arr;
+                  if (eventType === "INSERT") next = [...arr, newRow];
+                  else if (eventType === "UPDATE")
+                    next = arr.map((r) => (r.id === newRow.id ? newRow : r));
+                  else if (eventType === "DELETE")
+                    next = arr.filter((r) => r.id !== oldRow.id);
+                  return { ...prev, [table]: next };
+                });
               }
             )
             .subscribe((subStatus) => {
