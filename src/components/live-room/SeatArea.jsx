@@ -38,7 +38,7 @@ function getLayout(count) {
   return rows;
 }
 
-export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10 }) {
+export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10, registerSeatRef }) {
   const count = Math.max(2, seatCount);
   const seats = generateSeats(count);
   const layout = getLayout(count);
@@ -64,6 +64,7 @@ export default function SeatArea({ onSeatClick, seatEffects = [], seatCount = 10
           {rowSeats.map((seat) => (
             <Seat
               key={seat.id}
+              ref={(el) => registerSeatRef?.(seat.id, el)}
               seat={seat}
               onClick={onSeatClick}
               effects={getSeatEffects(seat.id)}

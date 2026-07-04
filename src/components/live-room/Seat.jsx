@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import { Armchair, Mic, MicOff, Crown } from "lucide-react";
 import { COLORS } from "./roomData";
 
@@ -9,7 +9,7 @@ const SEAT_SIZES = {
   small: 56,      // Small audience
 };
 
-export default function Seat({ seat, size, onClick, effects = [] }) {
+const Seat = forwardRef(({ seat, size, onClick, effects = [] }, ref) => {
   const { user, id, role } = seat;
   const isEmpty = !user;
   const isHost = role === "host";
@@ -23,6 +23,7 @@ export default function Seat({ seat, size, onClick, effects = [] }) {
 
   return (
     <div
+      ref={ref}
       className="flex flex-col items-center gap-1"
       style={{
         width: 80,
@@ -136,4 +137,7 @@ export default function Seat({ seat, size, onClick, effects = [] }) {
       `}</style>
     </div>
   );
-}
+});
+
+Seat.displayName = "Seat";
+export default Seat;

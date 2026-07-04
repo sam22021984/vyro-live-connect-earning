@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { COLORS, SEAT_POSITIONS } from "./roomData";
+import { COLORS } from "./roomData";
 
 function TravelAnim({ anim }) {
   const [phase, setPhase] = useState("start");
@@ -40,8 +40,8 @@ function TravelAnim({ anim }) {
   );
 }
 
-function SeatEffect({ effect, seatId }) {
-  const pos = SEAT_POSITIONS[seatId] || { x: 50, y: 50 };
+function SeatEffect({ effect, pos }) {
+  if (!pos) return null;
   const isPremium = ["gold_ring", "fireworks", "room_celebration", "screen_flash", "sparkle"].includes(effect);
   const isHammer = effect === "hammer";
   const baseColor = effect === "sparkle" ? "#3B82F6" : effect === "hearts" ? "#EC4899" : effect === "stars" ? "#F59E0B" : COLORS.gold;
@@ -187,14 +187,14 @@ function SeatEffect({ effect, seatId }) {
   );
 }
 
-export default function AnimationLayer({ animations = [], seatEffects = [] }) {
+export default function AnimationLayer({ animations = [], seatEffects = [], getSeatPosition }) {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 25 }}>
       {animations.map((anim) => (
         <TravelAnim key={anim.id} anim={anim} />
       ))}
       {seatEffects.map((eff) => (
-        <SeatEffect key={eff.id} effect={eff.effect} seatId={eff.seatId} />
+        <SeatEffect key={eff.id} effect={eff.effect} pos={getSeatPosition ? getSeatPosition(eff.seatId) : null} />
       ))}
       <style>{`
         @keyframes ringExpand {

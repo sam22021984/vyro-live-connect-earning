@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useLiveRoomApi } from "@/hooks/useLiveRoomApi";
@@ -45,6 +45,28 @@ export default function LiveRoom() {
   const [chatInput, setChatInput] = useState("");
   const [showChatInput, setShowChatInput] = useState(false);
   const [tempProfileUser, setTempProfileUser] = useState(null);
+
+  // Refs for dynamic seat positioning — replaces static SEAT_POSITIONS
+  const containerRef = useRef(null);
+  const seatRefs = useRef({});
+
+  const registerSeatRef = useCallback((seatId, el) => {
+    if (el) seatRefs.current[seatId] = el;
+    else delete seatRefs.current[seatId];
+  }, []);
+
+  // Compute real seat position as {x, y} percentages relative to the room container
+  const getSeatPosition = useCallback((seatId) => {
+    if (seatId === "audience") return { x: 50, y: 92 };
+    const el = seatRefs.current[seatId];
+    const container = containerRef.current;
+    if (!el || !container) return SEAT_POSITIONS[seatId] || { x: 50, y: 50 };
+    const seatRect = el.getBoundingClientRect();
+    const contRect = container.getBoundingClientRect();
+    const x = ((seatRect.left + seatRect.width / 2 - contRect.left) / contRect.width) * 100;
+    const y = ((seatRect.top + seatRect.height / 2 - contRect.top) / contRect.height) * 100;
+    return { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
+  }, []);
 
   // Merge Supabase chat messages into local chat — keep local seed messages, add new supabase ones
   useEffect(() => {
@@ -128,7 +150,7 @@ export default function LiveRoom() {
     const animId = Date.now() + Math.random();
     setAnimations((prev) => [...prev, {
       id: animId, type: "gift", icon: gift.icon,
-      from: SEAT_POSITIONS[senderSeatId] || SEAT_POSITIONS.audience, to: SEAT_POSITIONS[targetSeatId], duration: 1500,
+      from: getSeatPosition(senderSeatId), to: getSeatPosition(targetSeatId), duration: 1500,
     }]);
 
     setTimeout(() => {
@@ -159,7 +181,7 @@ export default function LiveRoom() {
     const animId = Date.now() + Math.random();
     setAnimations((prev) => [...prev, {
       id: animId, type: "emoji", icon: emojiObj.emoji, color: emojiObj.color, animation: emojiObj.animation,
-      from: SEAT_POSITIONS[senderSeatId] || SEAT_POSITIONS.audience, to: SEAT_POSITIONS[targetSeatId], duration: 1200,
+      from: getSeatPosition(senderSeatId), to: getSeatPosition(targetSeatId), duration: 1200,
     }]);
 
     setTimeout(() => {
@@ -251,12 +273,12 @@ export default function LiveRoom() {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden flex flex-col" style={{ background: theme.bg }}>
+    <div ref={containerRef} className="fixed inset-0 overflow-hidden flex flex-col" style={{ background: theme.bg }}>
       {/* Radial glow */}
       <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ background: `radial-gradient(circle at 50% 35%, ${theme.glow}15 0%, transparent 60%)` }} />
 
       {/* Animation layer */}
-      <AnimationLayer animations={animations} seatEffects={seatEffects} />
+      <AnimationLayer animations={animations} seatEffects={seatEffects} getSeatPosition={getSeatPosition} />
 
       {/* ===== Top Header — 56-64dp ===== */}
       <div className="relative z-30 flex-shrink-0" style={{ height: "60px", padding: "8px 16px" }}>
@@ -305,7 +327,7 @@ export default function LiveRoom() {
 
       {/* ===== Seat Grid — upper-mid ===== */}
       <div className="relative z-10 flex-shrink-0 flex items-center justify-start" style={{ padding: "0 16px", flex: "0 0 auto" }}>
-        <SeatArea onSeatClick={handleSeatClick} seatEffects={seatEffects} seatCount={seatCount} />
+        <SeatArea onSeatClick={handleSeatClick} seatEffects={seatEffects} seatCount={seatCount} registerSeatRef={registerSeatRef} />
       </div>
 
       {/* ===== Message Area — tabs + warning + chat (flexible, moves with seat count) ===== */}
