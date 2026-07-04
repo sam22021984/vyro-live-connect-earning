@@ -126,6 +126,24 @@ export default function GoLivePanel() {
         });
       } catch {}
 
+      // Create RoomParticipant for the host so they appear as a real member on seat 0
+      try {
+        await base44.entities.RoomParticipant.create({
+          room_id: room.id,
+          user_id: me.id,
+          username: profile?.username || me.full_name || "You",
+          avatar_url: profile?.avatar_url || "",
+          global_id: profile?.global_id || "",
+          role: "host",
+          status: "active",
+          seat_number: 0,
+          is_speaking: true,
+          joined_at: new Date().toISOString(),
+          country: profile?.country || "",
+          is_vip: profile?.is_vip || false,
+        });
+      } catch {}
+
       toast({ title: "Going Live! 🎉" });
       navigate(`/live-room/${room.id}`);
     } catch (err) {

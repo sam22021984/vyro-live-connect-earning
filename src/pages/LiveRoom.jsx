@@ -26,7 +26,7 @@ export default function LiveRoom() {
   const roomId = sessionId;
   const { joined, joining, error: joinError, recommendations, aiStats, giftStats, roomScore, audioAction, publishEvent, archiveRoom, backupRoom, requestMic, verifyPayment, runScheduler } = useLiveRoomApi(roomId);
   const [seatCount, setSeatCount] = useState(10);
-  const { room: liveRoom, chat: supabaseChat, seats, audience, sendChatMessage } = useLiveRoomData(roomId, seatCount);
+  const { room: liveRoom, chat: supabaseChat, seats, audience, sendChatMessage } = useLiveRoomData(roomId, seatCount, currentUser?.id);
   const [themeIndex, setThemeIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
@@ -81,7 +81,8 @@ export default function LiveRoom() {
   }, [supabaseChat]);
 
   const roomTitle = liveRoom?.name || "Arabian Nights Live";
-  const viewerCount = liveRoom?.viewers || 12450;
+  const realMemberCount = seats.filter((s) => s.user).length + audience.length;
+  const viewerCount = realMemberCount > 0 ? realMemberCount : (liveRoom?.viewers || 1);
 
   const theme = ROOM_THEMES[themeIndex];
   const currentUserSeatId = seats.find((s) => s.user?.user_id === currentUser?.id)?.id ?? 0;
@@ -103,11 +104,13 @@ export default function LiveRoom() {
       setUserRole("owner");
       return;
     }
-    // Check RoomParticipant for admin/co_host role
+    // Check RoomParticipant for host/admin/co_host role
     base44.entities.RoomParticipant.filter({ room_id: roomId, user_id: currentUser.id })
       .then((participants) => {
         const p = participants?.[0];
-        if (p && (p.role === "admin" || p.role === "co_host" || p.role === "moderator")) {
+        if (p?.role === "host") {
+          setUserRole("owner");
+        } else if (p && (p.role === "admin" || p.role === "co_host" || p.role === "moderator")) {
           setUserRole("admin");
         } else {
           setUserRole("viewer");

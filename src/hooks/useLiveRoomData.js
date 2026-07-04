@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 
-export function useLiveRoomData(roomId, seatCount = 10) {
+export function useLiveRoomData(roomId, seatCount = 10, currentUserId = null) {
   const [room, setRoom] = useState(null);
   const [chat, setChat] = useState([]);
   const [seats, setSeats] = useState([]);
@@ -17,6 +17,40 @@ export function useLiveRoomData(roomId, seatCount = 10) {
       console.error("Failed to fetch live room:", err);
     }
   }, [roomId]);
+
+  // Auto-join: when a user enters the room, create a viewer participant if they don't already exist
+  const autoJoin = useCallback(async () => {
+    if (!roomId || !currentUserId) return;
+    try {
+      const existing = await base44.entities.RoomParticipant.filter({
+        room_id: roomId,
+        user_id: currentUserId,
+      });
+      if (existing && existing.length > 0) return; // Already a participant
+
+      // Fetch profile for display info
+      let profile = null;
+      try {
+        const profiles = await base44.entities.UserProfile.filter({ user_id: currentUserId });
+        profile = profiles?.[0];
+      } catch {}
+
+      await base44.entities.RoomParticipant.create({
+        room_id: roomId,
+        user_id: currentUserId,
+        username: profile?.username || profile?.full_name || "User",
+        avatar_url: profile?.avatar_url || "",
+        global_id: profile?.global_id || "",
+        role: "viewer",
+        status: "active",
+        joined_at: new Date().toISOString(),
+        country: profile?.country || "",
+        is_vip: profile?.is_vip || false,
+      });
+    } catch (err) {
+      // Silently fail — non-critical
+    }
+  }, [roomId, currentUserId]);
 
   const fetchChat = useCallback(async () => {
     if (!roomId) return;
@@ -137,7 +171,7 @@ export function useLiveRoomData(roomId, seatCount = 10) {
   useEffect(() => {
     if (!roomId) return;
     setLoading(true);
-    Promise.all([fetchRoom(), fetchChat()]).finally(() => setLoading(false));
+    Promise.all([fetchRoom(), fetchChat(), autoJoin()]).finally(() => setLoading(false));
 
     const unsubRoom = base44.entities.PartyRoom.subscribe(fetchRoom);
     const unsubChat = base44.entities.ChatMessage.subscribe(fetchChat);
@@ -145,7 +179,7 @@ export function useLiveRoomData(roomId, seatCount = 10) {
       unsubRoom && unsubRoom();
       unsubChat && unsubChat();
     };
-  }, [roomId, fetchRoom, fetchChat]);
+  }, [roomId, fetchRoom, fetchChat, autoJoin]);
 
   // Participants subscription (separate — re-runs on seatCount change)
   useEffect(() => {
