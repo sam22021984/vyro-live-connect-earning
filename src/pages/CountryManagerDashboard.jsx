@@ -10,14 +10,12 @@ import {
   AtSign, Phone, AudioLines, ArrowUpFromLine, Plus,
 } from "lucide-react";
 import {
-  CTRY_SECTIONS, CTRY_KPIS, CTRY_QUICK_ACTIONS, CTRY_REALTIME_COUNTERS,
-  CTRY_LIVE_STREAM, CTRY_SEARCH_TYPES, CTRY_SEARCH_RESULTS, CTRY_USERS,
-  CTRY_HOSTS, CTRY_AGENTS, CTRY_AGENCIES, CTRY_APPLICATIONS, CTRY_REVENUE_PERIODS,
-  CTRY_REVENUE_SOURCES, CTRY_GIFT_STATS, CTRY_COIN_STATS, CTRY_RANKINGS,
-  CTRY_LIVE_STREAMS, CTRY_PK_BATTLES, CTRY_EVENTS, CTRY_VIP_STATS,
-  CTRY_REPORTS, CTRY_SECURITY_LOGS, CTRY_BROADCAST_TARGETS, CTRY_BROADCAST_TYPES,
-  CTRY_ANALYTICS, CTRY_SETTINGS_GROUPS, CTRY_COUNTRY_INFO, CTRY_REPORTING_STRUCTURE,
+  CTRY_SECTIONS, CTRY_QUICK_ACTIONS, CTRY_SEARCH_TYPES,
+  CTRY_BROADCAST_TARGETS, CTRY_BROADCAST_TYPES, CTRY_SETTINGS_GROUPS,
+  CTRY_COUNTRY_INFO, CTRY_REPORTING_STRUCTURE,
 } from "@/components/country-manager/countryManagerData";
+import { useAdminDashboard } from "@/hooks/useAdminDashboard";
+import { mapCountryManagerData } from "@/lib/adminDashboardData";
 import ReportToSection from "@/components/shared/ReportToSection";
 import CountryManagerPolicyTab from "@/components/country-manager/CountryManagerPolicyTab";
 
@@ -47,8 +45,15 @@ function StatusBadge({ status, color }) {
 function SectionHeader({ title, subtitle }) {
   return <div className="mb-3"><h3 className="text-base font-bold" style={{ color: DARK }}>{title}</h3>{subtitle && <p className="text-[11px]" style={{ color: GRAY }}>{subtitle}</p>}</div>;
 }
+function LoadingSpinner() {
+  return <div className="flex items-center justify-center py-20"><div className="w-6 h-6 border-2 border-emerald-200 border-t-emerald-500 rounded-full animate-spin" /></div>;
+}
+function EmptyState({ icon = "📊", label = "No data available" }) {
+  return <div className="text-center py-8"><span className="text-2xl">{icon}</span><p className="text-[10px] mt-1" style={{ color: GRAY }}>{label}</p></div>;
+}
 
-function HomeSection({ onNavigate }) {
+function HomeSection({ onNavigate, data, loading }) {
+  if (loading) return <LoadingSpinner />;
   return (
     <div className="space-y-4">
       <div className="rounded-2xl p-4 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0F1B3D 0%, #1A2952 50%, #065F46 100%)", boxShadow: "0 8px 24px rgba(15,27,61,0.2)" }}>
@@ -75,7 +80,7 @@ function HomeSection({ onNavigate }) {
       <div>
         <SectionHeader title="Real-Time Counters" subtitle="Live country activity" />
         <div className="grid grid-cols-3 gap-2">
-          {CTRY_REALTIME_COUNTERS.map((c, i) => {
+          {data.REALTIME_COUNTERS.map((c, i) => {
             const Icon = ICONS[c.icon] || Globe;
             return (
               <Card key={i} className="text-center">
@@ -93,7 +98,7 @@ function HomeSection({ onNavigate }) {
       <div>
         <SectionHeader title="Executive KPIs" subtitle="Country overview metrics" />
         <div className="grid grid-cols-2 gap-2">
-          {CTRY_KPIS.map((k, i) => {
+          {data.KPIS.map((k, i) => {
             const Icon = ICONS[k.icon] || BarChart3;
             return (
               <Card key={i}>
@@ -133,15 +138,17 @@ function HomeSection({ onNavigate }) {
       <div>
         <SectionHeader title="Live Country Activity" subtitle="Real-time event stream" />
         <Card>
-          <div className="space-y-2">
-            {CTRY_LIVE_STREAM.map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: item.status === "success" ? "#27AE60" : item.status === "warning" ? "#F2994A" : item.status === "error" ? "#EB5757" : "#2F80ED" }} />
-                <p className="text-[11px] flex-1" style={{ color: DARK }}>{item.text}</p>
-                <span className="text-[9px]" style={{ color: GRAY }}>{item.time}</span>
-              </div>
-            ))}
-          </div>
+          {data.LIVE_STREAM.length === 0 ? <EmptyState icon="📡" label="No live activity yet" /> : (
+            <div className="space-y-2">
+              {data.LIVE_STREAM.map((item, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: item.status === "success" ? "#27AE60" : item.status === "warning" ? "#F2994A" : item.status === "error" ? "#EB5757" : "#2F80ED" }} />
+                  <p className="text-[11px] flex-1" style={{ color: DARK }}>{item.text}</p>
+                  <span className="text-[9px]" style={{ color: GRAY }}>{item.time}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
 
@@ -189,183 +196,60 @@ function SearchSection() {
           })}
         </div>
       </Card>
-      <SectionHeader title="Search Results" />
-      <div className="space-y-2">
-        {CTRY_SEARCH_RESULTS.map((r, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ background: `linear-gradient(135deg, ${r.color}, ${r.color}cc)` }}>
-                {r.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{r.name}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{r.id} • {r.type} • {r.revenue}</p>
-              </div>
-              <StatusBadge status={r.status} color={r.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["View Profile", "Send Message", "Issue Warning", "Suspend", "Reactivate"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
     </div>
   );
 }
 
-function UsersSection() {
+function ListSection({ title, subtitle, icon: Icon, items, color, renderExtra, actions, emptyIcon }) {
   return (
     <div className="space-y-3">
-      <SectionHeader title="👥 User Management" subtitle="Manage all users within the country" />
-      <div className="space-y-2">
-        {CTRY_USERS.map((u, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ background: `linear-gradient(135deg, ${u.color}, ${u.color}cc)` }}>
-                {u.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+      <SectionHeader title={title} subtitle={subtitle} />
+      {items.length === 0 ? <EmptyState icon={emptyIcon || "📋"} label="No records found" /> : (
+        <div className="space-y-2">
+          {items.map((u, i) => (
+            <Card key={i}>
+              <div className="flex items-center gap-3">
+                {u.avatar ? (
+                  <img src={u.avatar} alt={u.name} className="w-10 h-10 rounded-full object-cover" />
+                ) : (
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${u.color || color}10` }}>
+                    <Icon size={16} style={{ color: u.color || color }} />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <p className="text-sm font-bold" style={{ color: DARK }}>{u.name}</p>
+                  <p className="text-[10px]" style={{ color: GRAY }}>{u.id} • {u.device || u.agency || u.country || ''}</p>
+                  {renderExtra && renderExtra(u)}
+                </div>
+                <StatusBadge status={u.status} color={u.color} />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{u.name}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{u.id} • {u.device} • VIP: {u.vip}</p>
-              </div>
-              <StatusBadge status={u.status} color={u.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["View Profile", "Issue Warning", "Suspend", "Reactivate", "Send Message"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
+      {actions && (
+        <div className="flex flex-wrap gap-2">
+          {actions.map((a, i) => (
+            <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function HostsSection() {
-  return (
-    <div className="space-y-3">
-      <SectionHeader title="🎙️ Host Management" subtitle="Monitor and manage all hosts" />
-      <div className="space-y-2">
-        {CTRY_HOSTS.map((h, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${h.color}10` }}>
-                <Mic size={16} style={{ color: h.color }} />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{h.name} <span className="text-[9px]" style={{ color: h.color }}>{h.level}</span></p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{h.followers} followers • {h.agency} • {h.revenue}</p>
-              </div>
-              <StatusBadge status={h.status} color={h.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["View Host", "View Performance", "Warning", "Suspend", "Feature Host"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
-    </div>
-  );
-}
+function UsersSection({ data }) { return <ListSection title="👥 User Management" subtitle="Manage all users within the country" icon={Users} color="#3B82F6" items={data.USERS} emptyIcon="👥" actions={["View Profile", "Issue Warning", "Suspend", "Reactivate", "Send Message"]} />; }
+function HostsSection({ data }) { return <ListSection title="🎙️ Host Management" subtitle="Monitor and manage all hosts" icon={Mic} color="#EF4444" items={data.HOSTS} emptyIcon="🎙️" actions={["View Host", "View Performance", "Warning", "Suspend", "Feature Host"]} />; }
+function AgentsSection({ data }) { return <ListSection title="🧑‍💼 Talent Agent Management" subtitle="Monitor all talent agents" icon={User} color="#8B5CF6" items={data.AGENTS} emptyIcon="🧑‍💼" actions={["View Agent", "Performance Analytics", "Warning", "Suspend Agent"]} />; }
+function AgenciesSection({ data }) { return <ListSection title="🏢 Agency Management" subtitle="Manage all agencies within the country" icon={Building2} color="#8B5CF6" items={data.AGENCIES} emptyIcon="🏢" actions={["View Agency", "Revenue Analysis", "Warning", "Suspend Agency"]} />; }
+function ApplicationsSection({ data }) { return <ListSection title="📋 Country Application Center" subtitle="Manage host, agent, and agency applications" icon={FileCheck} color="#F59E0B" items={data.APPLICATIONS} emptyIcon="📋" actions={["Approve", "Reject", "Hold", "Request Documents"]} />; }
 
-function AgentsSection() {
-  return (
-    <div className="space-y-3">
-      <SectionHeader title="🧑‍💼 Talent Agent Management" subtitle="Monitor all talent agents" />
-      <div className="space-y-2">
-        {CTRY_AGENTS.map((a, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${a.color}10` }}>
-                <User size={16} style={{ color: a.color }} />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{a.name}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{a.hosts} hosts • {a.agency} • {a.revenue}</p>
-              </div>
-              <StatusBadge status={a.status} color={a.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["View Agent", "Performance Analytics", "Warning", "Suspend Agent"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function AgenciesSection() {
-  return (
-    <div className="space-y-3">
-      <SectionHeader title="🏢 Agency Management" subtitle="Manage all agencies within the country" />
-      <div className="space-y-2">
-        {CTRY_AGENCIES.map((a, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${a.color}10` }}>
-                <Building2 size={16} style={{ color: a.color }} />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{a.name}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>Owner: {a.owner} • {a.hosts} hosts • {a.revenue}</p>
-              </div>
-              <StatusBadge status={a.status} color={a.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["View Agency", "Revenue Analysis", "Warning", "Suspend Agency"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ApplicationsSection() {
-  return (
-    <div className="space-y-3">
-      <SectionHeader title="📋 Country Application Center" subtitle="Manage host, agent, and agency applications" />
-      <div className="space-y-2">
-        {CTRY_APPLICATIONS.map((a, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${a.color}10` }}>
-                <FileCheck size={16} style={{ color: a.color }} />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{a.id} — {a.applicant}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{a.type} • {a.date}</p>
-              </div>
-              <StatusBadge status={a.status} color={a.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Approve", "Reject", "Hold", "Request Documents"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function RevenueSection() {
+function RevenueSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="💰 Country Revenue Center" subtitle="Track and monitor country revenue" />
       <div className="grid grid-cols-2 gap-2">
-        {CTRY_REVENUE_PERIODS.map((p, i) => (
+        {data.REVENUE_PERIODS.map((p, i) => (
           <Card key={i}>
             <p className="text-[9px]" style={{ color: GRAY }}>{p.label} Revenue</p>
             <p className="text-lg font-bold" style={{ color: p.color }}>{p.value}</p>
@@ -374,7 +258,7 @@ function RevenueSection() {
         ))}
       </div>
       <div className="space-y-2">
-        {CTRY_REVENUE_SOURCES.map((r, i) => {
+        {data.REVENUE_SOURCES.length === 0 ? <EmptyState icon="💰" label="No revenue data yet" /> : data.REVENUE_SOURCES.map((r, i) => {
           const Icon = ICONS[r.icon] || DollarSign;
           return (
             <Card key={i}>
@@ -397,21 +281,16 @@ function RevenueSection() {
           );
         })}
       </div>
-      <div className="flex flex-wrap gap-2">
-        {["Revenue Analytics", "Revenue Forecasting", "Export Reports"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
     </div>
   );
 }
 
-function GiftsSection() {
+function GiftsSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="🎁 Country Gift Center" subtitle="Track gift analytics and trends" />
       <div className="grid grid-cols-2 gap-2">
-        {CTRY_GIFT_STATS.map((g, i) => {
+        {data.GIFT_STATS.map((g, i) => {
           const Icon = ICONS[g.icon] || Gift;
           return (
             <Card key={i}>
@@ -419,29 +298,23 @@ function GiftsSection() {
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${g.color}10` }}>
                   <Icon size={14} style={{ color: g.color }} />
                 </div>
-                <span className="text-[9px] flex-1 leading-tight" style={{ color: GRAY }}>{g.metric}</span>
+                <span className="text-[9px] flex-1 leading-tight" style={{ color: GRAY }}>{g.label}</span>
               </div>
               <p className="text-sm font-bold" style={{ color: g.color }}>{g.value}</p>
-              <p className="text-[9px]" style={{ color: GRAY }}>{g.detail}</p>
             </Card>
           );
         })}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["View Gift Statistics", "Gift Reports", "Gift Trends"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
       </div>
     </div>
   );
 }
 
-function CoinsSection() {
+function CoinsSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="🪙 Country Coin Center" subtitle="Monitor coin economy statistics" />
       <div className="grid grid-cols-1 gap-2">
-        {CTRY_COIN_STATS.map((c, i) => {
+        {data.COIN_STATS.map((c, i) => {
           const Icon = ICONS[c.icon] || Coins;
           return (
             <Card key={i}>
@@ -459,98 +332,84 @@ function CoinsSection() {
           );
         })}
       </div>
-      <div className="flex flex-wrap gap-2">
-        {["Coin Analytics", "Promotion Reports", "Sales Reports"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
     </div>
   );
 }
 
-function RankingsSection() {
+function RankingsSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="🏆 Country Ranking Center" subtitle="Track top performers across categories" />
-      <div className="space-y-2">
-        {CTRY_RANKINGS.map((r, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ background: r.rank <= 3 ? `linear-gradient(135deg, ${r.color}, ${r.color}cc)` : `${SLATE}20`, color: r.rank <= 3 ? WHITE : SLATE }}>
-                {r.rank}
+      {data.HOSTS.length === 0 ? <EmptyState icon="🏆" /> : (
+        <div className="space-y-2">
+          {data.HOSTS.slice(0, 6).map((r, i) => (
+            <Card key={i}>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ background: i < 3 ? `linear-gradient(135deg, ${r.color}, ${r.color}cc)` : `${SLATE}20`, color: i < 3 ? WHITE : SLATE }}>
+                  {i + 1}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold" style={{ color: DARK }}>{r.name}</p>
+                  <p className="text-[10px]" style={{ color: GRAY }}>Top Host • {r.followers} followers</p>
+                </div>
+                <p className="text-sm font-bold" style={{ color: "#27AE60" }}>{r.revenue}</p>
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{r.name}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{r.category}</p>
-              </div>
-              <p className="text-sm font-bold" style={{ color: "#27AE60" }}>{r.score}</p>
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Daily", "Weekly", "Monthly", "Lifetime"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function LiveSection() {
+function LiveSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="📡 Live Monitoring Center" subtitle="Monitor all active live streams" />
-      <div className="space-y-2">
-        {CTRY_LIVE_STREAMS.map((l, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${l.color}10` }}>
-                <Radio size={16} style={{ color: l.color }} />
+      {data.LIVE_STREAMS.length === 0 ? <EmptyState icon="📡" label="No active live streams" /> : (
+        <div className="space-y-2">
+          {data.LIVE_STREAMS.map((l, i) => (
+            <Card key={i}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${l.color || '#EF4444'}10` }}>
+                  <Radio size={16} style={{ color: l.color || '#EF4444' }} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold" style={{ color: DARK }}>{l.host}</p>
+                  <p className="text-[10px]" style={{ color: GRAY }}>{l.viewers} viewers • Gifts: {l.gifts} • Rev: {l.revenue}</p>
+                </div>
+                <StatusBadge status="Live" color="#EF4444" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{l.host}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{l.viewers} viewers • Gifts: {l.gifts} • Rev: {l.revenue}</p>
-              </div>
-              <StatusBadge status={l.status} color={l.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Watch Live", "Send Warning", "Contact Host", "End Live Stream"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function PkSection() {
+function PkSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="⚔️ PK Monitoring Center" subtitle="Monitor active PK battles" />
-      <div className="space-y-2">
-        {CTRY_PK_BATTLES.map((p, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${p.color}10` }}>
-                <Swords size={16} style={{ color: p.color }} />
+      {data.PK_BATTLES.length === 0 ? <EmptyState icon="⚔️" label="No active PK battles" /> : (
+        <div className="space-y-2">
+          {data.PK_BATTLES.map((p, i) => (
+            <Card key={i}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${p.color || '#EF4444'}10` }}>
+                  <Swords size={16} style={{ color: p.color || '#EF4444' }} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold" style={{ color: DARK }}>{p.hostA} vs {p.hostB}</p>
+                  <p className="text-[10px]" style={{ color: GRAY }}>{p.viewers} viewers • {p.revenue} revenue</p>
+                </div>
+                <StatusBadge status={p.status} color={p.color} />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{p.hostA} vs {p.hostB}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{p.viewers} viewers • {p.revenue} revenue</p>
-              </div>
-              <StatusBadge status={p.status} color={p.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Monitor PK", "Warning", "End PK Session"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -559,35 +418,17 @@ function EventsSection() {
   return (
     <div className="space-y-3">
       <SectionHeader title="🎉 Event Management" subtitle="Manage country, festival, and competition events" />
-      <div className="space-y-2">
-        {CTRY_EVENTS.map((e, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{ background: `${e.color}10` }}>🎉</div>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: DARK }}>{e.name}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{e.type} • {e.participants} participants</p>
-              </div>
-              <StatusBadge status={e.status} color={e.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Create Event", "Edit Event", "Launch Event", "End Event"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
+      <EmptyState icon="🎉" label="No events configured yet" />
     </div>
   );
 }
 
-function VipSection() {
+function VipSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="💎 VIP Management" subtitle="Manage VIP users and programs" />
       <div className="grid grid-cols-2 gap-2">
-        {CTRY_VIP_STATS.map((v, i) => {
+        {data.VIP_STATS.map((v, i) => {
           const Icon = ICONS[v.icon] || Crown;
           return (
             <Card key={i}>
@@ -603,69 +444,58 @@ function VipSection() {
           );
         })}
       </div>
-      <div className="flex flex-wrap gap-2">
-        {["View VIP Members", "Upgrade VIP", "VIP Analytics"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
     </div>
   );
 }
 
-function ReportsSection() {
+function ReportsSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="🚩 Report Management" subtitle="Manage user, host, agency, and fraud reports" />
-      <div className="space-y-2">
-        {CTRY_REPORTS.map((r, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${r.color}10` }}>
-                <Flag size={16} style={{ color: r.color }} />
+      {data.REPORTS.length === 0 ? <EmptyState icon="🚩" label="No reports filed" /> : (
+        <div className="space-y-2">
+          {data.REPORTS.map((r, i) => (
+            <Card key={i}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${r.color}10` }}>
+                  <Flag size={16} style={{ color: r.color }} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-bold" style={{ color: DARK }}>{r.id} — {r.type}</p>
+                  <p className="text-[10px]" style={{ color: GRAY }}>{r.target} • {r.date}</p>
+                </div>
+                <StatusBadge status={r.status} color={r.color} />
               </div>
-              <div className="flex-1">
-                <p className="text-xs font-bold" style={{ color: DARK }}>{r.id} — {r.type}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{r.target} • {r.reason} • {r.date}</p>
-              </div>
-              <StatusBadge status={r.status} color={r.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Review Report", "Warning", "Suspend Account", "Resolve Case"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function SecuritySection() {
+function SecuritySection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="🔒 Security Center" subtitle="Monitor security logs and threats" />
-      <div className="space-y-2">
-        {CTRY_SECURITY_LOGS.map((s, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${s.color}10` }}>
-                <ShieldCheck size={16} style={{ color: s.color }} />
+      {data.SECURITY_LOGS.length === 0 ? <EmptyState icon="🔒" label="No security events" /> : (
+        <div className="space-y-2">
+          {data.SECURITY_LOGS.map((s, i) => (
+            <Card key={i}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${s.color}10` }}>
+                  <ShieldCheck size={16} style={{ color: s.color }} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-bold" style={{ color: DARK }}>{s.id} — {s.action}</p>
+                  <p className="text-[10px]" style={{ color: GRAY }}>{s.target} • {s.ip} • {s.date}</p>
+                </div>
+                <StatusBadge status={s.severity} color={s.color} />
               </div>
-              <div className="flex-1">
-                <p className="text-xs font-bold" style={{ color: DARK }}>{s.id} — {s.action}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{s.target} • {s.ip} • {s.date}</p>
-              </div>
-              <StatusBadge status={s.severity} color={s.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Lock Account", "Freeze Account", "Unlock Account"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -706,21 +536,16 @@ function BroadcastSection() {
           })}
         </div>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {["Create Broadcast", "Send Broadcast"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
     </div>
   );
 }
 
-function AnalyticsSection() {
+function AnalyticsSection({ data }) {
   return (
     <div className="space-y-3">
       <SectionHeader title="📊 Country Analytics" subtitle="Advanced country performance analytics" />
       <div className="grid grid-cols-2 gap-2">
-        {CTRY_ANALYTICS.map((a, i) => {
+        {data.ANALYTICS.map((a, i) => {
           const Icon = ICONS[a.icon] || BarChart3;
           return (
             <Card key={i}>
@@ -735,11 +560,6 @@ function AnalyticsSection() {
             </Card>
           );
         })}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {["Export Analytics", "Generate Reports"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
       </div>
     </div>
   );
@@ -762,11 +582,6 @@ function SettingsSection() {
           );
         })}
       </div>
-      <div className="flex flex-wrap gap-2">
-        {["Update Settings", "Save Configuration"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
-        ))}
-      </div>
     </div>
   );
 }
@@ -784,9 +599,19 @@ export default function CountryManagerDashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("overview");
   const [showSidebar, setShowSidebar] = useState(false);
+  const { stats, loading } = useAdminDashboard();
+  const data = mapCountryManagerData(stats) || { KPIS: [], REALTIME_COUNTERS: [], LIVE_STREAM: [], USERS: [], HOSTS: [], AGENTS: [], AGENCIES: [], APPLICATIONS: [], REVENUE_PERIODS: [], REVENUE_SOURCES: [], GIFT_STATS: [], COIN_STATS: [], LIVE_STREAMS: [], PK_BATTLES: [], REPORTS: [], SECURITY_LOGS: [], ANALYTICS: [], VIP_STATS: [] };
 
   const ActiveComponent = SECTIONS[activeSection] || HomeSection;
   const activeSectionData = CTRY_SECTIONS.find(s => s.id === activeSection) || CTRY_SECTIONS[0];
+
+  const renderSection = () => {
+    if (activeSection === "policy") return <CountryManagerPolicyTab />;
+    if (activeSection === "overview" || activeSection === "search" || activeSection === "broadcast" || activeSection === "settings" || activeSection === "events") {
+      return <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} data={data} loading={loading} />;
+    }
+    return <ActiveComponent data={data} loading={loading} />;
+  };
 
   return (
     <div className="min-h-screen" style={{ background: SOFT_BG }}>
@@ -842,7 +667,7 @@ export default function CountryManagerDashboard() {
         </div>
 
         <div className="px-4 pt-3">
-          <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />
+          {renderSection()}
         </div>
       </div>
     </div>
