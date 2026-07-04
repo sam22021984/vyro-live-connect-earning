@@ -1,22 +1,21 @@
 import React, { useState, useMemo } from "react";
 import { X, Gift, Smile, Send } from "lucide-react";
-import { COLORS, EMOJIS_3D, EMOJI_CATEGORIES, SEATS } from "./roomData";
+import { COLORS, EMOJIS_3D, EMOJI_CATEGORIES } from "./roomData";
 import { useGifts } from "@/hooks/useGifts";
 
 const QUICK_QTY = [1, 2, 5, 10, 20, 50, 99, 188, 520, 1314];
 
-export default function InteractionPanel({ type, targetId, onSend, onClose }) {
+export default function InteractionPanel({ type, targetId, seats = [], onSend, onClose }) {
   const { gifts, coins, loading } = useGifts();
   const [giftCat, setGiftCat] = useState("standard");
   const [emojiCat, setEmojiCat] = useState("basic");
   const [selectedTarget, setSelectedTarget] = useState(targetId);
-  // sendMode: "one" = 1 gift to 1 target, "multi" = N quantity to 1 target, "all" = 1 gift to every seat
   const [sendMode, setSendMode] = useState("one");
   const [qty, setQty] = useState(1);
   const [selectedGift, setSelectedGift] = useState(null);
 
-  const occupiedSeats = SEATS.filter((s) => s.user && s.id !== 0);
-  const targetSeat = SEATS.find((s) => s.id === selectedTarget);
+  const occupiedSeats = seats.filter((s) => s.user && s.id !== 0);
+  const targetSeat = seats.find((s) => s.id === selectedTarget);
 
   const giftCategories = useMemo(() => {
     const cats = [...new Set(gifts.map((g) => g.category).filter(Boolean))];
@@ -33,9 +32,7 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
   const items = type === "gift" ? giftItems : emojiItems;
   const categories = type === "gift" ? giftCategories : EMOJI_CATEGORIES;
 
-  // Effective quantity based on mode
   const effectiveQty = sendMode === "one" ? 1 : sendMode === "multi" ? qty : 1;
-  // Effective targets
   const effectiveTargets = sendMode === "all" ? occupiedSeats : (targetSeat ? [targetSeat] : []);
 
   const giftPrice = selectedGift ? (selectedGift.price_coins || selectedGift.price || 0) : 0;
@@ -52,7 +49,6 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
   const handleSend = () => {
     if (!canSend) return;
     if (type === "gift") {
-      // Send to each target with quantity
       effectiveTargets.forEach((seat) => {
         onSend({
           id: selectedGift.id,
@@ -67,12 +63,10 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
         }, seat.id, effectiveQty);
       });
     } else {
-      // Emoji
       effectiveTargets.forEach((seat) => {
         onSend(selectedGift || items[0], seat.id);
       });
     }
-    // Reset
     setSelectedGift(null);
     setQty(1);
     setSendMode("one");
@@ -120,7 +114,7 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
 
         {/* Scrollable content */}
         <div className="px-4 pb-2 space-y-2.5 overflow-y-auto scrollbar-hide flex-1">
-          {/* Send mode selector — 1 / Multi / All */}
+          {/* Send mode selector */}
           <div>
             <p className="text-[10px] font-bold mb-1.5 px-1" style={{ color: COLORS.gold }}>⚡ Send Mode</p>
             <div className="flex gap-1.5">
@@ -161,28 +155,40 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
             </div>
           )}
 
-          {/* Target seat selector — hidden in "all" mode */}
+          {/* Target seat selector */}
           {sendMode !== "all" && (
             <div>
               <p className="text-[10px] font-bold mb-1.5 px-1" style={{ color: COLORS.gold }}>🎯 Select Target</p>
-              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-                {occupiedSeats.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => setSelectedTarget(s.id)}
-                    className="flex-shrink-0 flex flex-col items-center gap-0.5 p-1.5 rounded-xl transition active:scale-90"
-                    style={selectedTarget === s.id
-                      ? { background: `${COLORS.gold}20`, border: `1px solid ${COLORS.gold}50` }
-                      : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-                  >
-                    <img src={s.user.avatar} alt={s.user.name} className="w-8 h-8 rounded-full object-cover" />
-                    <span className="text-[7px] font-bold" style={{ color: selectedTarget === s.id ? COLORS.gold : COLORS.softGray }}>
-                      {s.user.name}
-                    </span>
-                    <span className="text-[6px]" style={{ color: COLORS.softGray }}>Seat {s.id}</span>
-                  </button>
-                ))}
-              </div>
+              {occupiedSeats.length === 0 ? (
+                <div className="text-center py-3">
+                  <p className="text-[9px]" style={{ color: COLORS.softGray }}>No seated users available</p>
+                </div>
+              ) : (
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                  {occupiedSeats.map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setSelectedTarget(s.id)}
+                      className="flex-shrink-0 flex flex-col items-center gap-0.5 p-1.5 rounded-xl transition active:scale-90"
+                      style={selectedTarget === s.id
+                        ? { background: `${COLORS.gold}20`, border: `1px solid ${COLORS.gold}50` }
+                        : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                    >
+                      {s.user.avatar ? (
+                        <img src={s.user.avatar} alt={s.user.name} className="w-8 h-8 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: COLORS.tealMid }}>
+                          <span className="text-[9px] font-bold text-white">{(s.user.name || "U")[0]}</span>
+                        </div>
+                      )}
+                      <span className="text-[7px] font-bold" style={{ color: selectedTarget === s.id ? COLORS.gold : COLORS.softGray }}>
+                        {s.user.name}
+                      </span>
+                      <span className="text-[6px]" style={{ color: COLORS.softGray }}>Seat {s.id}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -252,7 +258,6 @@ export default function InteractionPanel({ type, targetId, onSend, onClose }) {
 
         {/* Footer — sticky send bar */}
         <div className="sticky bottom-0 z-10 px-4 py-2 flex-shrink-0" style={{ background: COLORS.tealDeep, borderTop: `1px solid ${COLORS.gold}20` }}>
-          {/* Summary */}
           {type === "gift" && selectedGift ? (
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-1.5">

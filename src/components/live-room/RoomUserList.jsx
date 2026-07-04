@@ -1,25 +1,15 @@
 import React, { useState } from "react";
 import { X, Search, Crown, Mic, MicOff, Users } from "lucide-react";
-import { COLORS, SEATS } from "./roomData";
+import { COLORS } from "./roomData";
 
-const AUDIENCE_USERS = [
-  { name: "Omar", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop", vip: "VIP 5", level: 28, country: "🇸🇦", vyro_id: "VY20001", agency: null, followers: 5400, following: 420, is_online: true, is_host: false },
-  { name: "Nora", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop", vip: null, level: 18, country: "🇶🇦", vyro_id: "VY20002", agency: null, followers: 1200, following: 80, is_online: true, is_host: false },
-  { name: "Khalid", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop", vip: null, level: 22, country: "🇦🇪", vyro_id: "VY20003", agency: null, followers: 3200, following: 150, is_online: true, is_host: false },
-  { name: "Maya", avatar: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=80&h=80&fit=crop", vip: "VIP 3", level: 15, country: "🇪🇬", vyro_id: "VY20004", agency: null, followers: 800, following: 60, is_online: true, is_host: false },
-  { name: "Ali", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&h=80&fit=crop", vip: null, level: 20, country: "🇰🇷", vyro_id: "VY20005", agency: null, followers: 2100, following: 110, is_online: true, is_host: false },
-  { name: "Sajid", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop", vip: "VIP 7", level: 33, country: "🇵🇰", vyro_id: "VY20006", agency: "Golden Stars", followers: 8900, following: 250, is_online: true, is_host: false },
-];
-
-export default function RoomUserList({ viewerCount, onClose, onUserClick }) {
+export default function RoomUserList({ viewerCount, seats = [], audience = [], onClose, onUserClick }) {
   const [tab, setTab] = useState("seated");
   const [search, setSearch] = useState("");
 
-  const seatedUsers = SEATS.filter((s) => s.user).map((s) => ({ ...s.user, seatId: s.id, role: s.role }));
-  const allUsers = [...seatedUsers, ...AUDIENCE_USERS];
-  const filtered = allUsers.filter((u) => u.name.toLowerCase().includes(search.toLowerCase()));
+  const seatedUsers = seats.filter((s) => s.user).map((s) => ({ ...s.user, seatId: s.id, role: s.role }));
+  const allUsers = [...seatedUsers, ...audience];
+  const filtered = allUsers.filter((u) => (u.name || "").toLowerCase().includes(search.toLowerCase()));
 
-  const tabUsers = tab === "seated" ? seatedUsers : allUsers;
   const displayUsers = tab === "seated" ? seatedUsers : filtered;
 
   return (
@@ -91,14 +81,20 @@ export default function RoomUserList({ viewerCount, onClose, onUserClick }) {
           )}
           {displayUsers.map((u, i) => (
             <button
-              key={i}
+              key={u.user_id || i}
               onClick={() => onUserClick(u)}
               className="w-full flex items-center gap-2.5 p-2 rounded-xl transition active:scale-[0.98]"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
             >
               <div className="relative flex-shrink-0">
                 <div className="absolute -inset-0.5 rounded-full" style={{ background: u.is_host || u.vip ? `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldDark})` : "transparent" }} />
-                <img src={u.avatar} className="relative w-9 h-9 rounded-full object-cover" alt={u.name} />
+                {u.avatar ? (
+                  <img src={u.avatar} className="relative w-9 h-9 rounded-full object-cover" alt={u.name} />
+                ) : (
+                  <div className="relative w-9 h-9 rounded-full flex items-center justify-center" style={{ background: COLORS.tealMid }}>
+                    <span className="text-[10px] font-bold text-white">{(u.name || "U")[0]}</span>
+                  </div>
+                )}
                 {u.is_online && (
                   <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full" style={{ background: COLORS.emerald, border: `1.5px solid ${COLORS.tealDeep}` }} />
                 )}
@@ -117,8 +113,8 @@ export default function RoomUserList({ viewerCount, onClose, onUserClick }) {
                   <span className="text-[8px] font-bold px-1 py-0.5 rounded-full" style={{ background: `${COLORS.electricBlue}20`, color: COLORS.electricBlue }}>
                     LV.{u.level}
                   </span>
-                  <span className="text-[9px]">{u.country}</span>
-                  <span className="text-[8px]" style={{ color: COLORS.softGray }}>ID: {u.vyro_id}</span>
+                  {u.country && <span className="text-[9px]">{u.country}</span>}
+                  {u.vyro_id && <span className="text-[8px]" style={{ color: COLORS.softGray }}>ID: {u.vyro_id}</span>}
                 </div>
               </div>
               {u.seatId !== undefined && (

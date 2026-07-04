@@ -14,7 +14,7 @@ import AnimationLayer from "@/components/live-room/AnimationLayer";
 import RoomUserList from "@/components/live-room/RoomUserList";
 import MessageArea from "@/components/live-room/MessageArea";
 import BottomNav from "@/components/live-room/BottomNav";
-import { COLORS, ROOM_THEMES, CHAT_MESSAGES, WARNING_TEXT, SEATS, SEAT_POSITIONS, GIFT_CATALOG, EMOJIS_3D } from "@/components/live-room/roomData";
+import { COLORS, ROOM_THEMES, WARNING_TEXT, SEAT_POSITIONS, GIFT_CATALOG, EMOJIS_3D } from "@/components/live-room/roomData";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function LiveRoom() {
@@ -25,13 +25,13 @@ export default function LiveRoom() {
   const [sessionId] = useState(() => urlRoomId || (crypto?.randomUUID?.() || `room-${Date.now()}-${Math.random().toString(36).slice(2)}`));
   const roomId = sessionId;
   const { joined, joining, error: joinError, recommendations, aiStats, giftStats, roomScore, audioAction, publishEvent, archiveRoom, backupRoom, requestMic, verifyPayment, runScheduler } = useLiveRoomApi(roomId);
-  const { room: liveRoom, chat: supabaseChat, sendChatMessage } = useLiveRoomData(roomId);
+  const [seatCount, setSeatCount] = useState(10);
+  const { room: liveRoom, chat: supabaseChat, seats, audience, sendChatMessage } = useLiveRoomData(roomId, seatCount);
   const [themeIndex, setThemeIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
   const [muted, setMuted] = useState(false);
   const [locked, setLocked] = useState(false);
-  const [seatCount, setSeatCount] = useState(10);
 
   // Interaction system state
   const [profileSeatId, setProfileSeatId] = useState(null);
@@ -41,7 +41,7 @@ export default function LiveRoom() {
   const [showUserList, setShowUserList] = useState(false);
   const [animations, setAnimations] = useState([]);
   const [seatEffects, setSeatEffects] = useState([]);
-  const [chat, setChat] = useState(CHAT_MESSAGES);
+  const [chat, setChat] = useState([]);
   const [chatInput, setChatInput] = useState("");
   const [showChatInput, setShowChatInput] = useState(false);
   const [tempProfileUser, setTempProfileUser] = useState(null);
@@ -84,8 +84,15 @@ export default function LiveRoom() {
   const viewerCount = liveRoom?.viewers || 12450;
 
   const theme = ROOM_THEMES[themeIndex];
-  const currentUserSeatId = 0;
-  const hostUser = SEATS[0].user;
+  const currentUserSeatId = seats.find((s) => s.user?.user_id === currentUser?.id)?.id ?? 0;
+  const hostUser = seats[0]?.user || (liveRoom?.host ? {
+    name: liveRoom.host.name || "Host",
+    avatar: liveRoom.host.avatar || "",
+    vip: liveRoom.host.vip || null,
+    level: 1, speaking: false, muted: false, country: "", vyro_id: "",
+    agency: null, is_host: true, followers: 0, following: 0, is_online: true,
+    user_id: liveRoom.created_by_id || "",
+  } : { name: "Host", avatar: "", vip: null, level: 1, speaking: false, muted: false, country: "", vyro_id: "", agency: null, is_host: true, followers: 0, following: 0, is_online: true, user_id: "" });
 
   // Determine the current user's role in this room
   const [userRole, setUserRole] = useState("viewer");
@@ -109,7 +116,7 @@ export default function LiveRoom() {
       .catch(() => setUserRole("viewer"));
   }, [liveRoom?.id, liveRoom?.created_by_id, currentUser?.id, roomId]);
 
-  const profileSeat = SEATS.find((s) => s.id === profileSeatId);
+  const profileSeat = seats.find((s) => s.id === profileSeatId);
 
   useEffect(() => {
     if (recommendations.length > 0) {
@@ -118,7 +125,7 @@ export default function LiveRoom() {
   }, [recommendations]);
 
   const handleSeatClick = (seatId) => {
-    const seat = SEATS.find((s) => s.id === seatId);
+    const seat = seats.find((s) => s.id === seatId);
     if (seat && seat.user) {
       setProfileSeatId(seatId);
     }
@@ -126,7 +133,7 @@ export default function LiveRoom() {
 
   // Open profile for any user object (from user list)
   const handleUserProfile = (userObj) => {
-    const seat = SEATS.find((s) => s.user?.name === userObj.name);
+    const seat = seats.find((s) => s.user?.name === userObj.name);
     if (seat) {
       setProfileSeatId(seat.id);
       setTempProfileUser(null);
@@ -143,8 +150,8 @@ export default function LiveRoom() {
     : profileSeat;
 
   const sendGift = (gift, targetSeatId, senderSeatId = currentUserSeatId, senderName = null) => {
-    const sender = senderName ? { name: senderName } : SEATS[senderSeatId]?.user || { name: "You" };
-    const receiver = SEATS[targetSeatId]?.user;
+    const sender = senderName ? { name: senderName } : seats[senderSeatId]?.user || { name: "You" };
+    const receiver = seats[targetSeatId]?.user;
     if (!receiver) return;
 
     const animId = Date.now() + Math.random();
@@ -172,8 +179,8 @@ export default function LiveRoom() {
   };
 
   const sendEmoji = (emoji, targetSeatId, senderSeatId = currentUserSeatId, senderName = null) => {
-    const sender = senderName ? { name: senderName } : SEATS[senderSeatId]?.user || { name: "You" };
-    const receiver = SEATS[targetSeatId]?.user;
+    const sender = senderName ? { name: senderName } : seats[senderSeatId]?.user || { name: "You" };
+    const receiver = seats[targetSeatId]?.user;
     if (!receiver) return;
 
     const emojiObj = typeof emoji === "string" ? EMOJIS_3D.find((e) => e.emoji === emoji) || { emoji, name: "Emoji", color: COLORS.pink, animation: "fly", id: "custom" } : emoji;
@@ -203,7 +210,7 @@ export default function LiveRoom() {
   };
 
   const handlePanelSendGift = async (gift, targetId, quantity = 1) => {
-    const receiver = SEATS[targetId]?.user;
+    const receiver = seats[targetId]?.user;
     if (!receiver) return;
     try {
       const res = await base44.functions.invoke("sendGift", {
@@ -246,7 +253,7 @@ export default function LiveRoom() {
   // Simulate audience-to-seat gifts periodically
   useEffect(() => {
     const interval = setInterval(() => {
-      const occupied = SEATS.filter((s) => s.user && s.id !== 0);
+      const occupied = seats.filter((s) => s.user && s.id !== 0);
       if (!occupied.length) return;
       const target = occupied[Math.floor(Math.random() * occupied.length)];
       const gift = GIFT_CATALOG[Math.floor(Math.random() * 3)];
@@ -327,7 +334,7 @@ export default function LiveRoom() {
 
       {/* ===== Seat Grid — upper-mid ===== */}
       <div className="relative z-10 flex-shrink-0 flex items-center justify-start" style={{ padding: "0 16px", flex: "0 0 auto" }}>
-        <SeatArea onSeatClick={handleSeatClick} seatEffects={seatEffects} seatCount={seatCount} registerSeatRef={registerSeatRef} />
+        <SeatArea seats={seats} onSeatClick={handleSeatClick} seatEffects={seatEffects} registerSeatRef={registerSeatRef} />
       </div>
 
       {/* ===== Message Area — tabs + warning + chat (flexible, moves with seat count) ===== */}
@@ -388,6 +395,7 @@ export default function LiveRoom() {
         <InteractionPanel
           type={panelType}
           targetId={panelTargetId}
+          seats={seats}
           onSend={panelType === "gift" ? handlePanelSendGift : handlePanelSendEmoji}
           onClose={() => { setPanelType(null); setPanelTargetId(null); }}
         />
@@ -400,6 +408,8 @@ export default function LiveRoom() {
       {showUserList && (
         <RoomUserList
           viewerCount={viewerCount}
+          seats={seats}
+          audience={audience}
           onClose={() => setShowUserList(false)}
           onUserClick={handleUserProfile}
         />
