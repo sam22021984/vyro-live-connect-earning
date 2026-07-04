@@ -1,25 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')?.replace(/\/$/, '');
-const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
-const supabaseHeaders = {
-  'apikey': SERVICE_ROLE_KEY,
-  'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
-  'Content-Type': 'application/json',
-};
-
-async function supabaseFetch(table: string, method: string, body?: any) {
-  const url = `${SUPABASE_URL}/rest/v1/${table}`;
-  const response = await fetch(url, {
-    method,
-    headers: { ...supabaseHeaders, 'Prefer': method === 'POST' ? 'return=representation' : 'return=representation' },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const text = await response.text();
-  try { return JSON.parse(text); } catch { return text; }
-}
-
 // Route a user request to the right AI capability using LLM
 async function orchestrate(base44: any, userRequest: string, context?: any) {
   const routingPrompt = `You are an AI orchestrator. Analyze the user request and determine which AI tool(s) to use.
@@ -93,7 +73,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { action } = body;
 
-    // 1. Orchestrate — route request to best AI tool, execute, store result in Supabase
+    // 1. Orchestrate — route request to best AI tool, execute, store result
     if (action === 'orchestrate') {
       const { request: userRequest, params, conversation_id } = body;
       if (!userRequest) return Response.json({ error: 'request is required' }, { status: 400 });
@@ -104,22 +84,21 @@ Deno.serve(async (req) => {
       // Step 2: Execute the tool
       const result = await executeTool(base44, routing.tool, routing.prompt, params || {});
 
-      // Step 3: Store in Supabase
-      const logEntry = {
-        user_id: user.id,
-        conversation_id: conversation_id || crypto.randomUUID(),
-        request: userRequest,
-        tool_used: routing.tool,
-        routing_explanation: routing.explanation,
-        result: typeof result === 'string' ? { text: result } : result,
-        created_at: new Date().toISOString(),
-      };
-
-      let stored = null;
+      // Step 3: Store log via Base44 entity
+      const convId = conversation_id || crypto.randomUUID();
+      let logId = null;
       try {
-        stored = await supabaseFetch('ai_orchestrator_logs', 'POST', logEntry);
+        const logEntry = await base44.asServiceRole.entities.AiOrchestratorLog.create({
+          user_id: user.id,
+          conversation_id: convId,
+          request: userRequest,
+          tool_used: routing.tool,
+          routing_explanation: routing.explanation,
+          result: typeof result === 'string' ? { text: result } : result,
+        });
+        logId = logEntry?.id || null;
       } catch (_e) {
-        // Table might not exist — result still returned
+        // Logging failure should not block the response
       }
 
       return Response.json({
@@ -127,19 +106,18 @@ Deno.serve(async (req) => {
         tool: routing.tool,
         explanation: routing.explanation,
         result,
-        log_id: stored?.[0]?.id || null,
-        conversation_id: logEntry.conversation_id,
+        log_id: logId,
+        conversation_id: convId,
       });
     }
 
-    // 2. Get conversation history from Supabase
+    // 2. Get conversation history
     if (action === 'history') {
       const { conversation_id } = body;
-      const filter = conversation_id
-        ? `?conversation_id=eq.${conversation_id}&order=created_at.asc`
-        : `?user_id=eq.${user.id}&order=created_at.desc&limit=50`;
-      const history = await supabaseFetch(`ai_orchestrator_logs${filter}`, 'GET');
-      return Response.json({ history });
+      const logs = conversation_id
+        ? await base44.asServiceRole.entities.AiOrchestratorLog.filter({ conversation_id }, '-created_date', 100)
+        : await base44.asServiceRole.entities.AiOrchestratorLog.filter({ user_id: user.id }, '-created_date', 50);
+      return Response.json({ history: logs });
     }
 
     // 3. Direct tool execution — skip routing, run a specific tool
@@ -149,19 +127,19 @@ Deno.serve(async (req) => {
 
       const result = await executeTool(base44, tool, prompt, execParams || {});
 
-      const logEntry = {
-        user_id: user.id,
-        conversation_id: body.conversation_id || crypto.randomUUID(),
-        request: prompt,
-        tool_used: tool,
-        routing_explanation: 'direct_execution',
-        result: typeof result === 'string' ? { text: result } : result,
-        created_at: new Date().toISOString(),
-      };
+      const convId = body.conversation_id || crypto.randomUUID();
+      try {
+        await base44.asServiceRole.entities.AiOrchestratorLog.create({
+          user_id: user.id,
+          conversation_id: convId,
+          request: prompt,
+          tool_used: tool,
+          routing_explanation: 'direct_execution',
+          result: typeof result === 'string' ? { text: result } : result,
+        });
+      } catch (_e) {}
 
-      try { await supabaseFetch('ai_orchestrator_logs', 'POST', logEntry); } catch (_e) {}
-
-      return Response.json({ success: true, tool, result });
+      return Response.json({ success: true, tool, result, conversation_id: convId });
     }
 
     // 4. List available tools
