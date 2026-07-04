@@ -1,5 +1,6 @@
 import React from "react";
-import { giftingPerformance, giftingAnalytics } from "@/components/levels/gifting/giftingData";
+import { useLevelSubDashboard } from "@/hooks/useLevelSubDashboard";
+import { Loader2 } from "lucide-react";
 
 function StatGrid({ title, subtitle, data }) {
   return (
@@ -21,15 +22,29 @@ function StatGrid({ title, subtitle, data }) {
   );
 }
 
+function LoadingState() {
+  return (
+    <div className="flex justify-center py-12">
+      <Loader2 className="w-6 h-6 animate-spin text-amber-500" />
+    </div>
+  );
+}
+
 export default function OverviewTab() {
+  const { performance, giftingAnalytics, loading } = useLevelSubDashboard("gifting");
+
+  if (loading) return <LoadingState />;
+
   return (
     <div className="space-y-5">
-      <StatGrid title="Gifting Performance Overview" subtitle="Coins, gifts & spending metrics" data={giftingPerformance} />
+      <StatGrid title="Gifting Performance Overview" subtitle="Live coins, gifts & spending metrics" data={performance} />
       <StatGrid title="Gifting Analytics" subtitle="Support insights & contribution" data={giftingAnalytics} />
     </div>
   );
 }
 
 export function AnalyticsTab() {
+  const { giftingAnalytics, loading } = useLevelSubDashboard("gifting");
+  if (loading) return <LoadingState />;
   return <StatGrid title="Gifting Analytics" subtitle="Detailed contribution insights" data={giftingAnalytics} />;
 }

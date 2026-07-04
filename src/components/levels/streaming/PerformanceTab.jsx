@@ -1,5 +1,6 @@
 import React from "react";
-import { streamPerformance, audienceAnalytics, streamDiscovery } from "@/components/levels/streaming/streamingData";
+import { useLevelSubDashboard } from "@/hooks/useLevelSubDashboard";
+import { Loader2 } from "lucide-react";
 
 function StatGrid({ title, subtitle, data }) {
   return (
@@ -21,12 +22,24 @@ function StatGrid({ title, subtitle, data }) {
   );
 }
 
+function LoadingState() {
+  return (
+    <div className="flex justify-center py-12">
+      <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+    </div>
+  );
+}
+
 export default function PerformanceTab() {
+  const { performance, audience, discovery, loading } = useLevelSubDashboard("streaming");
+
+  if (loading) return <LoadingState />;
+
   return (
     <div className="space-y-5">
-      <StatGrid title="Stream Performance Overview" subtitle="Live streaming performance metrics" data={streamPerformance} />
-      <StatGrid title="Audience Analytics" subtitle="Viewer & follower insights" data={audienceAnalytics} />
-      <StatGrid title="Stream Discovery Center" subtitle="Discovery & ranking scores" data={streamDiscovery} />
+      <StatGrid title="Stream Performance Overview" subtitle="Live streaming performance metrics" data={performance} />
+      <StatGrid title="Audience Analytics" subtitle="Live viewer & follower insights" data={audience} />
+      <StatGrid title="Stream Discovery Center" subtitle="Discovery & ranking scores" data={discovery} />
     </div>
   );
 }

@@ -1,13 +1,24 @@
 import React from "react";
-import { streamEvents } from "@/components/levels/streaming/streamingData";
+import { useLevelSubDashboard } from "@/hooks/useLevelSubDashboard";
+import { Loader2 } from "lucide-react";
 
 export default function EventsTab() {
+  const { events, loading } = useLevelSubDashboard("streaming");
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <h3 className="text-sm font-bold text-gray-800 mb-1 px-1">Event Center</h3>
       <p className="text-[10px] text-gray-400 mb-3 px-1">Active & upcoming streaming events</p>
       <div className="grid grid-cols-2 gap-2.5">
-        {streamEvents.map((e, i) => {
+        {events.map((e, i) => {
           const isActive = e.status === "Active";
           return (
             <div key={i} className="rounded-2xl p-3" style={{ background: "linear-gradient(135deg, #FFFFFF, #F5F7FA)", border: `1px solid ${e.color}30`, boxShadow: `0 4px 12px ${e.color}15` }}>

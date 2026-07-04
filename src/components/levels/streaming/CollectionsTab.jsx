@@ -1,15 +1,26 @@
 import React from "react";
-import { streamCollections, streamLeaderboard } from "@/components/levels/streaming/streamingData";
+import { useLevelSubDashboard } from "@/hooks/useLevelSubDashboard";
+import { Loader2 } from "lucide-react";
 
 export default function CollectionsTab() {
+  const { collections, leaderboard, loading } = useLevelSubDashboard("streaming");
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
       {/* Stream Collections */}
       <div>
         <h3 className="text-sm font-bold text-gray-800 mb-1 px-1">Stream Collections</h3>
-        <p className="text-[10px] text-gray-400 mb-3 px-1">Collection progress rings</p>
+        <p className="text-[10px] text-gray-400 mb-3 px-1">Live collection progress rings</p>
         <div className="grid grid-cols-2 gap-2.5">
-          {streamCollections.map((c, i) => {
+          {collections.map((c, i) => {
             const circumference = 2 * Math.PI * 28;
             const offset = circumference - (c.progress / 100) * circumference;
             return (
@@ -33,9 +44,9 @@ export default function CollectionsTab() {
       {/* Streaming Leaderboard */}
       <div>
         <h3 className="text-sm font-bold text-gray-800 mb-1 px-1">Streaming Leaderboard</h3>
-        <p className="text-[10px] text-gray-400 mb-3 px-1">Premium ranking overview</p>
+        <p className="text-[10px] text-gray-400 mb-3 px-1">Live ranking overview</p>
         <div className="grid grid-cols-2 gap-2.5">
-          {streamLeaderboard.map((l, i) => (
+          {leaderboard.map((l, i) => (
             <div key={i} className="rounded-2xl p-3" style={{ background: "linear-gradient(135deg, #FFFFFF, #F5F7FA)", border: `1px solid ${l.color}30`, boxShadow: `0 4px 12px ${l.color}15` }}>
               <div className="flex items-center justify-between mb-1">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: `${l.color}15` }}>{l.icon}</div>
