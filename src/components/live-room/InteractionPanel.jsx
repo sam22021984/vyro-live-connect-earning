@@ -63,12 +63,14 @@ export default function InteractionPanel({ type, targetId, seats = [], onSend, o
     <div className="fixed inset-0 z-[60] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative w-full max-w-md rounded-t-2xl flex flex-col animate-fadeIn"
+        className="relative w-[90%] max-w-md flex flex-col animate-fadeIn"
         style={{
           background: COLORS.tealDeep,
           border: `1px solid ${COLORS.gold}30`,
           boxShadow: "0 -8px 32px rgba(0,0,0,0.5)",
-          maxHeight: "55vh",
+          height: "60vh",
+          maxHeight: "85vh",
+          borderRadius: "26px 26px 0 0",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >

@@ -32,14 +32,14 @@ export default function SettingsPanel({ onClose, onArchive, onBackup, onSchedule
     toast({ title: isFailed(res) ? "Scheduler failed" : `Scheduler ran ✓ (${res?.processed_rooms ?? 0} rooms)`, variant: isFailed(res) ? "destructive" : "default" });
   };
 
-  const panelHeight = expanded ? "82vh" : "55vh";
+  const panelHeight = expanded ? "82vh" : "60vh";
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-md" onClick={onClose} />
 
       <div
-        className="relative w-[70%] max-w-md flex flex-col animate-fadeIn transition-all duration-300 ease-out"
+        className="relative w-[90%] max-w-md flex flex-col animate-fadeIn transition-all duration-300 ease-out"
         style={{
           height: panelHeight,
           borderRadius: "26px 26px 0 0",

@@ -91,8 +91,8 @@ export default function GiftLeaderboard({ onClose }) {
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative w-full max-w-md rounded-t-3xl max-h-[80vh] overflow-y-auto scrollbar-hide animate-fadeIn"
-        style={{ background: COLORS.tealDeep, border: `1px solid ${COLORS.gold}30`, boxShadow: "0 -8px 32px rgba(0,0,0,0.5)" }}
+        className="relative w-[90%] max-w-md overflow-y-auto scrollbar-hide animate-fadeIn"
+        style={{ background: COLORS.tealDeep, border: `1px solid ${COLORS.gold}30`, boxShadow: "0 -8px 32px rgba(0,0,0,0.5)", height: "60vh", maxHeight: "85vh", borderRadius: "26px 26px 0 0" }}
       >
         {/* Header */}
         <div className="sticky top-0 z-10 pt-3 pb-2 px-4" style={{ background: COLORS.tealDeep }}>
