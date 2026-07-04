@@ -1,7 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 // Decode Supabase JWT from request to get user identity
-// (Base44's built-in auth.me() doesn't recognize Supabase tokens)
 function getSupabaseUser(req: Request): { id: string; email: string; full_name?: string } | null {
   try {
     const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
@@ -9,7 +8,6 @@ function getSupabaseUser(req: Request): { id: string; email: string; full_name?:
     const token = authHeader.replace('Bearer ', '').trim();
     const parts = token.split('.');
     if (parts.length !== 3) return null;
-    // JWT payload is base64url — convert to base64, pad, decode
     let b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
     while (b64.length % 4) b64 += '=';
     const payload = JSON.parse(atob(b64));
@@ -45,12 +43,11 @@ const COUNTRY_CONFIG: Record<string, { name: string; calling_code: string }> = {
   IDN: { name: 'Indonesia', calling_code: '62' },
 };
 
-// Generate the next available Application ID for a country
+// Generate the next available Application ID for a country — conflict checks parallelized
 async function generateApplicationId(base44: any, countryCode: string): Promise<{ id: string; serial: number }> {
   const config = COUNTRY_CONFIG[countryCode] || COUNTRY_CONFIG.QAT;
   const callingCode = config.calling_code;
 
-  // Find max serial for this country
   const existing = await base44.asServiceRole.entities.ApplicationId.filter(
     { country_code: countryCode },
     '-serial_number',
@@ -59,22 +56,34 @@ async function generateApplicationId(base44: any, countryCode: string): Promise<
   const maxSerial = existing.length > 0 ? (existing[0].serial_number || 0) : 0;
   let nextSerial = maxSerial + 1;
 
-  // Format: COUNTRY-CALLING_CODE+10-digit serial
   let applicationId = `${countryCode}-${callingCode}${nextSerial.toString().padStart(10, '0')}`;
 
-  // Verify uniqueness against ApplicationId and LuckyId tables
-  let conflict = await base44.asServiceRole.entities.ApplicationId.filter({ application_id: applicationId });
-  let luckyConflict = await base44.asServiceRole.entities.LuckyId.filter({ application_id: applicationId });
+  // Check uniqueness against ApplicationId and LuckyId tables — in parallel
+  let [conflict, luckyConflict] = await Promise.all([
+    base44.asServiceRole.entities.ApplicationId.filter({ application_id: applicationId }),
+    base44.asServiceRole.entities.LuckyId.filter({ application_id: applicationId }),
+  ]);
   let attempts = 0;
   while ((conflict.length > 0 || luckyConflict.length > 0) && attempts < 100) {
     nextSerial++;
     applicationId = `${countryCode}-${callingCode}${nextSerial.toString().padStart(10, '0')}`;
-    conflict = await base44.asServiceRole.entities.ApplicationId.filter({ application_id: applicationId });
-    luckyConflict = await base44.asServiceRole.entities.LuckyId.filter({ application_id: applicationId });
+    [conflict, luckyConflict] = await Promise.all([
+      base44.asServiceRole.entities.ApplicationId.filter({ application_id: applicationId }),
+      base44.asServiceRole.entities.LuckyId.filter({ application_id: applicationId }),
+    ]);
     attempts++;
   }
 
   return { id: applicationId, serial: nextSerial };
+}
+
+// Helper: find user's profile — checks user_id and created_by_id in parallel
+async function findProfile(base44: any, userId: string) {
+  const [byUserId, byCreatedBy] = await Promise.all([
+    base44.asServiceRole.entities.UserProfile.filter({ user_id: userId }),
+    base44.asServiceRole.entities.UserProfile.filter({ created_by_id: userId }),
+  ]);
+  return byUserId.length > 0 ? byUserId[0] : (byCreatedBy.length > 0 ? byCreatedBy[0] : null);
 }
 
 function getZodiac(dateStr: string): string {
@@ -98,10 +107,15 @@ function getZodiac(dateStr: string): string {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = getSupabaseUser(req);
+    const body = await req.json();
+
+    // Resolve user identity — from JWT or internal service-role call
+    let user = getSupabaseUser(req);
+    if (!user && body._internal_user_id) {
+      user = { id: body._internal_user_id, email: body._internal_user_email || '' };
+    }
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const body = await req.json();
     const { action } = body;
 
     // Initialize or fetch profile after signup/login
@@ -110,42 +124,35 @@ Deno.serve(async (req) => {
       const countryCode = (country || 'QAT').toUpperCase();
       const countryConfig = COUNTRY_CONFIG[countryCode] || COUNTRY_CONFIG.QAT;
 
-      // Check if profile already exists for this user
-      let profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id: user.id });
-      if (profiles.length === 0) {
-        profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by_id: user.id });
-      }
+      const existing = await findProfile(base44, user.id);
 
-      if (profiles.length > 0) {
-        // Profile exists — ensure global_id is set
-        const existing = profiles[0];
+      if (existing) {
         if (!existing.global_id) {
-          // Generate country-based Application ID
           const { id: applicationId, serial } = await generateApplicationId(base44, countryCode);
 
-          // Create ApplicationId record
-          await base44.asServiceRole.entities.ApplicationId.create({
-            application_id: applicationId,
-            country_code: countryCode,
-            calling_code: countryConfig.calling_code,
-            serial_number: serial,
-            user_id: user.id,
-            username: existing.username || username || user.email?.split('@')[0],
-            country_name: countryConfig.name,
-            status: 'active',
-          });
-
-          // Create initial history entry
-          await base44.asServiceRole.entities.IdHistory.create({
-            user_id: user.id,
-            username: existing.username || username,
-            previous_id: '[none]',
-            new_id: applicationId,
-            change_reason: 'Initial Application ID generated during signup',
-            admin_log: `Auto-generated for country ${countryCode}`,
-            changed_by: user.id,
-            change_type: 'initial',
-          });
+          // Create ApplicationId + IdHistory in parallel — independent records
+          await Promise.all([
+            base44.asServiceRole.entities.ApplicationId.create({
+              application_id: applicationId,
+              country_code: countryCode,
+              calling_code: countryConfig.calling_code,
+              serial_number: serial,
+              user_id: user.id,
+              username: existing.username || username || user.email?.split('@')[0],
+              country_name: countryConfig.name,
+              status: 'active',
+            }),
+            base44.asServiceRole.entities.IdHistory.create({
+              user_id: user.id,
+              username: existing.username || username,
+              previous_id: '[none]',
+              new_id: applicationId,
+              change_reason: 'Initial Application ID generated during signup',
+              admin_log: `Auto-generated for country ${countryCode}`,
+              changed_by: user.id,
+              change_type: 'initial',
+            }),
+          ]);
 
           const updated = await base44.asServiceRole.entities.UserProfile.update(existing.id, {
             global_id: applicationId,
@@ -157,80 +164,73 @@ Deno.serve(async (req) => {
         return Response.json({ profile: existing, isNew: false, global_id: existing.global_id });
       }
 
-      // Check if this is the first real user — if so, assign owner role
-      const allProfiles = await base44.asServiceRole.entities.UserProfile.list('-created_date', 500);
-      const isFirstUser = allProfiles.length === 0;
+      // Check if this is the first real user — only fetch 1 record, not 500
+      const anyProfile = await base44.asServiceRole.entities.UserProfile.list('-created_date', 1);
+      const isFirstUser = anyProfile.length === 0;
       const assignedRole = isFirstUser ? 'owner' : (role || 'user');
       const isAppOwner = isFirstUser;
 
-      // Generate unique Application ID
       const { id: applicationId, serial } = await generateApplicationId(base44, countryCode);
       const finalUsername = username || user.full_name || user.email?.split('@')[0] || 'VYRO User';
 
-      // Create ApplicationId record
-      await base44.asServiceRole.entities.ApplicationId.create({
-        application_id: applicationId,
-        country_code: countryCode,
-        calling_code: countryConfig.calling_code,
-        serial_number: serial,
-        user_id: user.id,
-        username: finalUsername,
-        country_name: countryConfig.name,
-        status: 'active',
-      });
-
-      // Create initial history entry
-      await base44.asServiceRole.entities.IdHistory.create({
-        user_id: user.id,
-        username: finalUsername,
-        previous_id: '[none]',
-        new_id: applicationId,
-        change_reason: 'Initial Application ID generated during signup',
-        admin_log: `Auto-generated for country ${countryCode}`,
-        changed_by: user.id,
-        change_type: 'initial',
-      });
-
-      // Create profile with application_id
-      const profile = await base44.asServiceRole.entities.UserProfile.create({
-        username: finalUsername,
-        title: 'VYRO User',
-        user_id: user.id,
-        global_id: applicationId,
-        role: assignedRole,
-        country: countryConfig.name,
-        is_app_owner: isAppOwner,
-        is_verified: false,
-        is_official: false,
-        is_vip: false,
-        is_agency: false,
-        verification_status: 'unverified',
-        safety_status: 'high',
-        user_level: 1,
-        host_level: 1,
-        gifting_level: 1,
-        streaming_level: 1,
-        trust_score: 0,
-        reputation_rating: 0,
-        profile_completion: 0,
-        activity_score: 0,
-        coins: 0,
-        safety_status: 'medium',
-      });
+      // Create all 3 records in parallel — they don't depend on each other
+      const [, , profile] = await Promise.all([
+        base44.asServiceRole.entities.ApplicationId.create({
+          application_id: applicationId,
+          country_code: countryCode,
+          calling_code: countryConfig.calling_code,
+          serial_number: serial,
+          user_id: user.id,
+          username: finalUsername,
+          country_name: countryConfig.name,
+          status: 'active',
+        }),
+        base44.asServiceRole.entities.IdHistory.create({
+          user_id: user.id,
+          username: finalUsername,
+          previous_id: '[none]',
+          new_id: applicationId,
+          change_reason: 'Initial Application ID generated during signup',
+          admin_log: `Auto-generated for country ${countryCode}`,
+          changed_by: user.id,
+          change_type: 'initial',
+        }),
+        base44.asServiceRole.entities.UserProfile.create({
+          username: finalUsername,
+          title: 'VYRO User',
+          user_id: user.id,
+          global_id: applicationId,
+          role: assignedRole,
+          country: countryConfig.name,
+          is_app_owner: isAppOwner,
+          is_verified: false,
+          is_official: false,
+          is_vip: false,
+          is_agency: false,
+          verification_status: 'unverified',
+          safety_status: 'medium',
+          user_level: 1,
+          host_level: 1,
+          gifting_level: 1,
+          streaming_level: 1,
+          trust_score: 0,
+          reputation_rating: 0,
+          profile_completion: 0,
+          activity_score: 0,
+          coins: 0,
+        }),
+      ]);
 
       return Response.json({ profile, isNew: true, global_id: applicationId });
     }
 
     // Get current user's profile + global_id
     if (action === 'getProfile') {
-      let profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id: user.id });
-      if (profiles.length === 0) {
-        profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by_id: user.id });
-      }
-      if (profiles.length === 0) {
+      const p = await findProfile(base44, user.id);
+      if (!p) {
         return Response.json({ error: 'Profile not found', profile: null }, { status: 200 });
       }
-      return Response.json({ profile: profiles[0], global_id: profiles[0].global_id });
+      return Response.json({ profile: p, global_id: p.global_id });
     }
 
     // Look up a user by their global_id
@@ -281,11 +281,8 @@ Deno.serve(async (req) => {
     if (action === 'updateProfile') {
       const { username, full_name, bio, birthday, gender, avatar_url, cover_url, country, language, interests } = body;
 
-      let profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id: user.id });
-      if (profiles.length === 0) {
-        profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by_id: user.id });
-      }
-      if (profiles.length === 0) {
+      const p = await findProfile(base44, user.id);
+      if (!p) {
         return Response.json({ error: 'Profile not found' }, { status: 404 });
       }
 
@@ -301,19 +298,15 @@ Deno.serve(async (req) => {
       if (language) updates.language = language;
       if (interests) updates.interests = interests;
 
-      const updated = await base44.asServiceRole.entities.UserProfile.update(profiles[0].id, updates);
+      const updated = await base44.asServiceRole.entities.UserProfile.update(p.id, updates);
       return Response.json({ profile: updated });
     }
 
     // Claim welcome bonus
     if (action === 'claimWelcomeBonus') {
-      let profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id: user.id });
-      if (profiles.length === 0) {
-        profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by_id: user.id });
-      }
-      if (profiles.length === 0) return Response.json({ error: 'Profile not found' }, { status: 404 });
+      const p = await findProfile(base44, user.id);
+      if (!p) return Response.json({ error: 'Profile not found' }, { status: 404 });
 
-      const p = profiles[0];
       if (p.welcome_bonus_claimed) return Response.json({ error: 'Already claimed' }, { status: 400 });
 
       const updated = await base44.asServiceRole.entities.UserProfile.update(p.id, {

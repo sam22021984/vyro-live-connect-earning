@@ -52,8 +52,8 @@ export const supabaseAuth = {
     return null;
   },
 
-  async signUp(email, password) {
-    const res = await invoke({ action: "signup", email, password });
+  async signUp(email, password, opts = {}) {
+    const res = await invoke({ action: "signup", email, password, country: opts.country, username: opts.username });
     const { data, ok } = res.data;
     if (!ok) throw new Error(extractError(data));
     if (data.access_token) this.setToken(data.access_token, data.refresh_token);

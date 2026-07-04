@@ -32,15 +32,27 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      await supabaseAuth.signUp(email, password);
-      // Initialize profile with Global ID
-      const res = await base44.functions.invoke("userOnboarding", {
-        action: "initProfile",
-        role: "user",
-        username: email.split("@")[0],
+      const data = await supabaseAuth.signUp(email, password, {
         country,
+        username: email.split("@")[0],
       });
-      const { profile, global_id, isNew } = res.data;
+      // Profile init done internally in signUp — use combined result, fallback to separate call
+      let profile, global_id, isNew;
+      if (data.onboarding) {
+        profile = data.onboarding.profile;
+        global_id = data.onboarding.global_id;
+        isNew = data.onboarding.isNew;
+      } else {
+        const res = await base44.functions.invoke("userOnboarding", {
+          action: "initProfile",
+          role: "user",
+          username: email.split("@")[0],
+          country,
+        });
+        profile = res.data.profile;
+        global_id = res.data.global_id;
+        isNew = res.data.isNew;
+      }
       setOnboarding({ profile, globalId: global_id, isNew });
     } catch (err) {
       setError(err.message || "Registration failed");

@@ -1,10 +1,17 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 15000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(timeout));
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json();
-    const { action, email, password, otp, type, access_token, provider, redirect_to, phone } = body;
+    const { action, email, password, otp, type, access_token, provider, redirect_to, phone, country, username } = body;
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')?.replace(/\/$/, '');
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
@@ -27,24 +34,43 @@ Deno.serve(async (req) => {
       const adminHeaders = { ...baseHeaders, 'Authorization': `Bearer ${serviceRoleKey}` };
 
       // Create user (email_confirm: true → no verification email needed)
-      const createResponse = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
+      const createResponse = await fetchWithTimeout(`${supabaseUrl}/auth/v1/admin/users`, {
         method: 'POST',
         headers: adminHeaders,
         body: JSON.stringify({ email, password, email_confirm: true }),
-      });
+      }, 15000);
       const createData = await createResponse.json();
       if (!createResponse.ok) {
         return Response.json({ data: createData, ok: false, status: createResponse.status });
       }
 
       // Immediately log in to get access token
-      const loginResponse = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+      const loginResponse = await fetchWithTimeout(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
         method: 'POST',
         headers: baseHeaders,
         body: JSON.stringify({ email, password }),
-      });
+      }, 15000);
       const loginData = await loginResponse.json();
-      return Response.json({ data: loginData, ok: loginResponse.ok, status: loginResponse.status });
+      if (!loginResponse.ok || !loginData.access_token) {
+        return Response.json({ data: loginData, ok: false, status: loginResponse.status });
+      }
+
+      // Initialize profile internally — saves a frontend round trip
+      try {
+        const onboardingRes = await base44.asServiceRole.functions.invoke('userOnboarding', {
+          action: 'initProfile',
+          role: 'user',
+          username: username || email.split('@')[0],
+          country: country || 'QAT',
+          _internal_user_id: loginData.user?.id || createData.id,
+          _internal_user_email: loginData.user?.email || email,
+        });
+        loginData.onboarding = onboardingRes?.data || onboardingRes;
+      } catch (_e) {
+        // Fallback: frontend will call initProfile separately
+      }
+
+      return Response.json({ data: loginData, ok: true, status: 200 });
     }
 
     // OAuth URL — uses Supabase built-in OAuth for ALL providers (including Google)
