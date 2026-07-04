@@ -504,7 +504,7 @@ export default function UserDataSection() {
                 <Card key={f.id || i}>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-1.5">
-                      <AlertTriangle size={14} style={{ color: severityColor(f.risk_level)} />
+                      <AlertTriangle size={14} style={{ color: severityColor(f.risk_level) }} />
                       <h4 className="text-[10px] font-bold uppercase" style={{ color: DARK }}>{f.fraud_type?.replace(/_/g, " ")}</h4>
                     </div>
                     <Badge label={(f.risk_level || "low").toUpperCase()} color={severityColor(f.risk_level)} />
@@ -537,7 +537,7 @@ export default function UserDataSection() {
                 <Card key={s.id || i}>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-1.5">
-                      <MessageSquare size={14} style={{ color: severityColor(s.severity)} />
+                      <MessageSquare size={14} style={{ color: severityColor(s.severity) }} />
                       <h4 className="text-[10px] font-bold uppercase" style={{ color: DARK }}>{s.spam_type?.replace(/_/g, " ")}</h4>
                     </div>
                     <Badge label={(s.severity || "low").toUpperCase()} color={severityColor(s.severity)} />
