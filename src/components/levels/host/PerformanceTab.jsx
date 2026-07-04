@@ -1,5 +1,6 @@
 import React from "react";
-import { hostPerformance, liveStreamPerf, audienceAnalytics, roomPerformance } from "@/components/levels/host/hostData";
+import { useLevelSubDashboard } from "@/hooks/useLevelSubDashboard";
+import { Loader2 } from "lucide-react";
 
 function StatGrid({ title, subtitle, data }) {
   return (
@@ -21,16 +22,30 @@ function StatGrid({ title, subtitle, data }) {
   );
 }
 
+function LoadingState() {
+  return (
+    <div className="flex justify-center py-12">
+      <Loader2 className="w-6 h-6 animate-spin text-red-500" />
+    </div>
+  );
+}
+
 export default function PerformanceTab() {
+  const { performance, livePerf, roomPerf, loading } = useLevelSubDashboard("host");
+
+  if (loading) return <LoadingState />;
+
   return (
     <div className="space-y-5">
-      <StatGrid title="Host Performance Overview" subtitle="Earnings & revenue metrics" data={hostPerformance} />
-      <StatGrid title="Live Stream Performance" subtitle="Streaming hours & consistency" data={liveStreamPerf} />
-      <StatGrid title="Room Performance" subtitle="Room visits & popularity" data={roomPerformance} />
+      <StatGrid title="Host Performance Overview" subtitle="Live earnings & revenue metrics" data={performance} />
+      <StatGrid title="Live Stream Performance" subtitle="Streaming hours & consistency" data={livePerf} />
+      <StatGrid title="Room Performance" subtitle="Room visits & popularity" data={roomPerf} />
     </div>
   );
 }
 
 export function AudienceTab() {
-  return <StatGrid title="Audience Analytics" subtitle="Follower & viewer insights" data={audienceAnalytics} />;
+  const { audience, loading } = useLevelSubDashboard("host");
+  if (loading) return <LoadingState />;
+  return <StatGrid title="Audience Analytics" subtitle="Live follower & viewer insights" data={audience} />;
 }
