@@ -4,7 +4,7 @@ import { COLORS, FUNCTION_ITEMS, ENTERTAINMENT_ITEMS } from "./roomData";
 import SeatManagementSection from "./SeatManagementSection";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function SettingsPanel({ onClose, onArchive, onBackup, onScheduler, onEndRoom, endingRoom, giftStats, roomScore, aiStats, seatCount, onSeatCountChange, userRole = "viewer" }) {
+export default function SettingsPanel({ onClose, onArchive, onBackup, onScheduler, onEndRoom, endingRoom, giftStats, roomScore, aiStats, seatCount, onSeatCountChange, userRole = "viewer", onResetSeats }) {
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
   const [search, setSearch] = useState("");
@@ -128,6 +128,15 @@ export default function SettingsPanel({ onClose, onArchive, onBackup, onSchedule
                 onSeatCountChange={isOwner ? (onSeatCountChange || (() => {})) : () => toast({ title: "⛔ Only the room owner can change seats", variant: "destructive" })}
                 readOnly={!isOwner}
               />
+              {isOwner && onResetSeats && (
+                <button
+                  onClick={onResetSeats}
+                  className="w-full mt-2 py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition active:scale-95"
+                  style={{ background: `${COLORS.purple}15`, border: `1px solid ${COLORS.purple}30`, color: COLORS.purple }}
+                >
+                  🔄 Reset All Seats
+                </button>
+              )}
             </section>
 
             <Divider />

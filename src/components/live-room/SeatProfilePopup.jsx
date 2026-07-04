@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   X, UserPlus, UserMinus, MessageCircle, Share2, AtSign, Gift, Mic, MicOff,
   Crown, Shield, ShieldOff, Ban, Lock, Unlock, Users, ArrowRightLeft,
-  DoorOpen, Clock, Calendar, Eraser, ExternalLink, Sparkles, Circle,
+  DoorOpen, Clock, Calendar, Eraser, ExternalLink, Sparkles, Circle, Armchair,
 } from "lucide-react";
 import { COLORS, ADMIN_CONTROLS, getControlsForRole } from "./roomData";
 import { useToast } from "@/components/ui/use-toast";
@@ -53,7 +53,7 @@ function AdminSection({ title, controls, onAction }) {
   );
 }
 
-export default function SeatProfilePopup({ seat, userRole, onClose, onSendGift, onSendEmoji, onAction }) {
+export default function SeatProfilePopup({ seat, userRole, currentUserId, onClose, onSendGift, onSendEmoji, onAction }) {
   const { toast } = useToast();
   const [isFollowing, setIsFollowing] = useState(false);
   const [acting, setActing] = useState(false);
@@ -62,6 +62,31 @@ export default function SeatProfilePopup({ seat, userRole, onClose, onSendGift, 
 
   const isAdmin = userRole === "admin" || userRole === "owner" || userRole === "moderator" || userRole === "co_host";
   const controls = getControlsForRole(userRole);
+
+  // Host/Admin takes the seat currently occupied by this user
+  const handleTakeSeat = async () => {
+    if (acting) return;
+    setActing(true);
+    try {
+      const res = await base44.functions.invoke("moderateRoom", {
+        room_id: seat.room_id,
+        action: "take_seat",
+        target_seat_number: seat.id,
+        reason: "Seat taken by " + userRole,
+      });
+      const data = res.data || res;
+      if (data.error) {
+        toast({ title: data.error, variant: "destructive" });
+      } else {
+        toast({ title: `Moved to seat ${seat.id}`, description: `${u.name} moved to audience` });
+        onAction("take_seat");
+      }
+    } catch (err) {
+      toast({ title: "Failed to take seat", description: err.message, variant: "destructive" });
+    } finally {
+      setActing(false);
+    }
+  };
 
   const handleModeration = async (control) => {
     if (acting) return;
@@ -177,6 +202,19 @@ export default function SeatProfilePopup({ seat, userRole, onClose, onSendGift, 
               ))}
             </div>
           </div>
+
+          {/* Take This Seat — host/admin on an occupied seat that's not their own */}
+          {isAdmin && u.user_id !== currentUserId && seat.id !== 0 && (
+            <button
+              onClick={handleTakeSeat}
+              disabled={acting}
+              className="w-full py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition active:scale-95 disabled:opacity-60"
+              style={{ background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldDark})`, color: "#000" }}
+            >
+              <Armchair size={14} />
+              {acting ? "Moving…" : "Take This Seat"}
+            </button>
+          )}
 
           {/* Admin controls */}
           {isAdmin && (

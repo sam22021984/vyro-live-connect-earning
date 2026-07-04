@@ -9,7 +9,7 @@ const SEAT_SIZES = {
   small: 56,      // Small audience
 };
 
-const Seat = forwardRef(({ seat, size, onClick, effects = [] }, ref) => {
+const Seat = forwardRef(({ seat, size, onClick, effects = [], canSit = false, onSitClick }, ref) => {
   const { user, id, role } = seat;
   const isEmpty = !user;
   const isHost = role === "host";
@@ -33,12 +33,23 @@ const Seat = forwardRef(({ seat, size, onClick, effects = [] }, ref) => {
       {/* Avatar + overlays — fixed size container */}
       <div className="relative flex items-center justify-center" style={{ width: seatSize, height: seatSize }}>
         {isEmpty ? (
-          <div
-            className="w-full h-full rounded-full flex items-center justify-center"
-            style={{ background: "rgba(255,255,255,0.04)", border: `2px dashed ${COLORS.gold}40` }}
-          >
-            <Armchair size={18} style={{ color: `${COLORS.gold}50` }} />
-          </div>
+          canSit ? (
+            <button
+              onClick={() => onSitClick && onSitClick(id)}
+              className="w-full h-full rounded-full flex flex-col items-center justify-center active:scale-95 transition relative"
+              style={{ background: `${COLORS.gold}10`, border: `2px dashed ${COLORS.gold}` }}
+            >
+              <Armchair size={18} style={{ color: COLORS.gold }} />
+              <span className="text-[7px] font-bold mt-0.5" style={{ color: COLORS.gold }}>Sit</span>
+            </button>
+          ) : (
+            <div
+              className="w-full h-full rounded-full flex items-center justify-center"
+              style={{ background: "rgba(255,255,255,0.04)", border: `2px dashed ${COLORS.gold}40` }}
+            >
+              <Armchair size={18} style={{ color: `${COLORS.gold}50` }} />
+            </div>
+          )
         ) : (
           <button onClick={() => onClick && onClick(id)} className="w-full h-full block active:scale-95 transition relative" style={{ cursor: "pointer" }}>
             {/* Glow effect */}

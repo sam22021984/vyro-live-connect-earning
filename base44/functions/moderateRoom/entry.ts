@@ -4,14 +4,21 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 const PERMISSION_MATRIX = {
   owner: ['mute', 'unmute', 'remove_seat', 'move_seat', 'kick_audience', 'lock_seat', 'unlock_seat',
     'kick_room', 'ban_24h', 'ban_7d', 'ban_permanent', 'block_speaking', 'clear_messages',
-    'promote_mod', 'remove_mod', 'promote_admin', 'remove_admin', 'promote_co_host', 'assign_seat'],
+    'promote_mod', 'remove_mod', 'promote_admin', 'remove_admin', 'promote_co_host', 'assign_seat',
+    'take_seat', 'leave_seat', 'reset_seats'],
   admin: ['mute', 'unmute', 'remove_seat', 'move_seat', 'kick_audience', 'lock_seat', 'unlock_seat',
-    'kick_room', 'ban_24h', 'ban_7d', 'block_speaking', 'clear_messages', 'promote_mod', 'remove_mod'],
-  moderator: ['mute', 'unmute', 'kick_audience', 'kick_room', 'ban_24h', 'block_speaking', 'clear_messages'],
-  co_host: ['mute', 'unmute', 'remove_seat', 'move_seat', 'kick_audience', 'lock_seat', 'unlock_seat', 'kick_room', 'ban_24h'],
-  speaker: [],
-  viewer: [],
+    'kick_room', 'ban_24h', 'ban_7d', 'block_speaking', 'clear_messages', 'promote_mod', 'remove_mod',
+    'take_seat', 'leave_seat'],
+  moderator: ['mute', 'unmute', 'kick_audience', 'kick_room', 'ban_24h', 'block_speaking', 'clear_messages',
+    'leave_seat'],
+  co_host: ['mute', 'unmute', 'remove_seat', 'move_seat', 'kick_audience', 'lock_seat', 'unlock_seat', 'kick_room', 'ban_24h',
+    'take_seat', 'leave_seat'],
+  speaker: ['leave_seat'],
+  viewer: ['leave_seat'],
 };
+
+// Actions where the actor operates on their own seat (no target_user_id needed)
+const SELF_SEAT_ACTIONS = ['take_seat', 'leave_seat', 'reset_seats'];
 
 const ACTION_DURATIONS = {
   ban_24h: 24,
@@ -26,8 +33,11 @@ Deno.serve(async (req) => {
 
     const body = await req.json();
     const { room_id, target_user_id, action, reason, target_seat_number } = body;
-    if (!room_id || !target_user_id || !action) {
-      return Response.json({ error: 'room_id, target_user_id, and action are required' }, { status: 400 });
+    if (!room_id || !action) {
+      return Response.json({ error: 'room_id and action are required' }, { status: 400 });
+    }
+    if (!SELF_SEAT_ACTIONS.includes(action) && !target_user_id) {
+      return Response.json({ error: 'target_user_id is required for this action' }, { status: 400 });
     }
 
     // Fetch room
@@ -52,7 +62,83 @@ Deno.serve(async (req) => {
     // Check permission
     const allowedActions = PERMISSION_MATRIX[actorRole] || [];
     if (!allowedActions.includes(action)) {
-      return Response.json({ error: 'You do not have permission to perform this action', forbidden: true }, { status: 403 });
+      return Response.json({ error: 'Only the Room Owner can perform this action.', forbidden: true }, { status: 403 });
+    }
+
+    // ── Self-seat management actions ──
+    // These operate on the ACTOR, not a target user. Skip target validation.
+    if (SELF_SEAT_ACTIONS.includes(action)) {
+      const actorParticipants = await base44.asServiceRole.entities.RoomParticipant.filter({
+        room_id, user_id: user.id,
+      });
+      const actorP = actorParticipants?.[0];
+      if (!actorP) {
+        return Response.json({ error: 'You are not in this room' }, { status: 404 });
+      }
+
+      if (action === 'take_seat') {
+        if (target_seat_number === undefined || target_seat_number === null) {
+          return Response.json({ error: 'target_seat_number is required for take_seat' }, { status: 400 });
+        }
+        // Displace current occupant of the target seat (if any, and not the actor)
+        const occupants = await base44.asServiceRole.entities.RoomParticipant.filter({
+          room_id, seat_number: target_seat_number, status: 'active',
+        });
+        for (const occ of (occupants || [])) {
+          if (occ.user_id !== user.id) {
+            await base44.asServiceRole.entities.RoomParticipant.update(occ.id, {
+              seat_number: null, role: 'viewer',
+            });
+          }
+        }
+        // Move actor to the target seat
+        await base44.asServiceRole.entities.RoomParticipant.update(actorP.id, {
+          seat_number: target_seat_number,
+          role: actorRole === 'owner' ? 'host' : 'guest',
+          status: 'active',
+        });
+      } else if (action === 'leave_seat') {
+        if (actorRole === 'owner') {
+          return Response.json({ error: 'Host cannot leave their seat' }, { status: 403 });
+        }
+        await base44.asServiceRole.entities.RoomParticipant.update(actorP.id, {
+          seat_number: null, role: 'viewer',
+        });
+      } else if (action === 'reset_seats') {
+        if (actorRole !== 'owner') {
+          return Response.json({ error: 'Only the Room Owner can reset seats' }, { status: 403 });
+        }
+        // Remove all seated non-host participants to audience
+        const allActive = await base44.asServiceRole.entities.RoomParticipant.filter({
+          room_id, status: 'active',
+        });
+        for (const p of (allActive || [])) {
+          if (p.user_id !== user.id && p.seat_number !== null && p.seat_number !== undefined) {
+            await base44.asServiceRole.entities.RoomParticipant.update(p.id, {
+              seat_number: null, role: 'viewer',
+            });
+          }
+        }
+        // Ensure host is on seat 0
+        if (actorP.seat_number !== 0) {
+          await base44.asServiceRole.entities.RoomParticipant.update(actorP.id, {
+            seat_number: 0, role: 'host',
+          });
+        }
+      }
+
+      // Audit log for self-seat actions
+      await base44.asServiceRole.entities.AuditLog.create({
+        actor_id: user.id,
+        actor_role: actorRole,
+        action: 'issue_enforcement',
+        resource_type: 'RoomParticipant',
+        resource_id: actorP.id,
+        reason: reason || action,
+        details: { room_id, action, target_seat_number },
+      });
+
+      return Response.json({ success: true, action, actor_role: actorRole });
     }
 
     // Can't moderate the host/owner

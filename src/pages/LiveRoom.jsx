@@ -195,6 +195,30 @@ export default function LiveRoom() {
     }
   };
 
+  // Host/Admin takes an empty seat instantly
+  const handleTakeSeat = async (seatId) => {
+    if (userRole !== "owner" && userRole !== "admin") {
+      toast({ title: "You do not have permission to manage seats.", variant: "destructive" });
+      return;
+    }
+    try {
+      const res = await base44.functions.invoke("moderateRoom", {
+        room_id: roomId,
+        action: "take_seat",
+        target_seat_number: seatId,
+        reason: "Seat taken by " + userRole,
+      });
+      const data = res.data || res;
+      if (data.error) {
+        toast({ title: data.error, variant: "destructive" });
+      } else {
+        toast({ title: `Moved to seat ${seatId}` });
+      }
+    } catch (err) {
+      toast({ title: "Failed to take seat", description: err.message, variant: "destructive" });
+    }
+  };
+
   // Open profile for any user object (from user list)
   const handleUserProfile = (userObj) => {
     const seat = seats.find((s) => s.user?.name === userObj.name);
@@ -344,6 +368,28 @@ export default function LiveRoom() {
     navigate(-1);
   };
 
+  const handleResetSeats = async () => {
+    if (userRole !== "owner") {
+      toast({ title: "Only the Room Owner can reset seats.", variant: "destructive" });
+      return;
+    }
+    try {
+      const res = await base44.functions.invoke("moderateRoom", {
+        room_id: roomId,
+        action: "reset_seats",
+        reason: "Seats reset by owner",
+      });
+      const data = res.data || res;
+      if (data.error) {
+        toast({ title: data.error, variant: "destructive" });
+      } else {
+        toast({ title: "All seats reset" });
+      }
+    } catch (err) {
+      toast({ title: "Failed to reset seats", description: err.message, variant: "destructive" });
+    }
+  };
+
   const handleEndRoom = async () => {
     if (userRole !== "owner") {
       toast({ title: "Only the host can end this room", variant: "destructive" });
@@ -425,7 +471,7 @@ export default function LiveRoom() {
 
       {/* ===== Seat Grid — upper-mid ===== */}
       <div className="relative z-10 flex-shrink-0 flex items-center justify-start" style={{ padding: "0 16px", flex: "0 0 auto" }}>
-        <SeatArea seats={seats} onSeatClick={handleSeatClick} seatEffects={seatEffects} registerSeatRef={registerSeatRef} />
+        <SeatArea seats={seats} onSeatClick={handleSeatClick} seatEffects={seatEffects} registerSeatRef={registerSeatRef} canSit={userRole === "owner" || userRole === "admin"} onSitClick={handleTakeSeat} />
       </div>
 
       {/* ===== Message Area — tabs + warning + chat (flexible, moves with seat count) ===== */}
@@ -473,7 +519,8 @@ export default function LiveRoom() {
       {activeProfileSeat && (
         <SeatProfilePopup
           seat={{ ...activeProfileSeat, room_id: roomId }}
-          userRole={userRole === "owner" ? "owner" : userRole === "admin" ? "admin" : "audience"}
+          userRole={userRole}
+          currentUserId={currentUser?.id}
           onClose={() => { setProfileSeatId(null); setTempProfileUser(null); }}
           onSendGift={(seatId) => { setProfileSeatId(null); setTempProfileUser(null); setPanelTargetId(seatId); setPanelType("gift"); }}
           onSendEmoji={(seatId, emoji) => handleQuickEmoji(seatId, emoji)}
@@ -523,7 +570,7 @@ export default function LiveRoom() {
       )}
 
       {/* Settings */}
-      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} onScheduler={runScheduler} onEndRoom={handleEndRoom} endingRoom={endingRoom} giftStats={giftStats} roomScore={roomScore} aiStats={aiStats} seatCount={seatCount} onSeatCountChange={setSeatCount} userRole={userRole} />}
+      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} onArchive={archiveRoom} onBackup={backupRoom} onScheduler={runScheduler} onEndRoom={handleEndRoom} endingRoom={endingRoom} giftStats={giftStats} roomScore={roomScore} aiStats={aiStats} seatCount={seatCount} onSeatCountChange={setSeatCount} userRole={userRole} onResetSeats={handleResetSeats} />}
 
       {summary && <PostLiveSummary summary={summary} onClose={handleCloseSummary} />}
 

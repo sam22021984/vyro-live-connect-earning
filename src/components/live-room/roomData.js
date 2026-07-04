@@ -157,20 +157,23 @@ export const ROLE_PERMISSIONS = {
     "mute", "unmute", "remove_seat", "move_seat", "kick_audience", "lock_seat", "unlock_seat",
     "kick_room", "ban_24h", "ban_7d", "ban_permanent", "block_speaking", "clear_messages",
     "promote_mod", "remove_mod", "promote_admin", "remove_admin", "promote_co_host", "assign_seat",
+    "take_seat", "leave_seat", "reset_seats",
   ],
   admin: [
     "mute", "unmute", "remove_seat", "move_seat", "kick_audience", "lock_seat", "unlock_seat",
     "kick_room", "ban_24h", "ban_7d", "block_speaking", "clear_messages", "promote_mod", "remove_mod",
+    "take_seat", "leave_seat",
   ],
   co_host: [
     "mute", "unmute", "remove_seat", "move_seat", "kick_audience", "lock_seat", "unlock_seat",
-    "kick_room", "ban_24h",
+    "kick_room", "ban_24h", "take_seat", "leave_seat",
   ],
   moderator: [
     "mute", "unmute", "kick_audience", "kick_room", "ban_24h", "block_speaking", "clear_messages",
+    "leave_seat",
   ],
-  speaker: [],
-  viewer: [],
+  speaker: ["leave_seat"],
+  viewer: ["leave_seat"],
 };
 
 // Helper: filter ADMIN_CONTROLS sections by role permissions
