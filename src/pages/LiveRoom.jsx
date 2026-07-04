@@ -45,6 +45,7 @@ export default function LiveRoom() {
   const [chatInput, setChatInput] = useState("");
   const [showChatInput, setShowChatInput] = useState(false);
   const [tempProfileUser, setTempProfileUser] = useState(null);
+  const [lastSentGift, setLastSentGift] = useState(null);
 
   // Refs for dynamic seat positioning — replaces static SEAT_POSITIONS
   const containerRef = useRef(null);
@@ -230,6 +231,7 @@ export default function LiveRoom() {
       // Fallback: still do animation if backend fails (demo mode)
     }
     sendGift(gift, targetId);
+    setLastSentGift({ gift, targetId });
   };
 
   const handlePanelSendEmoji = (emoji, targetId) => {
@@ -391,6 +393,22 @@ export default function LiveRoom() {
           onSendEmoji={(seatId, emoji) => handleQuickEmoji(seatId, emoji)}
           onAction={(action) => { toast({ title: action }); setProfileSeatId(null); setTempProfileUser(null); }}
         />
+      )}
+
+      {/* Quick-resend button — shows after sending a gift, right side floating */}
+      {lastSentGift && !panelType && (
+        <button
+          onClick={() => handlePanelSendGift(lastSentGift.gift, lastSentGift.targetId)}
+          className="absolute right-3 z-40 w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition animate-fadeIn"
+          style={{
+            bottom: "80px",
+            background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldDark})`,
+            boxShadow: `0 4px 16px ${COLORS.gold}50`,
+            border: `1px solid ${COLORS.goldLight}60`,
+          }}
+        >
+          <span className="text-lg">{lastSentGift.gift.icon}</span>
+        </button>
       )}
 
       {/* Gift / Emoji panel */}
