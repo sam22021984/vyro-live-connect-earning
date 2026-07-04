@@ -1,0 +1,148 @@
+{
+  "name": "SpamDetection",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "spam_type": {
+      "type": "string",
+      "enum": [
+        "spam_message",
+        "mass_messaging",
+        "automated_registration",
+        "bot_activity",
+        "fake_engagement",
+        "bulk_account_creation",
+        "repeated_content",
+        "link_spam",
+        "promotional_spam",
+        "coordinated_spam",
+        "other"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "low"
+    },
+    "confidence_score": {
+      "type": "number",
+      "default": 0
+    },
+    "indicators": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "content_sample": {
+      "type": "string"
+    },
+    "message_count": {
+      "type": "number",
+      "default": 1
+    },
+    "time_window_seconds": {
+      "type": "number",
+      "default": 60
+    },
+    "detected_by": {
+      "type": "string",
+      "enum": [
+        "rate_limit",
+        "ai_detection",
+        "behavioral_analysis",
+        "device_fingerprint",
+        "manual_report"
+      ],
+      "default": "rate_limit"
+    },
+    "action_taken": {
+      "type": "string",
+      "enum": [
+        "none",
+        "rate_limited",
+        "warned",
+        "muted",
+        "blocked",
+        "banned"
+      ],
+      "default": "none"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "detected",
+        "investigating",
+        "confirmed",
+        "false_positive",
+        "resolved"
+      ],
+      "default": "detected"
+    },
+    "room_id": {
+      "type": "string"
+    },
+    "device_fingerprint": {
+      "type": "string"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "user_id",
+    "spam_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}

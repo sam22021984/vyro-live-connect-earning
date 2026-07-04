@@ -1,0 +1,125 @@
+{
+  "name": "AccountRecovery",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "recovery_type": {
+      "type": "string",
+      "enum": [
+        "phone",
+        "email",
+        "two_factor",
+        "trusted_device",
+        "face_verification",
+        "admin_review"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "initiated",
+        "verifying",
+        "approved",
+        "rejected",
+        "expired"
+      ],
+      "default": "initiated"
+    },
+    "initiated_by": {
+      "type": "string"
+    },
+    "verified_by": {
+      "type": "string"
+    },
+    "verification_method": {
+      "type": "string"
+    },
+    "recovery_email": {
+      "type": "string"
+    },
+    "recovery_phone": {
+      "type": "string"
+    },
+    "device_fingerprint": {
+      "type": "string"
+    },
+    "face_verification_id": {
+      "type": "string"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "risk_score": {
+      "type": "number",
+      "default": 0
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "approved_date": {
+      "type": "string"
+    },
+    "rejected_reason": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "user_id",
+    "recovery_type"
+  ],
+  "rls": {
+    "create": {
+      "data.user_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}

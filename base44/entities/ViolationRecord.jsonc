@@ -1,0 +1,166 @@
+{
+  "name": "ViolationRecord",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "violation_type": {
+      "type": "string",
+      "enum": [
+        "abusive_language",
+        "harassment",
+        "threats",
+        "bullying",
+        "sexual_harassment",
+        "racism",
+        "hate_speech",
+        "religious_insult",
+        "community_attack",
+        "toxic_behavior",
+        "spam",
+        "bot_activity",
+        "fake_engagement",
+        "fraud_attempt",
+        "scam",
+        "phishing",
+        "dangerous_content",
+        "violence",
+        "extremist_content",
+        "discrimination",
+        "incitement",
+        "child_safety",
+        "impersonation",
+        "privacy_violation",
+        "repeated_violation",
+        "other"
+      ]
+    },
+    "violation_level": {
+      "type": "number",
+      "default": 1
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "low"
+    },
+    "description": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "object"
+    },
+    "content_snippet": {
+      "type": "string"
+    },
+    "language_detected": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "ai_system",
+        "user_report",
+        "admin_action",
+        "automated_rule"
+      ],
+      "default": "ai_system"
+    },
+    "enforcement_issued": {
+      "type": "boolean",
+      "default": false
+    },
+    "enforcement_action": {
+      "type": "string"
+    },
+    "enforcement_id": {
+      "type": "string"
+    },
+    "room_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "moderation_log_id": {
+      "type": "string"
+    },
+    "appeal_status": {
+      "type": "string",
+      "enum": [
+        "none",
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "none"
+    },
+    "appeal_notes": {
+      "type": "string"
+    },
+    "appeal_date": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "overturned",
+        "expired"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "user_id",
+    "violation_type",
+    "description"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}

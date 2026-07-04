@@ -1,0 +1,148 @@
+{
+  "name": "ContentModerationLog",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "content_type": {
+      "type": "string",
+      "enum": [
+        "text_message",
+        "chat_message",
+        "live_chat",
+        "comment",
+        "voice_audio",
+        "live_audio",
+        "video_stream",
+        "profile_content",
+        "private_message",
+        "room_name",
+        "community_post"
+      ]
+    },
+    "original_content": {
+      "type": "string"
+    },
+    "language_detected": {
+      "type": "string"
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "safe",
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "safe"
+    },
+    "action_taken": {
+      "type": "string",
+      "enum": [
+        "approved",
+        "hidden",
+        "warned",
+        "muted",
+        "blocked",
+        "session_paused",
+        "session_ended",
+        "escalated"
+      ],
+      "default": "approved"
+    },
+    "ai_analysis": {
+      "type": "object"
+    },
+    "ai_confidence": {
+      "type": "number",
+      "default": 0
+    },
+    "room_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "message_id": {
+      "type": "string"
+    },
+    "is_auto_action": {
+      "type": "boolean",
+      "default": true
+    },
+    "reviewed_by": {
+      "type": "string"
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "auto",
+        "pending_review",
+        "reviewed",
+        "overturned"
+      ],
+      "default": "auto"
+    },
+    "review_notes": {
+      "type": "string"
+    },
+    "evidence_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "content_type",
+    "original_content"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "owner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "owner"
+      }
+    }
+  }
+}
