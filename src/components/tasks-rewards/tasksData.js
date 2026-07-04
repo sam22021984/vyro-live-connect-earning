@@ -43,34 +43,13 @@ export const tasks = {
 };
 
 // ============= REWARD CENTER =============
+// Reward data comes from useTasksRewardsData hook (Transaction + UserTask entities).
 export const rewardSections = [
   { key: "available", label: "Available", icon: "🎁" },
   { key: "claimed", label: "Claimed", icon: "✅" },
   { key: "expired", label: "Expired", icon: "⏰" },
   { key: "upcoming", label: "Upcoming", icon: "🔜" },
 ];
-
-export const rewards = {
-  available: [
-    { id: "r1", name: "500 Coins", type: "Currency", icon: "🪙", rarity: "Common", color: "#FFC83D", description: "500 coins added to your wallet" },
-    { id: "r2", name: "100 Diamonds", type: "Currency", icon: "💎", rarity: "Rare", color: "#3B82F6", description: "100 diamonds for premium gifts" },
-    { id: "r3", name: "VIP Frame (3 Days)", type: "VIP", icon: "🖼️", rarity: "Epic", color: "#8B5CF6", description: "Exclusive VIP profile frame" },
-    { id: "r4", name: "Entry Effect", type: "VIP", icon: "✨", rarity: "Epic", color: "#EC4899", description: "Special room entry animation" },
-    { id: "r5", name: "Gold Badge", type: "Special", icon: "🏅", rarity: "Legendary", color: "#F59E0B", description: "Permanent gold profile badge" },
-    { id: "r6", name: "Bubble Chat", type: "Special", icon: "💬", rarity: "Rare", color: "#06B6D4", description: "Custom chat bubble style" },
-  ],
-  claimed: [
-    { id: "rc1", name: "50 Coins", type: "Currency", icon: "🪙", rarity: "Common", color: "#FFC83D", description: "Daily login reward" },
-    { id: "rc2", name: "Bronze Medal", type: "Special", icon: "🥉", rarity: "Common", color: "#CD7F32", description: "First recharge achievement" },
-  ],
-  expired: [
-    { id: "re1", name: "Summer VIP Pass", type: "VIP", icon: "🏖️", rarity: "Legendary", color: "#F59E0B", description: "Expired on Jun 30" },
-  ],
-  upcoming: [
-    { id: "ru1", name: "Anniversary Frame", type: "VIP", icon: "🎉", rarity: "Legendary", color: "#8B5CF6", description: "Available in 5 days" },
-    { id: "ru2", name: "2000 Coins", type: "Currency", icon: "🪙", rarity: "Epic", color: "#FFC83D", description: "Available in 5 days" },
-  ],
-};
 
 // ============= DAILY BONUS =============
 export const dailyBonusDays = [
@@ -107,33 +86,10 @@ export const events = {
 };
 
 // ============= ACHIEVEMENTS =============
+// Achievement data comes from useTasksRewardsData hook (Achievement entity).
 export const achievementCategories = [
   { key: "user", label: "User", icon: "👤" },
   { key: "host", label: "Host", icon: "🎙️" },
   { key: "vip", label: "VIP", icon: "💎" },
   { key: "agency", label: "Agency", icon: "🏢" },
 ];
-
-export const achievements = {
-  user: [
-    { id: "a1", name: "First Recharge", badge: "💳", progress: 100, status: "unlocked", condition: "Complete your first coin recharge", reward: "100 XP + Bronze Medal" },
-    { id: "a2", name: "First Gift", badge: "🎁", progress: 100, status: "claimed", condition: "Send your first gift to a host", reward: "50 XP" },
-    { id: "a3", name: "100 Followers", badge: "👥", progress: 72, status: "in_progress", condition: "Reach 100 followers", reward: "500 XP + Silver Badge" },
-    { id: "a4", name: "1000 Followers", badge: "🌟", progress: 12, status: "in_progress", condition: "Reach 1000 followers", reward: "2000 XP + Gold Badge" },
-    { id: "a5", name: "10000 Followers", badge: "👑", progress: 0, status: "locked", condition: "Reach 10000 followers", reward: "10000 XP + Crown Badge" },
-  ],
-  host: [
-    { id: "h1", name: "First Live Stream", badge: "🎬", progress: 100, status: "claimed", condition: "Complete your first live stream", reward: "100 XP" },
-    { id: "h2", name: "100 Live Hours", badge: "⏱️", progress: 45, status: "in_progress", condition: "Stream for 100 total hours", reward: "2000 XP + Host Badge" },
-    { id: "h3", name: "Top Host", badge: "🏆", progress: 0, status: "locked", condition: "Become a Top 10 host", reward: "5000 XP + Legendary Badge" },
-  ],
-  vip: [
-    { id: "v1", name: "VIP Member", badge: "💎", progress: 100, status: "claimed", condition: "Activate VIP membership", reward: "500 XP" },
-    { id: "v2", name: "VIP Gold", badge: "🥇", progress: 60, status: "in_progress", condition: "Reach VIP Gold tier", reward: "2000 XP + Gold Frame" },
-    { id: "v3", name: "Top Gifter", badge: "💝", progress: 30, status: "in_progress", condition: "Become a Top 100 gifter", reward: "3000 XP + Diamond Badge" },
-  ],
-  agency: [
-    { id: "ag1", name: "Create Agency", badge: "🏢", progress: 0, status: "locked", condition: "Create your own agency", reward: "1000 XP" },
-    { id: "ag2", name: "Top Agency", badge: "🎖️", progress: 15, status: "in_progress", condition: "Your agency reaches Top 10", reward: "10000 XP + Agency Crown" },
-  ],
-};

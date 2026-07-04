@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { X } from "lucide-react";
-import { rewardSections, rewards, COLORS } from "./tasksData";
+import { X, Loader2 } from "lucide-react";
+import { rewardSections, COLORS } from "./tasksData";
 import RewardCard from "./RewardCard";
+import { useTasksRewardsData } from "@/hooks/useTasksRewardsData";
 import { useRewardClaim } from "@/hooks/useRewardClaim";
 
 export default function RewardCenterTab() {
   const [section, setSection] = useState("available");
-  const [rewardList, setRewardList] = useState(rewards);
   const [preview, setPreview] = useState(null);
   const { toast } = useToast();
+  const { availableRewards, claimedRewards, loading, reload } = useTasksRewardsData();
   const { claim, claiming } = useRewardClaim();
 
   const handleClaim = async (reward) => {
@@ -21,14 +22,7 @@ export default function RewardCenterTab() {
       source_id: reward.id,
       icon: reward.icon,
     });
-
-    if (result.success) {
-      setRewardList((prev) => ({
-        ...prev,
-        available: prev.available.filter((r) => r.id !== reward.id),
-        claimed: [reward, ...prev.claimed],
-      }));
-    }
+    if (result.success) reload();
   };
 
   const handleUse = (reward) => {
@@ -36,6 +30,21 @@ export default function RewardCenterTab() {
   };
 
   const handleView = (reward) => setPreview(reward);
+
+  const sections = {
+    available: availableRewards,
+    claimed: claimedRewards,
+    expired: [],
+    upcoming: [],
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: COLORS.primary }} />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -45,19 +54,19 @@ export default function RewardCenterTab() {
             className={`py-2 px-3.5 rounded-xl text-xs font-bold whitespace-nowrap active:scale-95 transition flex items-center gap-1.5 ${section === s.key ? "text-white" : ""}`}
             style={section === s.key ? { background: COLORS.primary } : { background: COLORS.cardBg, color: COLORS.muted, border: "1px solid #EEF0F4" }}>
             <span>{s.icon}</span> {s.label}
-            <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={section === s.key ? { background: "rgba(255,255,255,0.25)" } : { background: "#E5E7EB" }}>{rewardList[s.key].length}</span>
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={section === s.key ? { background: "rgba(255,255,255,0.25)" } : { background: "#E5E7EB" }}>{sections[s.key].length}</span>
           </button>
         ))}
       </div>
 
       <div className="space-y-2.5">
-        {rewardList[section].length === 0 ? (
+        {sections[section].length === 0 ? (
           <div className="text-center py-12">
             <p className="text-3xl mb-2">📭</p>
             <p className="text-xs font-medium" style={{ color: COLORS.muted }}>No {section} rewards</p>
           </div>
         ) : (
-          rewardList[section].map((r) => (
+          sections[section].map((r) => (
             <RewardCard key={r.id} reward={r} isClaimed={section === "claimed"} onClaim={handleClaim} onView={handleView} onUse={handleUse} disabled={claiming} />
           ))
         )}

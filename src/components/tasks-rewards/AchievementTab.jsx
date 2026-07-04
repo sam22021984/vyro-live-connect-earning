@@ -1,44 +1,80 @@
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { X, Gift } from "lucide-react";
-import { achievementCategories, achievements, COLORS } from "./tasksData";
+import { X, Gift, Loader2 } from "lucide-react";
+import { COLORS } from "./tasksData";
 import AchievementCard from "./AchievementCard";
+import { useTasksRewardsData } from "@/hooks/useTasksRewardsData";
+import { useRewardClaim } from "@/hooks/useRewardClaim";
 
 export default function AchievementTab() {
-  const [cat, setCat] = useState("user");
-  const [achList, setAchList] = useState(achievements);
   const [detail, setDetail] = useState(null);
   const { toast } = useToast();
+  const { achievements, loading, reload } = useTasksRewardsData();
+  const { claim, claiming } = useRewardClaim();
 
-  const handleClaim = (ach) => {
-    setAchList((prev) => ({
-      ...prev,
-      [cat]: prev[cat].map((a) => (a.id === ach.id ? { ...a, status: "claimed" } : a)),
-    }));
-    toast({ title: "🎁 Reward Claimed!", description: `${ach.name} - ${ach.reward}` });
+  const unlocked = achievements.filter((a) => a.status === "unlocked");
+  const inProgress = achievements.filter((a) => a.status === "in_progress");
+  const locked = achievements.filter((a) => a.status === "locked");
+
+  const handleClaim = async (ach) => {
+    const result = await claim({
+      reward_type: "Achievement",
+      reward_amount: 0,
+      reward_name: ach.name,
+      source: "achievement",
+      source_id: ach.id,
+      icon: ach.badge,
+    });
+    if (result.success) reload();
   };
 
   const handleShare = (ach) => {
     toast({ title: "📢 Shared to Feed!", description: `${ach.name} achievement shared.` });
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: COLORS.primary }} />
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide">
-        {achievementCategories.map((c) => (
-          <button key={c.key} onClick={() => setCat(c.key)}
-            className={`py-2 px-3.5 rounded-xl text-xs font-bold whitespace-nowrap active:scale-95 transition flex items-center gap-1.5 ${cat === c.key ? "text-white" : ""}`}
-            style={cat === c.key ? { background: COLORS.primary } : { background: COLORS.cardBg, color: COLORS.muted, border: "1px solid #EEF0F4" }}>
-            <span>{c.icon}</span> {c.label}
-          </button>
-        ))}
+      {/* Stats summary */}
+      <div className="grid grid-cols-4 gap-2 mb-3">
+        <div className="rounded-2xl p-2.5 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <p className="text-base font-bold" style={{ color: COLORS.navy }}>{achievements.length}</p>
+          <p className="text-[8px]" style={{ color: COLORS.muted }}>Total</p>
+        </div>
+        <div className="rounded-2xl p-2.5 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <p className="text-base font-bold" style={{ color: COLORS.success }}>{unlocked.length}</p>
+          <p className="text-[8px]" style={{ color: COLORS.muted }}>Unlocked</p>
+        </div>
+        <div className="rounded-2xl p-2.5 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <p className="text-base font-bold" style={{ color: COLORS.primary }}>{inProgress.length}</p>
+          <p className="text-[8px]" style={{ color: COLORS.muted }}>In Progress</p>
+        </div>
+        <div className="rounded-2xl p-2.5 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <p className="text-base font-bold" style={{ color: COLORS.muted }}>{locked.length}</p>
+          <p className="text-[8px]" style={{ color: COLORS.muted }}>Locked</p>
+        </div>
       </div>
 
-      <div className="space-y-2.5">
-        {achList[cat].map((a) => (
-          <AchievementCard key={a.id} achievement={a} onView={setDetail} onClaim={handleClaim} onShare={handleShare} />
-        ))}
-      </div>
+      {achievements.length === 0 ? (
+        <div className="rounded-2xl p-8 text-center" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
+          <span className="text-3xl block mb-2">🏆</span>
+          <p className="text-xs font-bold" style={{ color: COLORS.navy }}>No Achievements Yet</p>
+          <p className="text-[10px] mt-1" style={{ color: COLORS.muted }}>Complete tasks and activities to earn achievements</p>
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {achievements.map((a) => (
+            <AchievementCard key={a.id} achievement={a} onView={setDetail} onClaim={handleClaim} onShare={handleShare} />
+          ))}
+        </div>
+      )}
 
       {detail && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
