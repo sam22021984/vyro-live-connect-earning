@@ -1,7 +1,9 @@
 import React from "react";
-import { collectionProgress } from "@/components/levels/dashboardData";
+import { useLevelDashboard } from "@/hooks/useLevelDashboard";
 
 export default function CollectionsTab() {
+  const { collectionProgress } = useLevelDashboard();
+
   return (
     <div>
       <h3 className="text-sm font-bold text-gray-800 mb-1 px-1">Collection Progress</h3>

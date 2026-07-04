@@ -1,33 +1,47 @@
 import React from "react";
-import { privileges, milestones } from "@/components/levels/dashboardData";
-import { Check, Lock, Crown } from "lucide-react";
+import { useLevelDashboard } from "@/hooks/useLevelDashboard";
+import { Check, Lock, Crown, Loader2 } from "lucide-react";
 
 export default function PrivilegesTab() {
+  const { privileges, milestones, loading } = useLevelDashboard();
+
+  if (loading && privileges.length === 0) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
       {/* SECTION 09 — Exclusive Privileges */}
       <div>
         <h3 className="text-sm font-bold text-gray-800 mb-1 px-1">Exclusive Privileges</h3>
         <p className="text-[10px] text-gray-400 mb-3 px-1">Current tier & upcoming privileges</p>
-        <div className="grid grid-cols-2 gap-2.5">
-          {privileges.map((p, i) => {
-            const isActive = p.status === "Active";
-            return (
-              <div key={i} className="rounded-2xl p-3" style={{ background: "linear-gradient(135deg, #FFFFFF, #F5F7FA)", border: `1px solid ${isActive ? p.color : "#E5E7EB"}30`, boxShadow: isActive ? `0 4px 12px ${p.color}15` : "none", opacity: isActive ? 1 : 0.8 }}>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base" style={{ background: `${p.color}15`, border: `1px solid ${p.color}25` }}>
-                    <span style={{ filter: isActive ? `drop-shadow(0 1px 2px ${p.color}50)` : "grayscale(1)" }}>{p.icon}</span>
+        {privileges.length === 0 ? (
+          <p className="text-xs text-gray-400 text-center py-4">No privileges equipped yet</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-2.5">
+            {privileges.map((p, i) => {
+              const isActive = p.status === "Active";
+              return (
+                <div key={i} className="rounded-2xl p-3" style={{ background: "linear-gradient(135deg, #FFFFFF, #F5F7FA)", border: `1px solid ${isActive ? p.color : "#E5E7EB"}30`, boxShadow: isActive ? `0 4px 12px ${p.color}15` : "none", opacity: isActive ? 1 : 0.8 }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base" style={{ background: `${p.color}15`, border: `1px solid ${p.color}25` }}>
+                      <span style={{ filter: isActive ? `drop-shadow(0 1px 2px ${p.color}50)` : "grayscale(1)" }}>{p.icon}</span>
+                    </div>
+                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-0.5" style={{ background: isActive ? "#22C55E15" : "#94A3B815", color: isActive ? "#22C55E" : "#94A3B8" }}>
+                      {isActive ? <Check size={8} /> : <Lock size={8} />} {p.status}
+                    </span>
                   </div>
-                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-0.5" style={{ background: isActive ? "#22C55E15" : "#94A3B815", color: isActive ? "#22C55E" : "#94A3B8" }}>
-                    {isActive ? <Check size={8} /> : <Lock size={8} />} {p.status}
-                  </span>
+                  <p className="text-[10px] font-bold text-gray-800 truncate">{p.name}</p>
+                  <p className="text-[9px] text-gray-400">{p.desc}</p>
                 </div>
-                <p className="text-[10px] font-bold text-gray-800 truncate">{p.name}</p>
-                <p className="text-[9px] text-gray-400">{p.desc}</p>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* SECTION 10 — Level Milestones */}

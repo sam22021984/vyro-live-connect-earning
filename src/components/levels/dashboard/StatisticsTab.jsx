@@ -1,7 +1,9 @@
 import React from "react";
-import { dashboardStats, leaderboardStatus, levelHistory } from "@/components/levels/dashboardData";
+import { useLevelDashboard } from "@/hooks/useLevelDashboard";
 
 export default function StatisticsTab() {
+  const { dashboardStats, leaderboardStatus, levelHistory } = useLevelDashboard();
+
   const statCards = [
     { label: "Total Coins Earned", value: dashboardStats.totalCoins, icon: "🪙", color: "#FFC83D" },
     { label: "Total XP Earned", value: dashboardStats.totalXp, icon: "⚡", color: "#1F6BFF" },
@@ -18,7 +20,7 @@ export default function StatisticsTab() {
       {/* SECTION 11 — Statistics Dashboard */}
       <div>
         <h3 className="text-sm font-bold text-gray-800 mb-1 px-1">Statistics Dashboard</h3>
-        <p className="text-[10px] text-gray-400 mb-3 px-1">Advanced analytics overview</p>
+        <p className="text-[10px] text-gray-400 mb-3 px-1">Live analytics overview</p>
         <div className="grid grid-cols-2 gap-2.5">
           {statCards.map((s, i) => (
             <div key={i} className="rounded-2xl p-3" style={{ background: "linear-gradient(135deg, #FFFFFF, #F5F7FA)", border: "1px solid rgba(255,255,255,0.9)", boxShadow: `0 4px 12px ${s.color}15` }}>
@@ -37,7 +39,7 @@ export default function StatisticsTab() {
       {/* SECTION 13 — Leaderboard Status */}
       <div>
         <h3 className="text-sm font-bold text-gray-800 mb-1 px-1">Leaderboard Status</h3>
-        <p className="text-[10px] text-gray-400 mb-3 px-1">Premium ranking overview</p>
+        <p className="text-[10px] text-gray-400 mb-3 px-1">Live ranking overview</p>
         <div className="grid grid-cols-2 gap-2.5">
           {leaderboardStatus.map((l, i) => (
             <div key={i} className="rounded-2xl p-3" style={{ background: "linear-gradient(135deg, #FFFFFF, #F5F7FA)", border: `1px solid ${l.color}30`, boxShadow: `0 4px 12px ${l.color}15` }}>
@@ -56,20 +58,24 @@ export default function StatisticsTab() {
       <div>
         <h3 className="text-sm font-bold text-gray-800 mb-1 px-1">Level History</h3>
         <p className="text-[10px] text-gray-400 mb-3 px-1">Recent activity timeline</p>
-        <div className="rounded-2xl p-3 space-y-2.5" style={{ background: "linear-gradient(135deg, #FFFFFF, #F5F7FA)", border: "1px solid rgba(255,255,255,0.9)" }}>
-          {levelHistory.map((h, i) => (
-            <div key={i} className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0" style={{ background: `${h.color}15`, border: `1px solid ${h.color}25` }}>
-                <span>{h.icon}</span>
+        {levelHistory.length === 0 ? (
+          <p className="text-xs text-gray-400 text-center py-4">No recent activity</p>
+        ) : (
+          <div className="rounded-2xl p-3 space-y-2.5" style={{ background: "linear-gradient(135deg, #FFFFFF, #F5F7FA)", border: "1px solid rgba(255,255,255,0.9)" }}>
+            {levelHistory.map((h, i) => (
+              <div key={i} className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0" style={{ background: `${h.color}15`, border: `1px solid ${h.color}25` }}>
+                  <span>{h.icon}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-bold text-gray-800 truncate">{h.desc}</p>
+                  <p className="text-[9px] text-gray-400">{h.type} • {h.date}</p>
+                </div>
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: `${h.color}15`, color: h.color }}>{h.type}</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-bold text-gray-800 truncate">{h.desc}</p>
-                <p className="text-[9px] text-gray-400">{h.type} • {h.date}</p>
-              </div>
-              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: `${h.color}15`, color: h.color }}>{h.type}</span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,15 +1,34 @@
 import React from "react";
-import { achievements, rarityColors } from "@/components/levels/dashboardData";
-import { Lock, Trophy } from "lucide-react";
+import { useLevelDashboard } from "@/hooks/useLevelDashboard";
+import { Lock, Trophy, Loader2 } from "lucide-react";
 
 export default function AchievementsTab() {
+  const { achievements, rarityColors, loading } = useLevelDashboard();
+
+  if (loading && achievements.length === 0) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
+  if (achievements.length === 0) {
+    return (
+      <div className="flex flex-col items-center py-12 gap-2">
+        <Trophy size={32} className="text-gray-300" />
+        <p className="text-xs text-gray-400">No achievements yet</p>
+      </div>
+    );
+  }
+
   const unlocked = achievements.filter(a => a.unlocked).length;
   const locked = achievements.filter(a => !a.unlocked).length;
 
   return (
     <div>
       <h3 className="text-sm font-bold text-gray-800 mb-1 px-1">Achievement Collection</h3>
-      <p className="text-[10px] text-gray-400 mb-3 px-1">Premium trophy showcase</p>
+      <p className="text-[10px] text-gray-400 mb-3 px-1">Live trophy showcase</p>
 
       {/* Summary */}
       <div className="grid grid-cols-4 gap-2 mb-4">
@@ -30,7 +49,7 @@ export default function AchievementsTab() {
       {/* Achievement grid */}
       <div className="grid grid-cols-2 gap-2.5">
         {achievements.map((a, i) => {
-          const rc = rarityColors[a.rarity] || "#94A3B8";
+          const rc = rarityColors[a.rarity] || a.color || "#94A3B8";
           return (
             <div key={i} className="rounded-2xl p-3 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #FFFFFF, #F5F7FA)", border: `1px solid ${rc}30`, boxShadow: a.unlocked ? `0 4px 12px ${rc}20` : "none", opacity: a.unlocked ? 1 : 0.7 }}>
               <div className="absolute top-2 right-2 text-[8px] font-bold px-1.5 py-0.5 rounded-md uppercase" style={{ background: `${rc}15`, color: rc }}>{a.rarity}</div>
@@ -39,6 +58,14 @@ export default function AchievementsTab() {
               </div>
               <p className="text-[10px] font-bold text-gray-800 truncate">{a.name}</p>
               <p className="text-[9px] text-gray-400 mb-2">{a.desc}</p>
+              {a.progress > 0 && !a.unlocked && (
+                <div className="mb-2">
+                  <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${a.progress}%`, background: rc }} />
+                  </div>
+                  <p className="text-[8px] text-gray-400 mt-0.5">{a.progress}% complete</p>
+                </div>
+              )}
               <button className="w-full text-[9px] font-bold py-1.5 rounded-lg active:scale-95 transition flex items-center justify-center gap-1" style={{ background: a.unlocked ? rc : `${rc}10`, color: a.unlocked ? "#fff" : rc }}>
                 {a.unlocked ? <><Trophy size={10} /> Claim Reward</> : "View Requirements"}
               </button>
