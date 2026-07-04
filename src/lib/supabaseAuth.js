@@ -46,6 +46,7 @@ export const supabaseAuth = {
     if (accessToken) {
       window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
       this.setToken(accessToken, refreshToken);
+      sessionStorage.setItem('sb_just_oauthed', 'true');
       return { accessToken, refreshToken };
     }
     return null;

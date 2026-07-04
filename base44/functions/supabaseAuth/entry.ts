@@ -47,30 +47,15 @@ Deno.serve(async (req) => {
       return Response.json({ data: loginData, ok: loginResponse.ok, status: loginResponse.status });
     }
 
-    // Custom Google OAuth URL — uses GOOGLE_CLIENT_ID directly (no Supabase dashboard config needed)
+    // OAuth URL — uses Supabase built-in OAuth for ALL providers (including Google)
+    // This uses Supabase's fixed callback URL (already registered in Google Cloud Console)
     if (action === 'oauth-url') {
-      const googleClientId = Deno.env.get('GOOGLE_CLIENT_ID');
       const referer = req.headers.get('referer') || req.headers.get('origin') || '';
       let appOrigin = body.app_origin || '';
       if (!appOrigin) {
         try { if (referer) appOrigin = new URL(referer).origin; } catch {}
       }
 
-      if (provider === 'google' && googleClientId && appOrigin) {
-        // Direct Google OAuth — redirect back to app frontend
-        const redirectUri = `${appOrigin}/login`;
-        const state = `google_${Date.now()}`;
-        const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-          `client_id=${encodeURIComponent(googleClientId)}` +
-          `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-          `&response_type=code` +
-          `&scope=${encodeURIComponent('openid email profile')}` +
-          `&state=${state}` +
-          `&prompt=select_account`;
-        return Response.json({ data: { url: googleUrl, provider: 'google_direct' }, ok: true, status: 200 });
-      }
-
-      // Fallback: Supabase built-in OAuth for other providers
       let redirect = redirect_to || '/';
       if (redirect.startsWith('/') && appOrigin) redirect = appOrigin + redirect;
       else if (!redirect.startsWith('http') && appOrigin) redirect = appOrigin + '/' + redirect;

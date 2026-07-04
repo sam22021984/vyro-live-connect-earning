@@ -17,8 +17,30 @@ export default function Login() {
   const [welcomeData, setWelcomeData] = useState(null);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  // Handle Google OAuth callback — runs on mount if ?code=...&state=google_* is in URL
+  // Handle OAuth callback — runs on mount
+  // Handles both: Supabase OAuth (hash tokens) and legacy direct Google OAuth (?code=)
   useEffect(() => {
+    // Check for Supabase OAuth hash tokens (just extracted by AuthContext)
+    const justOAuthed = sessionStorage.getItem('sb_just_oauthed');
+    if (justOAuthed === 'true') {
+      sessionStorage.removeItem('sb_just_oauthed');
+      setGoogleLoading(true);
+      base44.functions.invoke("userOnboarding", { action: "getProfile" })
+        .then(async (res) => {
+          if (!res.data?.profile?.global_id) {
+            res = await base44.functions.invoke("userOnboarding", { action: "initProfile", country: "QAT" });
+          }
+          if (res.data?.profile?.global_id) {
+            setWelcomeData({ globalId: res.data.profile.global_id, username: res.data.profile.username, role: res.data.profile.role });
+          } else {
+            window.location.href = "/";
+          }
+        })
+        .catch(() => { window.location.href = "/"; });
+      return;
+    }
+
+    // Legacy: direct Google OAuth callback (?code=...&state=google_*)
     const code = supabaseAuth.getGoogleCallbackCode();
     if (!code) return;
     setGoogleLoading(true);
@@ -70,9 +92,9 @@ export default function Login() {
   };
 
   const handleProvider = (provider) => {
-    if (provider === "google") supabaseAuth.loginWithProvider("google", "/");
-    else if (provider === "facebook") supabaseAuth.loginWithProvider("facebook", "/");
-    else if (provider === "apple") supabaseAuth.loginWithProvider("apple", "/");
+    if (provider === "google") supabaseAuth.loginWithProvider("google", "/login");
+    else if (provider === "facebook") supabaseAuth.loginWithProvider("facebook", "/login");
+    else if (provider === "apple") supabaseAuth.loginWithProvider("apple", "/login");
     else if (provider === "twitter") supabaseAuth.loginWithProvider("twitter", "/");
     else if (provider === "whatsapp" || provider === "mobile") {
       setError(`${provider === "whatsapp" ? "WhatsApp" : "Mobile"} login is coming soon!`);
