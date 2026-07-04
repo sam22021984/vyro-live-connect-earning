@@ -4,19 +4,10 @@ import { useAuth } from "@/lib/AuthContext";
 import MyProfileHeader from "@/components/my-profile/MyProfileHeader";
 import MyStatsDashboard from "@/components/my-profile/MyStatsDashboard";
 import QuickActions from "@/components/my-profile/QuickActions";
-import WalletSummary from "@/components/my-profile/WalletSummary";
-import CreatorControl from "@/components/my-profile/CreatorControl";
-import LiveCenter from "@/components/my-profile/LiveCenter";
-import AudioRoomCenter from "@/components/my-profile/AudioRoomCenter";
 import PartyCenter from "@/components/my-profile/PartyCenter";
-import TasksCenter from "@/components/my-profile/TasksCenter";
 import VipCenter from "@/components/my-profile/VipCenter";
-import FamilyCenter from "@/components/my-profile/FamilyCenter";
-import AgencyCenter from "@/components/my-profile/AgencyCenter";
 import AnalyticsDashboard from "@/components/my-profile/AnalyticsDashboard";
-import MyContent from "@/components/my-profile/MyContent";
 import MyAchievements from "@/components/my-profile/MyAchievements";
-import MyDecorations from "@/components/my-profile/MyDecorations";
 import MyMoreMenu from "@/components/my-profile/MyMoreMenu";
 import MoreServices from "@/components/profile/MoreServices";
 
@@ -84,31 +75,13 @@ export default function ProfileDashboard() {
 
         <QuickActions profile={profile} />
 
-        <WalletSummary profile={profile} />
-
-        <CreatorControl profile={profile} />
-
-        <LiveCenter profile={profile} />
-
-        <AudioRoomCenter profile={profile} />
-
         <PartyCenter profile={profile} />
-
-        <TasksCenter profile={profile} />
 
         <VipCenter profile={profile} />
 
-        <FamilyCenter profile={profile} />
-
-        <AgencyCenter profile={profile} />
-
         <AnalyticsDashboard profile={profile} />
 
-        <MyContent profile={profile} />
-
         <MyAchievements achievements={achievements} />
-
-        <MyDecorations profile={profile} />
 
         <MoreServices />
 
