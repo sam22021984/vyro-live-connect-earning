@@ -2,7 +2,7 @@ import React from "react";
 import { Eye, Check, Sparkles } from "lucide-react";
 import { COLORS } from "./tasksData";
 
-export default function RewardCard({ reward, isClaimed, onClaim, onView, onUse }) {
+export default function RewardCard({ reward, isClaimed, onClaim, onView, onUse, disabled }) {
   return (
     <div className="rounded-2xl p-3 flex items-center gap-3" style={{ background: COLORS.cardBg, border: "1px solid #EEF0F4" }}>
       <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
@@ -23,9 +23,9 @@ export default function RewardCard({ reward, isClaimed, onClaim, onView, onUse }
             <Sparkles size={11} /> Use
           </button>
         ) : (
-          <button onClick={() => onClaim(reward)} className="flex items-center gap-1 py-1.5 px-3 rounded-lg text-[10px] font-bold active:scale-95 transition"
+          <button onClick={() => onClaim(reward)} disabled={disabled} className="flex items-center gap-1 py-1.5 px-3 rounded-lg text-[10px] font-bold active:scale-95 transition disabled:opacity-50"
             style={{ background: COLORS.primary, color: COLORS.white }}>
-            <Check size={11} /> Claim
+            <Check size={11} /> {disabled ? "..." : "Claim"}
           </button>
         )}
         <button onClick={() => onView(reward)} className="flex items-center gap-1 py-1.5 px-3 rounded-lg text-[10px] font-bold active:scale-95 transition"

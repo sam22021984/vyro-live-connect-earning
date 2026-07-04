@@ -73,21 +73,20 @@ export function useUserTasks() {
       setUserTasks((prev) => ({ ...prev, [task.id]: created }));
     }
 
-    // Award coins + XP to UserProfile
+    // Centralized: credit coins + XP, create Transaction, send Notification — atomically on backend
     try {
-      const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
-      if (profiles.length > 0) {
-        const p = profiles[0];
-        const coinAdd = task.reward_type === "Coins" ? task.reward_amount : 0;
-        const xpAdd = Math.floor(task.reward_amount / 10);
-        await base44.entities.UserProfile.update(p.id, {
-          coins: (p.coins || 0) + coinAdd,
-          user_xp: (p.user_xp || 0) + xpAdd,
-          total_xp: (p.total_xp || 0) + xpAdd,
-        });
-      }
+      await base44.functions.invoke("claimReward", {
+        action: "claim",
+        reward_type: task.reward_type,
+        reward_amount: task.reward_amount,
+        reward_name: `${task.reward_amount} ${task.reward_type}`,
+        source: "task",
+        task_id: task.id,
+        icon: task.reward_icon,
+      });
     } catch (e) {
-      // profile may not exist yet
+      // UserTask is already marked claimed; coin credit may still succeed on retry
+      console.error("Reward credit failed:", e);
     }
   }, [user, userTasks]);
 

@@ -1,19 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Flame, Check, Lock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { dailyBonusDays, COLORS } from "./tasksData";
+import { useRewardClaim } from "@/hooks/useRewardClaim";
 
 export default function DailyBonusTab() {
-  const [currentDay, setCurrentDay] = useState(4);
-  const [streak, setStreak] = useState(3);
+  const [streak, setStreak] = useState(0);
+  const [claimedToday, setClaimedToday] = useState(false);
   const { toast } = useToast();
+  const { claimDaily, getDailyStatus, claiming } = useRewardClaim();
 
-  const handleCheckIn = () => {
-    if (currentDay > 7) return;
-    const day = dailyBonusDays[currentDay - 1];
-    setCurrentDay((d) => d + 1);
-    setStreak((s) => s + 1);
-    toast({ title: day.is_mega ? "🎁 Mega Reward Claimed!" : "✅ Daily Bonus Claimed!", description: day.reward });
+  useEffect(() => {
+    getDailyStatus().then((data) => {
+      setStreak(data.streak || 0);
+      setClaimedToday(data.claimedToday || false);
+    });
+  }, [getDailyStatus]);
+
+  const currentDay = claimedToday ? streak + 1 : streak + 1;
+
+  const handleCheckIn = async () => {
+    if (claimedToday || claiming) return;
+    const day = Math.min(streak + 1, 7);
+    const dayData = dailyBonusDays[day - 1];
+
+    const result = await claimDaily({
+      day,
+      reward_amount: parseInt(dayData.amount, 10),
+      reward_name: dayData.reward,
+      is_mega: dayData.is_mega,
+    });
+
+    if (result.success) {
+      setStreak(day);
+      setClaimedToday(true);
+    }
   };
 
   return (
@@ -39,7 +60,7 @@ export default function DailyBonusTab() {
       <div className="grid grid-cols-4 gap-2.5 mb-4">
         {dailyBonusDays.map((d) => {
           const isClaimed = d.day < currentDay;
-          const isToday = d.day === currentDay;
+          const isToday = d.day === currentDay && !claimedToday;
           const isLocked = d.day > currentDay;
           return (
             <div key={d.day} className={`rounded-2xl p-2.5 flex flex-col items-center text-center transition ${d.is_mega ? "col-span-2" : ""}`}
@@ -61,10 +82,10 @@ export default function DailyBonusTab() {
       </div>
 
       {/* Check in button */}
-      <button onClick={handleCheckIn} disabled={currentDay > 7}
+      <button onClick={handleCheckIn} disabled={claimedToday || claiming}
         className="w-full py-3.5 rounded-2xl text-sm font-bold text-white active:scale-95 transition flex items-center justify-center gap-2 disabled:opacity-50"
         style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.navy})`, boxShadow: `0 4px 12px ${COLORS.primary}40` }}>
-        {currentDay > 7 ? "All Rewards Claimed 🎉" : `Check In - Day ${currentDay}`}
+        {claiming ? "Claiming..." : claimedToday ? "Come Back Tomorrow! 🎉" : `Check In - Day ${currentDay}`}
       </button>
 
       <div className="mt-4 rounded-2xl p-3 flex items-center gap-3" style={{ background: `${COLORS.gold}10`, border: `1px solid ${COLORS.gold}30` }}>

@@ -1,22 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { X } from "lucide-react";
 import { rewardSections, rewards, COLORS } from "./tasksData";
 import RewardCard from "./RewardCard";
+import { useRewardClaim } from "@/hooks/useRewardClaim";
 
 export default function RewardCenterTab() {
   const [section, setSection] = useState("available");
   const [rewardList, setRewardList] = useState(rewards);
   const [preview, setPreview] = useState(null);
   const { toast } = useToast();
+  const { claim, claiming } = useRewardClaim();
 
-  const handleClaim = (reward) => {
-    setRewardList((prev) => ({
-      ...prev,
-      available: prev.available.filter((r) => r.id !== reward.id),
-      claimed: [reward, ...prev.claimed],
-    }));
-    toast({ title: "🎉 Reward Claimed!", description: `${reward.name} added to your account.` });
+  const handleClaim = async (reward) => {
+    const result = await claim({
+      reward_type: reward.type === "Currency" ? "Coins" : reward.type,
+      reward_amount: parseInt(String(reward.name).match(/\d+/)?.[0] || "0", 10),
+      reward_name: reward.name,
+      source: "reward_center",
+      source_id: reward.id,
+      icon: reward.icon,
+    });
+
+    if (result.success) {
+      setRewardList((prev) => ({
+        ...prev,
+        available: prev.available.filter((r) => r.id !== reward.id),
+        claimed: [reward, ...prev.claimed],
+      }));
+    }
   };
 
   const handleUse = (reward) => {
@@ -46,7 +58,7 @@ export default function RewardCenterTab() {
           </div>
         ) : (
           rewardList[section].map((r) => (
-            <RewardCard key={r.id} reward={r} isClaimed={section === "claimed"} onClaim={handleClaim} onView={handleView} onUse={handleUse} />
+            <RewardCard key={r.id} reward={r} isClaimed={section === "claimed"} onClaim={handleClaim} onView={handleView} onUse={handleUse} disabled={claiming} />
           ))
         )}
       </div>

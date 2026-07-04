@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Gift, Flame, Coins, Check } from "lucide-react";
-import { base44 } from "@/api/base44Client";
-import { getCurrentUser } from "@/lib/getCurrentUser";
+import { useRewardClaim } from "@/hooks/useRewardClaim";
 
 const DAILY_REWARDS = [50, 100, 150, 200, 300, 500, 1000];
 
@@ -10,54 +9,35 @@ export default function DailyRewardWidget() {
   const [claimedToday, setClaimedToday] = useState(false);
   const [claiming, setClaiming] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { claimDaily, getDailyStatus } = useRewardClaim();
 
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("vyro_daily_reward") || "{}");
-    const today = new Date().toDateString();
-    if (data.lastClaimDate === today) {
-      setClaimedToday(true);
+    getDailyStatus().then((data) => {
       setStreak(data.streak || 0);
-    } else {
-      setStreak(data.streak || 0);
-    }
-  }, []);
+      setClaimedToday(data.claimedToday || false);
+    });
+  }, [getDailyStatus]);
 
   const handleClaim = async () => {
     if (claimedToday || claiming) return;
     setClaiming(true);
-    try {
-      const newStreak = streak >= 7 ? 1 : streak + 1;
-      const reward = DAILY_REWARDS[newStreak - 1] || 50;
+    const newStreak = streak >= 7 ? 1 : streak + 1;
+    const reward = DAILY_REWARDS[newStreak - 1] || 50;
 
-      // Credit coins
-      try {
-        const me = await getCurrentUser();
-        let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
-        if (profiles.length > 0) {
-          await base44.entities.UserProfile.update(profiles[0].id, {
-            coins: (profiles[0].coins || 0) + reward,
-          });
-        }
-      } catch {}
+    const result = await claimDaily({
+      day: newStreak,
+      reward_amount: reward,
+      reward_name: `${reward} Coins`,
+      is_mega: newStreak === 7,
+    });
 
-      localStorage.setItem("vyro_daily_reward", JSON.stringify({
-        streak: newStreak,
-        lastClaimDate: new Date().toDateString(),
-      }));
+    if (result.success) {
       setStreak(newStreak);
       setClaimedToday(true);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 2500);
-    } catch (e) {
-      // Still mark as claimed locally
-      localStorage.setItem("vyro_daily_reward", JSON.stringify({
-        streak: 1,
-        lastClaimDate: new Date().toDateString(),
-      }));
-      setClaimedToday(true);
-    } finally {
-      setClaiming(false);
     }
+    setClaiming(false);
   };
 
   const todayReward = DAILY_REWARDS[claimedToday ? streak - 1 : streak] || DAILY_REWARDS[0];
