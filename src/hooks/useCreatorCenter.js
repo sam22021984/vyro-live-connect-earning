@@ -15,23 +15,14 @@ export function useCreatorCenter() {
       const me = authUser;
       if (!me?.id) return null;
       setUser(me);
-      let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
-      if (profiles.length === 0) {
-        profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+      // Use backend function to resolve profile — it correctly maps JWT sub to user_id
+      const res = await base44.functions.invoke("dashboardData", { action: "getProfile" });
+      const profile = res.data?.profile;
+      if (profile) {
+        setProfile(profile);
+        return profile;
       }
-      if (profiles.length > 0) {
-        setProfile(profiles[0]);
-        return profiles[0];
-      }
-      const newProfile = await base44.entities.UserProfile.create({
-        username: me.full_name || me.email?.split("@")[0] || "User",
-        user_id: me.id,
-        is_vip: false,
-        coins: 0,
-        role: "user",
-      });
-      setProfile(newProfile);
-      return newProfile;
+      return null;
     } catch (e) {
       console.error("Failed to load profile:", e);
       return null;

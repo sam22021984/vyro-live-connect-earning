@@ -19,6 +19,9 @@ export function useProfileStats() {
       setUser(me);
 
       let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
+      if (profiles.length === 0 && me.email) {
+        profiles = await base44.entities.UserProfile.filter({ user_id: me.email });
+      }
       if (profiles.length === 0) {
         profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
       }

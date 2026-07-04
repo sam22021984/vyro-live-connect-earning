@@ -17,6 +17,10 @@ export function useGifts() {
       ]);
       setGifts(giftList);
       if (profiles.length > 0) setProfile(profiles[0]);
+      else if (authUser?.email) {
+        const profilesByEmail = await base44.entities.UserProfile.filter({ user_id: authUser.email }).catch(() => []);
+        if (profilesByEmail.length > 0) setProfile(profilesByEmail[0]);
+      }
     } catch (e) {
       console.error("Failed to load gifts:", e);
     } finally {
