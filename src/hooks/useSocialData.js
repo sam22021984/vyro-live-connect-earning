@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { callDashboardAPI } from "@/lib/dashboardApi";
-import { buildModules } from "@/components/social/socialData";
+import { buildModules, SOCIAL_MODULE_CONFIG } from "@/components/social/socialData";
 
 export function useSocialData() {
   const [data, setData] = useState(null);
@@ -11,8 +11,10 @@ export function useSocialData() {
   const fetchData = useCallback(async () => {
     try {
       const result = await callDashboardAPI("social_feed", {});
-      // Only accept real data — never fall back to static mock config
-      if (result && typeof result === "object" && Object.keys(result).length > 0) {
+      // Only accept real data with the expected module shape — otherwise fall
+      // back to the static config so the page still renders.
+      const hasModules = result && result.invite && result.people && result.friends && result.relationship && result.family;
+      if (hasModules) {
         setData(result);
         setHasRealData(true);
       } else {
@@ -99,8 +101,9 @@ export function useSocialData() {
     return result;
   }, [fetchData]);
 
-  // Only build modules from real data — no static fallback
-  const modules = hasRealData && data ? buildModules(data) : [];
+  // Use real data when available; otherwise fall back to static config so the
+  // page still renders module cards.
+  const modules = hasRealData && data ? buildModules(data) : SOCIAL_MODULE_CONFIG;
 
   return {
     modules,
