@@ -61,7 +61,8 @@ export default function CoinsRecharge() {
           toast({ title: "Payment capture failed", description: res.data?.error, variant: "destructive" });
         }
       } catch (err) {
-        toast({ title: "Payment error", description: err.message, variant: "destructive" });
+        const backendError = err.response?.data?.error || err.message;
+        toast({ title: "Payment error", description: backendError, variant: "destructive" });
       }
       setCapturing(false);
       window.history.replaceState({}, "", "/coins-recharge");
@@ -94,7 +95,8 @@ export default function CoinsRecharge() {
         toast({ title: "Failed to create order", description: res.data?.error, variant: "destructive" });
       }
     } catch (err) {
-      toast({ title: "PayPal error", description: err.message, variant: "destructive" });
+      const backendError = err.response?.data?.error || err.message;
+      toast({ title: "PayPal error", description: backendError, variant: "destructive" });
     }
     setCreatingOrder(false);
   };

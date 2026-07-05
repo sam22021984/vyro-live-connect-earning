@@ -182,6 +182,7 @@ Deno.serve(async (req) => {
     }
     return Response.json({ order_id: orderData.id, approval_url: approvalUrl });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error("paypalRecharge error:", error?.message || error, error?.stack || "");
+    return Response.json({ error: error.message || "Internal server error" }, { status: 500 });
   }
 });
