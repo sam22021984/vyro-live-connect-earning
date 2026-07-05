@@ -26,11 +26,11 @@ export function useDashboardData(dashboardType, defaults) {
         });
         if (cancelled) return;
 
-        if (stored && typeof stored === "object" && Object.keys(stored).length > 0) {
-          setInfo(stored.info ?? null);
-          setStats(stored.stats ?? null);
-          setModules(stored.modules ?? null);
-          setQuickActions(stored.quickActions ?? null);
+        if (stored && typeof stored === "object" && Object.keys(stored).length > 0 && !stored.error) {
+          setInfo(stored.info ?? defaults?.info ?? null);
+          setStats(stored.stats ?? defaults?.stats ?? null);
+          setModules(stored.modules ?? defaults?.modules ?? null);
+          setQuickActions(stored.quickActions ?? defaults?.quickActions ?? null);
           setHasRealData(true);
         } else {
           // first access — persist defaults then use the seeded response
@@ -40,13 +40,17 @@ export function useDashboardData(dashboardType, defaults) {
             data: defaults,
           });
           if (cancelled) return;
-          if (seeded && typeof seeded === "object" && Object.keys(seeded).length > 0) {
-            setInfo(seeded.info ?? null);
-            setStats(seeded.stats ?? null);
-            setModules(seeded.modules ?? null);
-            setQuickActions(seeded.quickActions ?? null);
+          if (seeded && typeof seeded === "object" && Object.keys(seeded).length > 0 && !seeded.error) {
+            setInfo(seeded.info ?? defaults?.info ?? null);
+            setStats(seeded.stats ?? defaults?.stats ?? null);
+            setModules(seeded.modules ?? defaults?.modules ?? null);
+            setQuickActions(seeded.quickActions ?? defaults?.quickActions ?? null);
             setHasRealData(true);
           } else {
+            setInfo(defaults?.info ?? null);
+            setStats(defaults?.stats ?? null);
+            setModules(defaults?.modules ?? null);
+            setQuickActions(defaults?.quickActions ?? null);
             setHasRealData(false);
           }
         }
@@ -55,7 +59,15 @@ export function useDashboardData(dashboardType, defaults) {
         if (cancelled) return;
         setHasRealData(false);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          // Always fall back to defaults so the dashboard renders even when
+          // the backend returns an error (e.g. INVALID_DASHBOARD).
+          setInfo((prev) => prev ?? defaults?.info ?? null);
+          setStats((prev) => prev ?? defaults?.stats ?? null);
+          setModules((prev) => prev ?? defaults?.modules ?? null);
+          setQuickActions((prev) => prev ?? defaults?.quickActions ?? null);
+          setLoading(false);
+        }
       }
     };
     load();
