@@ -94,7 +94,17 @@ export default function GoLivePanel() {
       toast({ title: "Going Live! 🎉" });
       navigate(`/live-room/${res.data.room_id}`);
     } catch (err) {
-      toast({ title: "Failed to go live", description: err.message, variant: "destructive" });
+      const backendError = err.response?.data?.error || err.message;
+      const existingRoomId = err.response?.data?.existing_room_id;
+      if (existingRoomId) {
+        toast({
+          title: "You already have a live room",
+          description: "Rejoining your active room…",
+        });
+        navigate(`/live-room/${existingRoomId}`);
+      } else {
+        toast({ title: "Failed to go live", description: backendError, variant: "destructive" });
+      }
       setStarting(false);
     }
   };

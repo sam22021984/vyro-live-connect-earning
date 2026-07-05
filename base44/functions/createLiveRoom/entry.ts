@@ -49,7 +49,10 @@ Deno.serve(async (req) => {
         status: 'live'
       });
       if (existingRooms && existingRooms.length > 0) {
-        return Response.json({ error: 'You already have an active live room. End it first.' }, { status: 409 });
+        return Response.json({
+          error: 'You already have an active live room. End it first.',
+          existing_room_id: existingRooms[0].id,
+        }, { status: 409 });
       }
     } catch {}
 
