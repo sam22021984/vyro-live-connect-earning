@@ -67,6 +67,7 @@ Deno.serve(async (req) => {
         avatar: host_avatar || profile?.avatar_url || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100',
         vip: host_vip || (profile?.is_vip ? 'VIP' : ''),
       },
+      owner_id: user.id,
       host_id: user.id,
       viewers: 1,
       members: 1,

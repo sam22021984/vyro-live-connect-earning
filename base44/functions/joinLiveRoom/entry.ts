@@ -19,11 +19,13 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'This live room has ended', room_status: room.status }, { status: 403 });
     }
 
-    // Check if user is the host — host always passes
-    const isHost = room.created_by_id === user.id || room.host_id === user.id;
+    // Check if user is the room owner — owner always passes all checks.
+    // owner_id is the permanent, authoritative identifier; created_by_id and
+    // host_id are kept as fallbacks for rooms created before owner_id existed.
+    const isOwner = room.owner_id === user.id || room.created_by_id === user.id || room.host_id === user.id;
 
     // Check for active bans / suspensions (EnforcementAction)
-    if (!isHost) {
+    if (!isOwner) {
       const activeEnforcements = await base44.asServiceRole.entities.EnforcementAction.filter({
         user_id: user.id,
         status: 'active',
@@ -39,8 +41,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Room-type access enforcement (host bypasses all)
-    if (!isHost && !skip_checks) {
+    // Room-type access enforcement (owner bypasses all)
+    if (!isOwner && !skip_checks) {
       const roomType = room.room_type || 'public';
 
       if (roomType === 'password') {
@@ -78,7 +80,7 @@ Deno.serve(async (req) => {
         // Only the host's followers can join
         const rel = await base44.asServiceRole.entities.Relationship.filter({
           user_id: user.id,
-          target_user_id: room.created_by_id || room.host_id,
+          target_user_id: room.owner_id || room.created_by_id || room.host_id,
           type: 'follow',
         });
         if (!rel || rel.length === 0) {
@@ -89,7 +91,7 @@ Deno.serve(async (req) => {
       if (roomType === 'friends') {
         const rel = await base44.asServiceRole.entities.Relationship.filter({
           user_id: user.id,
-          target_user_id: room.created_by_id || room.host_id,
+          target_user_id: room.owner_id || room.created_by_id || room.host_id,
           type: 'friend',
         });
         if (!rel || rel.length === 0) {
@@ -116,12 +118,24 @@ Deno.serve(async (req) => {
     if (existing && existing.length > 0) {
       // Reactivate if previously left
       participant = existing[0];
-      if (participant.status === 'left' || participant.status === 'inactive') {
-        participant = await base44.asServiceRole.entities.RoomParticipant.update(participant.id, {
+      const needsReactivation = participant.status === 'left' || participant.status === 'inactive';
+      // If the owner is rejoining, always ensure they have the host role and
+      // seat 0 — even if a previous bug or moderation action changed it.
+      const needsRoleFix = isOwner && (participant.role !== 'host' || participant.seat_number !== 0);
+      if (needsReactivation || needsRoleFix) {
+        const updateFields = {
           status: 'active',
           joined_at: new Date().toISOString(),
           left_at: null,
-        });
+        };
+        if (isOwner) {
+          updateFields.role = 'host';
+          updateFields.seat_number = 0;
+          updateFields.is_muted = false;
+          updateFields.is_banned = false;
+          updateFields.is_speaking = true;
+        }
+        participant = await base44.asServiceRole.entities.RoomParticipant.update(participant.id, updateFields);
       }
     } else {
       // Create new participant
@@ -132,8 +146,10 @@ Deno.serve(async (req) => {
         user_id: user.id,
         username: user.full_name || profile?.display_name || 'User',
         avatar_url: profile?.avatar || '',
-        role: isHost ? 'host' : 'viewer',
+        role: isOwner ? 'host' : 'viewer',
         status: 'active',
+        seat_number: isOwner ? 0 : null,
+        is_speaking: isOwner,
         joined_at: new Date().toISOString(),
         is_vip: profile?.vip_level >= 1 || false,
         country: profile?.country || '',
@@ -152,12 +168,14 @@ Deno.serve(async (req) => {
     return Response.json({
       success: true,
       participant,
+      is_owner: isOwner,
       room: {
         id: room.id,
         name: room.name,
         room_type: room.room_type,
         status: room.status,
         seat_count: room.seat_count,
+        owner_id: room.owner_id || room.created_by_id || room.host_id,
       },
       role: participant.role,
     });

@@ -45,8 +45,10 @@ Deno.serve(async (req) => {
     if (!room) return Response.json({ error: 'Room not found' }, { status: 404 });
 
     // Determine the acting user's role
+    // owner_id is the permanent identifier; fall back to created_by_id / host_id
+    // for rooms created before owner_id was introduced.
     let actorRole = 'viewer';
-    if (room.created_by_id === user.id || room.host_id === user.id) {
+    if (room.owner_id === user.id || room.created_by_id === user.id || room.host_id === user.id) {
       actorRole = 'owner';
     } else {
       const actorParticipants = await base44.asServiceRole.entities.RoomParticipant.filter({
@@ -142,7 +144,7 @@ Deno.serve(async (req) => {
     }
 
     // Can't moderate the host/owner
-    if (target_user_id === room.created_by_id || target_user_id === room.host_id) {
+    if (target_user_id === room.owner_id || target_user_id === room.created_by_id || target_user_id === room.host_id) {
       return Response.json({ error: 'Cannot moderate the room host' }, { status: 403 });
     }
 

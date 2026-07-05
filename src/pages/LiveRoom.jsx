@@ -108,6 +108,10 @@ export default function LiveRoom() {
           } else {
             setJoinBlock(null);
             setJoiningRoom(false);
+            // Backend confirms owner identity from authenticated user_id
+            if (data.is_owner) {
+              setUserRole("owner");
+            }
           }
         })
         .catch(() => {
@@ -156,29 +160,34 @@ export default function LiveRoom() {
     user_id: liveRoom.created_by_id || "",
   } : { name: "Host", avatar: "", vip: null, level: 1, speaking: false, muted: false, country: "", vyro_id: "", agency: null, is_host: true, followers: 0, following: 0, is_online: true, user_id: "" });
 
-  // Determine the current user's role in this room
+  // Determine the current user's role in this room.
+  // Owner identity is verified from the room's owner_id field (set
+  // server-side from the authenticated user_id), NOT from frontend state.
+  // Falls back to created_by_id / host_id for rooms created before owner_id.
   const [userRole, setUserRole] = useState("viewer");
   useEffect(() => {
     if (!liveRoom || !currentUser?.id) return;
-    // Owner = room creator
-    if (liveRoom.created_by_id === currentUser.id) {
+    // Owner = room creator (checked first — authoritative source)
+    const isOwner =
+      liveRoom.owner_id === currentUser.id ||
+      liveRoom.created_by_id === currentUser.id ||
+      liveRoom.host_id === currentUser.id;
+    if (isOwner) {
       setUserRole("owner");
       return;
     }
-    // Check RoomParticipant for host/admin/co_host role
+    // Check RoomParticipant for admin/co_host/moderator role
     base44.entities.RoomParticipant.filter({ room_id: roomId, user_id: currentUser.id })
       .then((participants) => {
         const p = participants?.[0];
-        if (p?.role === "host") {
-          setUserRole("owner");
-        } else if (p && (p.role === "admin" || p.role === "co_host" || p.role === "moderator")) {
+        if (p && (p.role === "admin" || p.role === "co_host" || p.role === "moderator")) {
           setUserRole("admin");
         } else {
           setUserRole("viewer");
         }
       })
       .catch(() => setUserRole("viewer"));
-  }, [liveRoom?.id, liveRoom?.created_by_id, currentUser?.id, roomId]);
+  }, [liveRoom?.id, liveRoom?.owner_id, liveRoom?.created_by_id, liveRoom?.host_id, currentUser?.id, roomId]);
 
   const profileSeat = seats.find((s) => s.id === profileSeatId);
 

@@ -14,10 +14,10 @@ Deno.serve(async (req) => {
     const room = await base44.entities.PartyRoom.get(room_id);
     if (!room) return Response.json({ error: 'Room not found' }, { status: 404 });
 
-    // Only host or admin can end
-    const isHost = room.host_id === user.id;
+    // Only the room owner or a platform admin can end the room
+    const isOwner = room.owner_id === user.id || room.host_id === user.id || room.created_by_id === user.id;
     const isAdmin = user.role === 'admin' || user.role === 'owner';
-    if (!isHost && !isAdmin) {
+    if (!isOwner && !isAdmin) {
       return Response.json({ error: 'Only the host can end this room' }, { status: 403 });
     }
 

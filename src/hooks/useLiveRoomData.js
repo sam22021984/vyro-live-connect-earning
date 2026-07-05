@@ -18,10 +18,23 @@ export function useLiveRoomData(roomId, seatCount = 10, currentUserId = null) {
     }
   }, [roomId]);
 
-  // Auto-join: when a user enters the room, create a viewer participant if they don't already exist
+  // Auto-join: when a user enters the room, create a viewer participant if
+  // they don't already exist. The room OWNER is skipped — createLiveRoom
+  // already created their host participant, and joinLiveRoom restores it.
+  // Creating a second "viewer" participant for the owner would cause the
+  // owner to be misidentified as a normal user.
   const autoJoin = useCallback(async () => {
     if (!roomId || !currentUserId) return;
     try {
+      // Fetch the room first to check ownership
+      const roomData = await base44.entities.PartyRoom.get(roomId);
+      if (!roomData) return;
+      const isOwner =
+        roomData.owner_id === currentUserId ||
+        roomData.created_by_id === currentUserId ||
+        roomData.host_id === currentUserId;
+      if (isOwner) return; // Owner already has a host participant
+
       const existing = await base44.entities.RoomParticipant.filter({
         room_id: roomId,
         user_id: currentUserId,
