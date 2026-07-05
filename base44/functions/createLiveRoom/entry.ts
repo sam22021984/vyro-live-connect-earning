@@ -25,10 +25,15 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Ticket price is required for ticket rooms' }, { status: 400 });
     }
 
+    // Use service role for all entity operations — matches joinLiveRoom pattern.
+    // The Supabase JWT is valid for auth.me() but user-scoped entity calls can
+    // fail with "Authentication required to view users" for non-admin users.
+    const db = base44.asServiceRole;
+
     // Step 2: System Validation
     let profile = null;
     try {
-      const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
+      const profiles = await db.entities.UserProfile.filter({ user_id: user.id });
       profile = profiles?.[0];
     } catch {}
 
@@ -44,7 +49,7 @@ Deno.serve(async (req) => {
 
     // Check for existing live room by this host
     try {
-      const existingRooms = await base44.entities.PartyRoom.filter({
+      const existingRooms = await db.entities.PartyRoom.filter({
         host_id: user.id,
         status: 'live'
       });
@@ -95,10 +100,10 @@ Deno.serve(async (req) => {
       total_coins: 0,
     };
 
-    const room = await base44.entities.PartyRoom.create(roomData);
+    const room = await db.entities.PartyRoom.create(roomData);
 
     // Create analytics session
-    const session = await base44.entities.RoomSession.create({
+    const session = await db.entities.RoomSession.create({
       room_id: room.id,
       party_name: room.name,
       host_id: user.id,
@@ -117,7 +122,7 @@ Deno.serve(async (req) => {
     });
 
     // Create host participant on seat 0
-    await base44.entities.RoomParticipant.create({
+    await db.entities.RoomParticipant.create({
       room_id: room.id,
       user_id: user.id,
       username: room.host.name,
@@ -139,6 +144,7 @@ Deno.serve(async (req) => {
       room,
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('createLiveRoom error:', error?.message || error, error?.stack || '');
+    return Response.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 });
