@@ -132,18 +132,18 @@ export const supabaseAuth = {
     try {
       const res = await invoke({ action: "me", access_token: token });
       const { data, ok, status } = res.data;
-      if (ok && status !== 401) {
+      if (ok && status !== 401 && status !== 403) {
         return mapUser(data);
       }
-      // 401 = token expired — try refresh before logging out
-      if (status === 401) {
+      // 401 (expired) or 403 (bad_jwt) — token is unusable, try refresh
+      if (status === 401 || status === 403 || data?.error_code === "bad_jwt") {
         const refreshed = await this.refreshSession();
         if (refreshed) return refreshed;
         // Refresh failed — only now clear the token
         this.clearToken();
         return null;
       }
-      // Non-401 error (500, network, function redeploying) — DON'T clear token
+      // Non-401/403 error (500, network, function redeploying) — DON'T clear token
       // Return null so UI shows loading, but keep token for retry
       return null;
     } catch {
