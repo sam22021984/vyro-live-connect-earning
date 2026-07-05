@@ -74,100 +74,54 @@ export function useVipProfile() {
     const me = user || await base44.auth.me();
     if (!profile) throw new Error("Profile not loaded");
 
-    const months = durationMonths || 1;
-    const disc = discount || 0;
-    const coinsCost = Math.round(tierCoins * months * (1 - disc / 100));
-    const cashCost = Math.round(tierCash * months * (1 - disc / 100) * 100) / 100;
-
-    if (paymentMethod === "coins" && (profile.coins || 0) < coinsCost) {
-      throw new Error("Insufficient coins");
-    }
-
-    const expiryDate = new Date();
-    expiryDate.setMonth(expiryDate.getMonth() + Math.ceil(months));
-
-    await base44.entities.Transaction.create({
-      user_id: me.id,
-      type: "recharge",
-      amount_usd: paymentMethod === "cash" ? cashCost : 0,
-      coins: coinsCost,
-      status: paymentMethod === "coins" ? "completed" : "pending",
-      tier_label: tierName,
-      description: `VIP Purchase: ${tierName} - ${months} months (${paymentMethod})`,
+    const res = await base44.functions.invoke("processVipPurchase", {
+      action: "purchase",
+      tier_name: tierName,
+      tier_coins: tierCoins,
+      tier_cash: tierCash,
+      months: durationMonths,
+      discount,
+      payment_method: paymentMethod,
     });
-
-    const updates = {
-      is_vip: true,
-      vip_tier: tierName,
-      vip_expiry: expiryDate.toISOString(),
-    };
-    if (paymentMethod === "coins") {
-      updates.coins = (profile.coins || 0) - coinsCost;
-      updates.total_xp = (profile.total_xp || 0) + coinsCost;
-    }
-
-    const updated = await base44.entities.UserProfile.update(profile.id, updates);
-    setProfile(updated);
+    const result = res.data || res;
+    if (result.error) throw new Error(result.error);
+    if (result.updated) setProfile(result.updated);
     await loadHistory(me.id);
-    return { updated, coinsCost, cashCost };
+    return { updated: result.updated, coinsCost: result.coinsCost, cashCost: result.cashCost };
   }, [profile, user, loadHistory]);
 
   const upgradeVip = useCallback(async (newTierName, coinsCost, cashCost, paymentMethod) => {
     if (!profile) throw new Error("Profile not loaded");
     const me = user || await base44.auth.me();
 
-    if (paymentMethod === "coins" && (profile.coins || 0) < coinsCost) {
-      throw new Error("Insufficient coins");
-    }
-
-    const expiryDate = new Date();
-    expiryDate.setMonth(expiryDate.getMonth() + 12);
-
-    await base44.entities.Transaction.create({
-      user_id: me.id,
-      type: "recharge",
-      amount_usd: paymentMethod === "cash" ? cashCost : 0,
-      coins: coinsCost,
-      status: paymentMethod === "coins" ? "completed" : "pending",
-      tier_label: newTierName,
-      description: `VIP Upgrade → ${newTierName} (${paymentMethod})`,
+    const res = await base44.functions.invoke("processVipPurchase", {
+      action: "upgrade",
+      tier_name: newTierName,
+      tier_coins: coinsCost,
+      tier_cash: cashCost,
+      payment_method: paymentMethod,
     });
-
-    const updates = {
-      is_vip: true,
-      vip_tier: newTierName,
-      vip_expiry: expiryDate.toISOString(),
-    };
-    if (paymentMethod === "coins") {
-      updates.coins = (profile.coins || 0) - coinsCost;
-      updates.total_xp = (profile.total_xp || 0) + coinsCost;
-    }
-
-    const updated = await base44.entities.UserProfile.update(profile.id, updates);
-    setProfile(updated);
+    const result = res.data || res;
+    if (result.error) throw new Error(result.error);
+    if (result.updated) setProfile(result.updated);
     await loadHistory(me.id);
-    return updated;
+    return result.updated;
   }, [profile, user, loadHistory]);
 
   const claimReward = useCallback(async (rewardName, coins) => {
     if (!profile) throw new Error("Profile not loaded");
     const me = user || await base44.auth.me();
 
-    await base44.entities.Transaction.create({
-      user_id: me.id,
-      type: "recharge",
-      coins: coins,
-      status: "completed",
-      description: `VIP Reward: ${rewardName}`,
+    const res = await base44.functions.invoke("processVipPurchase", {
+      action: "claim_reward",
+      reward_name: rewardName,
+      reward_coins: coins,
     });
-
-    const updated = await base44.entities.UserProfile.update(profile.id, {
-      coins: (profile.coins || 0) + coins,
-      gifts_received: (profile.gifts_received || 0) + 1,
-    });
-    setProfile(updated);
+    const result = res.data || res;
+    if (result.error) throw new Error(result.error);
+    if (result.updated) setProfile(result.updated);
     await loadHistory(me.id);
-    return updated;
+    return result.updated;
   }, [profile, user, loadHistory]);
 
   const isRewardClaimedToday = useCallback((rewardName) => {
