@@ -9,6 +9,7 @@ export function useCreatorCenter() {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hasRealStats, setHasRealStats] = useState(false);
   const [approvedApplications, setApprovedApplications] = useState([]);
 
   const loadProfile = useCallback(async () => {
@@ -31,9 +32,17 @@ export function useCreatorCenter() {
 
   const loadStats = useCallback(async () => {
     try {
-      return await callDashboardAPI("dashboard_get", { type: "platform_stats" });
+      const data = await callDashboardAPI("dashboard_get", { type: "platform_stats" });
+      // Only accept real data — never fall back to mock values
+      if (data && typeof data === "object" && Object.keys(data).length > 0) {
+        setHasRealStats(true);
+        return data;
+      }
+      setHasRealStats(false);
+      return null;
     } catch (e) {
       console.error("Failed to load stats:", e);
+      setHasRealStats(false);
       return null;
     }
   }, []);
@@ -83,5 +92,5 @@ export function useCreatorCenter() {
     }
   }, []);
 
-  return { profile, user, stats, loading, refresh, trackDashboardVisit, approvedApplications };
+  return { profile, user, stats, hasRealStats, loading, refresh, trackDashboardVisit, approvedApplications };
 }

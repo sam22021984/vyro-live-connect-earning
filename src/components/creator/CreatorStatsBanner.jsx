@@ -11,8 +11,8 @@ function StatCard({ icon: Icon, label, value, color }) {
   );
 }
 
-export default function CreatorStatsBanner({ stats, loading }) {
-  if (loading || !stats) {
+export default function CreatorStatsBanner({ stats, loading, hasRealStats }) {
+  if (loading) {
     return (
       <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EEF2F7 100%)", border: "1px solid #E5E7EB" }}>
         <div className="flex items-center justify-center py-4">
@@ -22,13 +22,24 @@ export default function CreatorStatsBanner({ stats, loading }) {
     );
   }
 
+  // No real data — show empty state, never render mock/fake stats
+  if (!stats || !hasRealStats) {
+    return (
+      <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EEF2F7 100%)", border: "1px solid #E5E7EB" }}>
+        <div className="flex flex-col items-center justify-center py-6">
+          <p className="text-xs font-semibold" style={{ color: "#9CA3AF" }}>No Real Data Available</p>
+        </div>
+      </div>
+    );
+  }
+
   const statItems = [
-    { icon: Users, label: "Total Users", value: stats.totalUsers?.toLocaleString() || "0", color: "#2F80ED" },
-    { icon: Radio, label: "Live Rooms", value: String(stats.liveRooms || 0), color: "#EF4444" },
-    { icon: DollarSign, label: "Revenue", value: `$${(stats.totalRevenue || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "#10B981" },
-    { icon: Coins, label: "Coins Flow", value: (stats.totalCoins || 0).toLocaleString(), color: "#F59E0B" },
-    { icon: Crown, label: "VIP Users", value: String(stats.vipUsers || 0), color: "#D4AF37" },
-    { icon: Shield, label: "Verified", value: String(stats.verifiedUsers || 0), color: "#6366F1" },
+    { icon: Users, label: "Total Users", value: stats.totalUsers != null ? stats.totalUsers.toLocaleString() : "—", color: "#2F80ED" },
+    { icon: Radio, label: "Live Rooms", value: stats.liveRooms != null ? String(stats.liveRooms) : "—", color: "#EF4444" },
+    { icon: DollarSign, label: "Revenue", value: stats.totalRevenue != null ? `$${stats.totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}` : "—", color: "#10B981" },
+    { icon: Coins, label: "Coins Flow", value: stats.totalCoins != null ? stats.totalCoins.toLocaleString() : "—", color: "#F59E0B" },
+    { icon: Crown, label: "VIP Users", value: stats.vipUsers != null ? String(stats.vipUsers) : "—", color: "#D4AF37" },
+    { icon: Shield, label: "Verified", value: stats.verifiedUsers != null ? String(stats.verifiedUsers) : "—", color: "#6366F1" },
   ];
 
   return (

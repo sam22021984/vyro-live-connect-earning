@@ -10,11 +10,12 @@ import { callDashboardAPI } from "@/lib/dashboardApi";
  * @param {object} defaults - { info, stats, modules } fallback / seed data
  */
 export function useDashboardData(dashboardType, defaults) {
-  const [info, setInfo] = useState(defaults.info || {});
-  const [stats, setStats] = useState(defaults.stats || []);
-  const [modules, setModules] = useState(defaults.modules || []);
-  const [quickActions, setQuickActions] = useState(defaults.quickActions || []);
+  const [info, setInfo] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [modules, setModules] = useState(null);
+  const [quickActions, setQuickActions] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hasRealData, setHasRealData] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -24,31 +25,35 @@ export function useDashboardData(dashboardType, defaults) {
           dashboard_type: dashboardType,
         });
         if (cancelled) return;
-        if (stored && Object.keys(stored).length > 0) {
-          setInfo(stored.info || defaults.info || {});
-          setStats(stored.stats || defaults.stats || []);
-          setModules(stored.modules || defaults.modules || []);
-          setQuickActions(stored.quickActions || defaults.quickActions || []);
+
+        if (stored && typeof stored === "object" && Object.keys(stored).length > 0) {
+          setInfo(stored.info ?? null);
+          setStats(stored.stats ?? null);
+          setModules(stored.modules ?? null);
+          setQuickActions(stored.quickActions ?? null);
+          setHasRealData(true);
         } else {
-          // first access — persist the defaults to the database
+          // first access — persist defaults then use the seeded response
           const seeded = await callDashboardAPI("dashboard_event", {
             event: "save",
             dashboard_type: dashboardType,
             data: defaults,
           });
           if (cancelled) return;
-          setInfo(seeded?.info || defaults.info || {});
-          setStats(seeded?.stats || defaults.stats || []);
-          setModules(seeded?.modules || defaults.modules || []);
-          setQuickActions(seeded?.quickActions || defaults.quickActions || []);
+          if (seeded && typeof seeded === "object" && Object.keys(seeded).length > 0) {
+            setInfo(seeded.info ?? null);
+            setStats(seeded.stats ?? null);
+            setModules(seeded.modules ?? null);
+            setQuickActions(seeded.quickActions ?? null);
+            setHasRealData(true);
+          } else {
+            setHasRealData(false);
+          }
         }
       } catch (e) {
         console.error("useDashboardData error:", e);
         if (cancelled) return;
-        setInfo(defaults.info || {});
-        setStats(defaults.stats || []);
-        setModules(defaults.modules || []);
-        setQuickActions(defaults.quickActions || []);
+        setHasRealData(false);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -58,5 +63,5 @@ export function useDashboardData(dashboardType, defaults) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dashboardType]);
 
-  return { info, stats, modules, quickActions, loading };
+  return { info, stats, modules, quickActions, hasRealData, loading };
 }

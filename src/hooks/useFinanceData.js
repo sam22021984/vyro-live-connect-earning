@@ -13,10 +13,11 @@ function formatUsd(n) {
 
 export function useFinanceData() {
   const { user } = useAuth();
-  const [transactions, setTransactions] = useState([]);
-  const [notifications, setNotifications] = useState([]);
+  const [transactions, setTransactions] = useState(null);
+  const [notifications, setNotifications] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hasRealData, setHasRealData] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!user?.id) { setLoading(false); return; }
@@ -25,11 +26,19 @@ export function useFinanceData() {
 
       // All wallet/finance data fetched through the dashboard-api proxy
       const data = await callDashboardAPI("wallet_get", { user_id: user.id });
-      setTransactions(data?.transactions || []);
-      setProfile(data?.profile || null);
-      setNotifications(data?.notifications || []);
+
+      // Only accept real data — never fall back to mock/empty arrays
+      if (data && typeof data === "object") {
+        setTransactions(Array.isArray(data.transactions) ? data.transactions : null);
+        setProfile(data.profile ?? null);
+        setNotifications(Array.isArray(data.notifications) ? data.notifications : null);
+        setHasRealData(true);
+      } else {
+        setHasRealData(false);
+      }
     } catch (err) {
       console.error("Failed to fetch finance data:", err);
+      setHasRealData(false);
     } finally {
       setLoading(false);
     }
@@ -39,8 +48,9 @@ export function useFinanceData() {
     fetchData();
   }, [fetchData]);
 
-  // Compute stats from transactions
-  const completedTxns = transactions.filter((t) => t.status === "completed");
+  // Compute stats from transactions — guard against null (no real data yet)
+  const txns = Array.isArray(transactions) ? transactions : [];
+  const completedTxns = txns.filter((t) => t.status === "completed");
   const totalRevenue = completedTxns
     .filter((t) => t.type === "recharge" || t.type === "purchase" || t.type === "gift")
     .reduce((sum, t) => sum + (t.amount_usd || 0), 0);
@@ -82,7 +92,7 @@ export function useFinanceData() {
   }
 
   // Recent transactions (last 10)
-  const recentTransactions = transactions.slice(0, 10).map((t) => ({
+  const recentTransactions = txns.slice(0, 10).map((t) => ({
     id: t.id || "TXN-" + Math.random().toString(36).slice(2, 8),
     user: t.recipient_name || "User",
     type: t.type ? (t.type.charAt(0).toUpperCase() + t.type.slice(1)) : "Transaction",
@@ -112,7 +122,7 @@ export function useFinanceData() {
   ];
 
   // Withdrawals
-  const withdrawals = transactions
+  const withdrawals = txns
     .filter((t) => t.type === "withdraw")
     .slice(0, 10)
     .map((t) => ({
@@ -130,7 +140,7 @@ export function useFinanceData() {
   const giftRevenue = completedTxns.filter((t) => t.type === "gift").reduce((s, t) => s + (t.amount_usd || 0), 0);
   const vipRevenue = completedTxns.filter((t) => t.type === "purchase" && t.description?.toLowerCase().includes("vip")).reduce((s, t) => s + (t.amount_usd || 0), 0);
   const rechargeRevenue = completedTxns.filter((t) => t.type === "recharge").reduce((s, t) => s + (t.amount_usd || 0), 0);
-  const refundProcessed = transactions.filter((t) => t.status === "failed").reduce((s, t) => s + (t.amount_usd || 0), 0);
+  const refundProcessed = txns.filter((t) => t.status === "failed").reduce((s, t) => s + (t.amount_usd || 0), 0);
   const commissionEarned = giftRevenue * 0.3; // platform 30% commission
 
   const reportCategories = [
@@ -143,7 +153,8 @@ export function useFinanceData() {
   ];
 
   // Map notifications to finance format
-  const financeNotifications = notifications.slice(0, 6).map((n) => ({
+  const notifs = Array.isArray(notifications) ? notifications : [];
+  const financeNotifications = notifs.slice(0, 6).map((n) => ({
     title: n.title || "Notification",
     desc: n.body || "",
     time: n.created_date ? formatTimeAgo(n.created_date) : "Recently",
@@ -152,7 +163,7 @@ export function useFinanceData() {
   }));
 
   return {
-    transactions,
+    transactions: txns,
     statsCards,
     revenueData,
     recentTransactions,
@@ -160,13 +171,14 @@ export function useFinanceData() {
     withdrawals,
     reportCategories,
     financeNotifications,
+    hasRealData,
     heroStats: {
       totalOverview: formatUsd(totalRevenue + walletBalance),
       monthlyGrowth: revenueData.length >= 2
         ? ((revenueData[revenueData.length - 1].revenue - revenueData[revenueData.length - 2].revenue) / Math.max(revenueData[revenueData.length - 2].revenue, 1) * 100).toFixed(1)
         : "0",
       pendingCount,
-      activeAccounts: new Set(transactions.map((t) => t.user_id)).size,
+      activeAccounts: new Set(txns.map((t) => t.user_id)).size,
     },
     loading,
     refetch: fetchData,

@@ -12,18 +12,6 @@ import { base44 } from "@/api/base44Client";
  * @returns {Promise<any>} - the data returned by the Edge Function
  */
 export async function callDashboardAPI(action, payload = {}) {
-  const res = await base44.functions.invoke("dashboardApi", {
-    action,
-    payload,
-  });
-  const result = res.data ?? res;
-
-  if (result?.data?.error) {
-    throw new Error(result.data.error);
-  }
-  if (result?.error) {
-    throw new Error(result.error);
-  }
-
-  return result.data ?? result;
+  const res = await base44.functions.invoke("dashboardApi", { action, payload });
+  return res.data ?? res;
 }

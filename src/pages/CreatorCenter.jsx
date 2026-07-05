@@ -20,7 +20,7 @@ import { getRoleLevel, getCreatorCenterDashboards } from "@/lib/roleUtils";
 export default function CreatorCenter() {
   const navigate = useNavigate();
   const handleBack = useBackNav("/more-services");
-  const { profile, stats, loading, approvedApplications } = useCreatorCenter();
+  const { profile, stats, hasRealStats, loading, approvedApplications } = useCreatorCenter();
 
   const userRole = profile?.role || "user";
   const { visible: visibleDashboards, locked: lockedDashboards } = getCreatorCenterDashboards(dashboards, userRole);
@@ -67,7 +67,7 @@ export default function CreatorCenter() {
 
         {/* Stats Banner */}
         <div className="px-4 pt-4">
-          <CreatorStatsBanner stats={stats} loading={loading} />
+          <CreatorStatsBanner stats={stats} loading={loading} hasRealStats={hasRealStats} />
         </div>
 
         {/* Earning Banner */}
