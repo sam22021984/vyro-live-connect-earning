@@ -191,6 +191,16 @@ export default function LiveRoom() {
 
   const profileSeat = seats.find((s) => s.id === profileSeatId);
 
+  // Room Owner: immediately show the Seat Control Panel (Settings) when
+  // entering their own room, so they can manage seats without requesting one.
+  const [ownerPanelShown, setOwnerPanelShown] = useState(false);
+  useEffect(() => {
+    if (userRole === "owner" && !ownerPanelShown && !joiningRoom && !joinBlock) {
+      setShowSettings(true);
+      setOwnerPanelShown(true);
+    }
+  }, [userRole, ownerPanelShown, joiningRoom, joinBlock]);
+
   useEffect(() => {
     if (recommendations.length > 0) {
       toast({ title: "💡 AI Tip", description: recommendations[0] });
