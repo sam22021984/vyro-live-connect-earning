@@ -35,7 +35,8 @@ export default function UserDashboard() {
   const { info: USER_INFO, modules: USER_MODULES, quickActions: QUICK_ACTIONS, loading } = useDashboardData("user", { info: USER_INFO_D, modules: USER_MODULES_D, quickActions: QUICK_ACTIONS_D });
   const [activeModule, setActiveModule] = useState("home");
   const ActiveComponent = SECTIONS[activeModule] || HomeSection;
-  const currentModule = USER_MODULES.find((m) => m.id === activeModule) || USER_MODULES[0];
+  const moduleList = Array.isArray(USER_MODULES) ? USER_MODULES : USER_MODULES_D;
+  const currentModule = moduleList.find((m) => m.id === activeModule) || moduleList[0];
 
   if (loading || !currentModule) {
     return (

@@ -59,7 +59,7 @@ export function useFinanceData() {
     .reduce((sum, t) => sum + (t.amount_usd || 0), 0);
   const walletBalance = (profile?.coins || 0) / 100; // coins to USD approx
   const netEarnings = totalRevenue - totalExpenses;
-  const pendingCount = transactions.filter((t) => t.status === "pending").length;
+  const pendingCount = txns.filter((t) => t.status === "pending").length;
 
   const statsCards = [
     { id: "revenue", label: "Total Revenue", value: formatUsd(totalRevenue), icon: "💰", color: "emerald", trend: "up", change: "+12.5%" },
@@ -73,7 +73,7 @@ export function useFinanceData() {
   const revenueData = [];
   for (let i = 11; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthTxns = transactions.filter((t) => {
+    const monthTxns = txns.filter((t) => {
       if (!t.created_date) return false;
       const td = new Date(t.created_date);
       return td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear();
@@ -104,10 +104,10 @@ export function useFinanceData() {
   }));
 
   // Wallet summary
-  const pendingClearing = transactions
+  const pendingClearing = txns
     .filter((t) => t.status === "pending" && t.type !== "withdraw")
     .reduce((sum, t) => sum + (t.amount_usd || 0), 0);
-  const lockedFunds = transactions
+  const lockedFunds = txns
     .filter((t) => t.status === "pending" && t.type === "withdraw")
     .reduce((sum, t) => sum + (t.amount_usd || 0), 0);
   const totalDeposits = completedTxns
