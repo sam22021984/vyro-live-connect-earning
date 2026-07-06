@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { supabaseAuth } from '@/lib/supabaseAuth';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
+import { trackEvent } from '@/lib/eventTracker';
 
 const AuthContext = createContext();
 
@@ -53,6 +54,8 @@ export const AuthProvider = ({ children }) => {
       if (currentUser) {
         setUser(currentUser);
         setIsAuthenticated(true);
+        // Track login event → event-tracker → database → live-analytics dashboard
+        trackEvent('login');
       } else {
         // me() returned null. If token was cleared by me() (real 401/403/refresh
         // failure), this is a real logout — clear auth state. If token still

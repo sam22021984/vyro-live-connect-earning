@@ -1,9 +1,11 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useHomeFeed } from "@/hooks/useHomeFeed";
+import { trackEvent } from "@/lib/eventTracker";
 import HomeHeader from "@/components/home/HomeHeader";
 import HomeSearchOverlay from "@/components/home/HomeSearchOverlay";
 import HomeTabs from "@/components/home/HomeTabs";
 import PromoBanner from "@/components/home/PromoBanner";
+import LiveAnalyticsWidget from "@/components/home/LiveAnalyticsWidget";
 import LiveFeed from "@/components/home/LiveFeed";
 import { AudioRoomFeed, PartyRoomFeed } from "@/components/home/RoomFeeds";
 import { CreatorSuggestions, FriendSuggestions } from "@/components/home/PeopleSuggestions";
@@ -21,6 +23,9 @@ export default function Home() {
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
   const scrollRef = useRef(null);
+
+  // Track session_start event for live analytics (event-tracker → database → live-analytics)
+  useEffect(() => { trackEvent("session_start"); }, []);
 
   // Filter content based on active tab + country
   const filterContent = useCallback((items, countryField = "country") => {
@@ -118,6 +123,8 @@ export default function Home() {
         <HomeTabs active={activeTab} onChange={setActiveTab} />
 
         <PromoBanner />
+
+        <LiveAnalyticsWidget />
 
         <DailyRewardWidget />
 
