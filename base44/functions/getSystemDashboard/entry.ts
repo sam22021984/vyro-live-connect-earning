@@ -7,15 +7,15 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
 
-    // Call live-analytics Supabase Edge Function
+    // Call the final-live-analytics Supabase Edge Function directly.
     // This reads from the same tables that event-tracker writes to
-    // (user_presence, live_room_gifts, room_chats)
-    const res = await fetch(`${supabaseUrl}/functions/v1/live-analytics`, {
+    // (user_presence, live_room_gifts, room_chats).
+    const res = await fetch(`${supabaseUrl}/functions/v1/Finel-live-analytics`, {
       headers: {
-        'apikey': serviceRoleKey,
-        'Authorization': `Bearer ${serviceRoleKey}`,
+        'apikey': anonKey,
+        'Authorization': `Bearer ${anonKey}`,
       },
     });
 
