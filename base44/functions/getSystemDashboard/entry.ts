@@ -9,10 +9,9 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
 
-    // Call the final-live-analytics Supabase Edge Function directly.
-    // This reads from the same tables that event-tracker writes to
-    // (user_presence, live_room_gifts, room_chats).
-    const res = await fetch(`${supabaseUrl}/functions/v1/Finel-live-analytics`, {
+    // Call the live-analytics Supabase Edge Function directly.
+    // Returns live_metrics, engagement, economy, and system_health.
+    const res = await fetch(`${supabaseUrl}/functions/v1/live-analytics`, {
       headers: {
         'apikey': anonKey,
         'Authorization': `Bearer ${anonKey}`,
