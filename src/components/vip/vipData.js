@@ -1,9 +1,9 @@
 export const vipLevels = [
   { id: 1, name: "VIP 1", title: "Bronze Crystal Shield", icon: "🥉", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/f1fc4cbc5_file_0000000058107243b293076f7d382f01.png", color: "#CD7F32", glow: "#B8860B", coins: 100000, cash: 5, dailyCoins: 300, benefits: ["VIP Badge", "Basic Profile Frame", "Colored Username", "Exclusive VIP Emojis", "VIP Welcome Message", "Basic Priority Support"] },
   { id: 2, name: "VVIP", title: "Silver Crystal Crown", icon: "🥈", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/cc31a5d07_file_000000001ea8724381868ba1867df54b.png", color: "#C0C0C0", glow: "#94A3B8", coins: 200000, cash: 10, dailyCoins: 500, benefits: ["VVIP Badge", "Premium Profile Frame", "Colored Username", "Exclusive Chat Bubble", "VIP Emojis Pack", "Priority Support", "2% Gift Cashback"] },
-  { id: 3, name: "SVIP", title: "Golden Sapphire Crown", icon: "🥇", color: "#FFD700", glow: "#F59E0B", coins: 500000, cash: 25, dailyCoins: 700, benefits: ["SVIP Badge", "Animated Profile Frame", "Premium Chat Bubble", "Exclusive Stickers", "Entrance Effect", "Priority Support", "3% Gift Cashback"] },
-  { id: 4, name: "SSVIP", title: "Diamond Crystal Shield", icon: "💠", color: "#22D3EE", glow: "#3B82F6", coins: 800000, cash: 40, dailyCoins: 1000, benefits: ["SSVIP Badge", "Animated Frame", "Animated Entrance Effect", "Exclusive Username Color", "Room Entry Priority", "VIP Support", "5% Gift Cashback"] },
-  { id: 5, name: "MSVIP", title: "Master Royal Crown", icon: "🥇", color: "#A855F7", glow: "#7C3AED", coins: 1500000, cash: 75, dailyCoins: 1500, benefits: ["MSVIP Crown Badge", "Luxury Profile Frame", "Vehicle Entry Effect", "Premium Chat Bubble", "Exclusive Gifts Access", "VIP Support", "7% Gift Cashback"] },
+  { id: 3, name: "SVIP", title: "Golden Sapphire Crown", icon: "🥇", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/6bd110fac_file_00000000a94c71f48c7f8eb0fcca30e5.png", color: "#FFD700", glow: "#F59E0B", coins: 500000, cash: 25, dailyCoins: 700, benefits: ["SVIP Badge", "Animated Profile Frame", "Premium Chat Bubble", "Exclusive Stickers", "Entrance Effect", "Priority Support", "3% Gift Cashback"] },
+  { id: 4, name: "SSVIP", title: "Diamond Crystal Shield", icon: "💠", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/a88c59d68_file_00000000da1072438cc39ccb2851571a.png", color: "#22D3EE", glow: "#3B82F6", coins: 800000, cash: 40, dailyCoins: 1000, benefits: ["SSVIP Badge", "Animated Frame", "Animated Entrance Effect", "Exclusive Username Color", "Room Entry Priority", "VIP Support", "5% Gift Cashback"] },
+  { id: 5, name: "MSVIP", title: "Master Royal Crown", icon: "🥇", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/91c7470eb_file_00000000dd6472469c7b758f0598129b.png", color: "#A855F7", glow: "#7C3AED", coins: 1500000, cash: 75, dailyCoins: 1500, benefits: ["MSVIP Crown Badge", "Luxury Profile Frame", "Vehicle Entry Effect", "Premium Chat Bubble", "Exclusive Gifts Access", "VIP Support", "7% Gift Cashback"] },
   { id: 6, name: "MSSVIP", title: "Royal Phoenix Crown", icon: "👑", color: "#EC4899", glow: "#DB2777", coins: 2500000, cash: 125, dailyCoins: 2500, benefits: ["MSSVIP Crown Badge", "Luxury Animated Frame", "Premium Entrance Animation", "Exclusive Gift Collection", "VIP Lounge Access", "Enhanced Support", "10% Gift Cashback"] },
   { id: 7, name: "MISVIP", title: "Imperial Royal Crown", icon: "💎", color: "#3B82F6", glow: "#1E40AF", coins: 5000000, cash: 250, dailyCoins: 4000, benefits: ["MISVIP Royal Crown", "Diamond Profile Frame", "Premium Vehicle Effect", "Exclusive ID Tag", "VIP Room Access", "Priority Verification", "VIP Exclusive Tasks", "VIP Lucky Draw Tickets", "VIP Shop Discounts", "12% Gift Cashback"] },
   { id: 8, name: "MISSVIP", title: "Ultimate Diamond Crown", icon: "👑", color: "#9932CC", glow: "#7E22CE", coins: 10000000, cash: 500, dailyCoins: 6000, benefits: ["MISSVIP Diamond Crown", "Diamond Animated Frame", "Legendary Entrance Effect", "Exclusive Room Theme", "Exclusive Avatar Items", "VIP Event Access", "Monthly Exclusive Gift Pack", "Double Daily Check-in Rewards", "VIP Event Invitations", "15% Gift Cashback"] },
@@ -30,7 +30,7 @@ export const vipPricingTiers = [
     rewardTime: { dailyCoins: "24 hours", frameEntry: "7 days" },
   },
   {
-    id: "svip", name: "SVIP", icon: "🥇", tierIcon: "🥇",
+    id: "svip", name: "SVIP", icon: "🥇", tierIcon: "🥇", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/6bd110fac_file_00000000a94c71f48c7f8eb0fcca30e5.png",
     color: "#FFD700", gradient: "from-yellow-400 to-amber-500",
     coins: "500,000", cash: "$25", dailyCoins: "700",
     benefits: ["SVIP Badge", "Animated Profile Frame", "Premium Chat Bubble", "Exclusive Stickers", "Entrance Effect", "Priority Support", "3% Gift Cashback"],
@@ -38,7 +38,7 @@ export const vipPricingTiers = [
     rewardTime: { frame: "30 days", badge: "7 days", entry: "7 days" },
   },
   {
-    id: "ssvip", name: "SSVIP", icon: "💠", tierIcon: "💠",
+    id: "ssvip", name: "SSVIP", icon: "💠", tierIcon: "💠", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/a88c59d68_file_00000000da1072438cc39ccb2851571a.png",
     color: "#22D3EE", gradient: "from-cyan-400 to-blue-500",
     coins: "800,000", cash: "$40", dailyCoins: "1,000",
     benefits: ["SSVIP Badge", "Animated Frame", "Animated Entrance Effect", "Exclusive Username Color", "Room Entry Priority", "VIP Support", "5% Gift Cashback"],
@@ -46,7 +46,7 @@ export const vipPricingTiers = [
     rewardTime: { frame: "15 days", entry: "15 days" },
   },
   {
-    id: "msvip", name: "MSVIP", icon: "🥇", tierIcon: "🥇",
+    id: "msvip", name: "MSVIP", icon: "🥇", tierIcon: "🥇", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/91c7470eb_file_00000000dd6472469c7b758f0598129b.png",
     color: "#A855F7", gradient: "from-purple-500 to-violet-600",
     coins: "1,500,000", cash: "$75", dailyCoins: "1,500",
     benefits: ["MSVIP Crown Badge", "Luxury Profile Frame", "Vehicle Entry Effect", "Premium Chat Bubble", "Exclusive Gifts Access", "VIP Support", "7% Gift Cashback"],
