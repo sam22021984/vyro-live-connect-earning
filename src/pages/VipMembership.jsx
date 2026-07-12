@@ -25,7 +25,8 @@ import { useBackNav } from "@/hooks/useBackNav";
 export default function VipMembership() {
   const navigate = useNavigate();
   const handleBack = useBackNav("/more-services");
-  const [activeTab, setActiveTab] = useState("home");
+  const initialTab = new URLSearchParams(window.location.search).get("tab") || "home";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [selectedDurationId, setSelectedDurationId] = useState(null);
 
   const handleSelectDuration = (planId) => {
