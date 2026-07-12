@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { vipLevels } from "@/components/vip/vipData";
 import { ChevronRight } from "lucide-react";
+import VipIcon from "@/components/vip/VipIcon";
 
 export default function VipLevelsTab() {
   const navigate = useNavigate();
@@ -29,11 +30,7 @@ export default function VipLevelsTab() {
                   boxShadow: `0 2px 8px ${l.glow}30`,
                 }}
               >
-                {l.iconImage ? (
-                  <img src={l.iconImage} alt={l.name} className="w-full h-full object-cover" />
-                ) : (
-                  l.icon
-                )}
+                <VipIcon iconVideo={l.iconVideo} iconImage={l.iconImage} icon={l.icon} alt={l.name} />
               </div>
               <div className="flex-1 text-left">
                 <div className="flex items-center gap-2">

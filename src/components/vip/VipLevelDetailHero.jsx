@@ -1,4 +1,5 @@
 import React from "react";
+import VipIcon from "@/components/vip/VipIcon";
 
 export default function VipLevelDetailHero({ level, detail, pricingTier }) {
   return (
@@ -28,11 +29,7 @@ export default function VipLevelDetailHero({ level, detail, pricingTier }) {
             boxShadow: `0 0 30px ${level.glow}50, inset 0 0 20px ${level.color}20`,
           }}
         >
-          {level.iconImage ? (
-            <img src={level.iconImage} alt={level.name} className="w-full h-full object-cover rounded-full" />
-          ) : (
-            <span>{level.icon}</span>
-          )}
+          <VipIcon iconVideo={level.iconVideo} iconImage={level.iconImage} icon={level.icon} alt={level.name} round />
         </div>
       </div>
 

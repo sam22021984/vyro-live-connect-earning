@@ -6,10 +6,10 @@ export const vipLevels = [
   { id: 5, name: "MSVIP", title: "Master Royal Crown", icon: "🥇", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/91c7470eb_file_00000000dd6472469c7b758f0598129b.png", color: "#A855F7", glow: "#7C3AED", coins: 1500000, cash: 75, dailyCoins: 1500, benefits: ["MSVIP Crown Badge", "Luxury Profile Frame", "Vehicle Entry Effect", "Premium Chat Bubble", "Exclusive Gifts Access", "VIP Support", "7% Gift Cashback"] },
   { id: 6, name: "MSSVIP", title: "Royal Phoenix Crown", icon: "👑", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/0643e8f3e_file_00000000fc2072468b890d16fdc9eda3.png", color: "#EC4899", glow: "#DB2777", coins: 2500000, cash: 125, dailyCoins: 2500, benefits: ["MSSVIP Crown Badge", "Luxury Animated Frame", "Premium Entrance Animation", "Exclusive Gift Collection", "VIP Lounge Access", "Enhanced Support", "10% Gift Cashback"] },
   { id: 7, name: "MISVIP", title: "Imperial Royal Crown", icon: "💎", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/422b0b0d8_file_00000000c064720abe05418f2a8a0e89.png", color: "#3B82F6", glow: "#1E40AF", coins: 5000000, cash: 250, dailyCoins: 4000, benefits: ["MISVIP Royal Crown", "Diamond Profile Frame", "Premium Vehicle Effect", "Exclusive ID Tag", "VIP Room Access", "Priority Verification", "VIP Exclusive Tasks", "VIP Lucky Draw Tickets", "VIP Shop Discounts", "12% Gift Cashback"] },
-  { id: 8, name: "MISSVIP", title: "Ultimate Diamond Crown", icon: "👑", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/e8544aa70_file_0000000029287243b0822d52373c4714.png", color: "#9932CC", glow: "#7E22CE", coins: 10000000, cash: 500, dailyCoins: 6000, benefits: ["MISSVIP Diamond Crown", "Diamond Animated Frame", "Legendary Entrance Effect", "Exclusive Room Theme", "Exclusive Avatar Items", "VIP Event Access", "Monthly Exclusive Gift Pack", "Double Daily Check-in Rewards", "VIP Event Invitations", "15% Gift Cashback"] },
-  { id: 9, name: "ULTRA MISSVIP", title: "Ultra Dragon Crown", icon: "🔥", color: "#EF4444", glow: "#DC2626", coins: 20000000, cash: 1000, dailyCoins: 30000, benefits: ["Ultra Crown Badge", "Ultra Animated Frame", "Super Entrance Effect", "Ultra Vehicle Effect", "Exclusive Gifts", "VIP Event Priority", "Monthly 500,000 Bonus Coins", "Priority Room Seat Reservation", "Exclusive Seasonal Avatar Set", "18% Gift Cashback"] },
-  { id: 10, name: "LEGEND IMISVIP", title: "Galaxy Legendary Crown", icon: "👑", color: "#6366F1", glow: "#4F46E5", coins: 50000000, cash: 2500, dailyCoins: 50000, benefits: ["Legend Crown Badge", "Legendary Profile Frame", "Mythical Entrance Effect", "Custom Chat Bubble", "Exclusive Username Style", "Special VIP Events", "Monthly 1,500,000 Bonus Coins", "Custom Profile Background", "Priority Feature Testing Access", "Dedicated VIP Support", "20% Gift Cashback"] },
-  { id: 11, name: "ROYAL IMISSVIP", title: "Royal Emperor Throne", icon: "🌌", color: "#FFD700", glow: "#F59E0B", coins: 100000000, cash: 5000, dailyCoins: 100000, benefits: ["Royal King Crown Badge", "Ultimate Animated Frame", "Royal Entrance Effect", "Royal Vehicle Effect", "Custom Username Color", "Custom Profile Theme", "Exclusive Royal Gifts", "Highest Room Priority", "Dedicated Account Manager", "Premium 24/7 Support", "Private VIP Events", "Monthly 5,000,000 Bonus Coins", "Custom Animated Profile Background", "Royal Leaderboard Badge", "Early Access To New Features", "25% Gift Cashback"] },
+  { id: 8, name: "MISSVIP", title: "Ultimate Diamond Crown", icon: "👑", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/e8544aa70_file_0000000029287243b0822d52373c4714.png", iconVideo: "https://media.base44.com/videos/public/6a461e2b7cac52b13d542424/a245271ee_NQY4FPQFCT.mp4", color: "#9932CC", glow: "#7E22CE", coins: 10000000, cash: 500, dailyCoins: 6000, benefits: ["MISSVIP Diamond Crown", "Diamond Animated Frame", "Legendary Entrance Effect", "Exclusive Room Theme", "Exclusive Avatar Items", "VIP Event Access", "Monthly Exclusive Gift Pack", "Double Daily Check-in Rewards", "VIP Event Invitations", "15% Gift Cashback"] },
+  { id: 9, name: "ULTRA MISSVIP", title: "Ultra Dragon Crown", icon: "🔥", iconVideo: "https://media.base44.com/videos/public/6a461e2b7cac52b13d542424/784f84a5e_DLBW0J4HSS.mp4", color: "#EF4444", glow: "#DC2626", coins: 20000000, cash: 1000, dailyCoins: 30000, benefits: ["Ultra Crown Badge", "Ultra Animated Frame", "Super Entrance Effect", "Ultra Vehicle Effect", "Exclusive Gifts", "VIP Event Priority", "Monthly 500,000 Bonus Coins", "Priority Room Seat Reservation", "Exclusive Seasonal Avatar Set", "18% Gift Cashback"] },
+  { id: 10, name: "LEGEND IMISVIP", title: "Galaxy Legendary Crown", icon: "👑", iconVideo: "https://media.base44.com/videos/public/6a461e2b7cac52b13d542424/e13594ba7_K7H5644AFO.mp4", color: "#6366F1", glow: "#4F46E5", coins: 50000000, cash: 2500, dailyCoins: 50000, benefits: ["Legend Crown Badge", "Legendary Profile Frame", "Mythical Entrance Effect", "Custom Chat Bubble", "Exclusive Username Style", "Special VIP Events", "Monthly 1,500,000 Bonus Coins", "Custom Profile Background", "Priority Feature Testing Access", "Dedicated VIP Support", "20% Gift Cashback"] },
+  { id: 11, name: "ROYAL IMISSVIP", title: "Royal Emperor Throne", icon: "🌌", iconVideo: "https://media.base44.com/videos/public/6a461e2b7cac52b13d542424/3817bfdaa_FEZTFI2U4L.mp4", color: "#FFD700", glow: "#F59E0B", coins: 100000000, cash: 5000, dailyCoins: 100000, benefits: ["Royal King Crown Badge", "Ultimate Animated Frame", "Royal Entrance Effect", "Royal Vehicle Effect", "Custom Username Color", "Custom Profile Theme", "Exclusive Royal Gifts", "Highest Room Priority", "Dedicated Account Manager", "Premium 24/7 Support", "Private VIP Events", "Monthly 5,000,000 Bonus Coins", "Custom Animated Profile Background", "Royal Leaderboard Badge", "Early Access To New Features", "25% Gift Cashback"] },
 ];
 
 export const vipPricingTiers = [
@@ -70,7 +70,7 @@ export const vipPricingTiers = [
     rewardTime: { dailyCoins: "Enabled", frame: "30 days" },
   },
   {
-    id: "missvip", name: "MISSVIP", icon: "👑", tierIcon: "👑", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/e8544aa70_file_0000000029287243b0822d52373c4714.png",
+    id: "missvip", name: "MISSVIP", icon: "👑", tierIcon: "👑", iconImage: "https://media.base44.com/images/public/6a461e2b7cac52b13d542424/e8544aa70_file_0000000029287243b0822d52373c4714.png", iconVideo: "https://media.base44.com/videos/public/6a461e2b7cac52b13d542424/a245271ee_NQY4FPQFCT.mp4",
     color: "#9932CC", gradient: "from-purple-500 to-fuchsia-600",
     coins: "10,000,000", cash: "$500", dailyCoins: "6,000",
     benefits: ["MISSVIP Diamond Crown", "Diamond Animated Frame", "Legendary Entrance Effect", "Exclusive Room Theme", "Exclusive Avatar Items", "VIP Event Access", "Monthly Exclusive Gift Pack", "Double Daily Check-in Rewards", "VIP Event Invitations", "15% Gift Cashback"],
@@ -78,7 +78,7 @@ export const vipPricingTiers = [
     rewardTime: { frame: "45 days", entry: "45 days", dailyCoins: "Enabled" },
   },
   {
-    id: "ultra", name: "ULTRA MISSVIP", icon: "🔥", tierIcon: "🔥",
+    id: "ultra", name: "ULTRA MISSVIP", icon: "🔥", tierIcon: "🔥", iconVideo: "https://media.base44.com/videos/public/6a461e2b7cac52b13d542424/784f84a5e_DLBW0J4HSS.mp4",
     color: "#EF4444", gradient: "from-red-500 to-orange-600",
     coins: "20,000,000", cash: "$1,000", dailyCoins: "30,000",
     benefits: ["Ultra Crown Badge", "Ultra Animated Frame", "Super Entrance Effect", "Ultra Vehicle Effect", "Exclusive Gifts", "VIP Event Priority", "Monthly 500,000 Bonus Coins", "Priority Room Seat Reservation", "Exclusive Seasonal Avatar Set", "18% Gift Cashback"],
@@ -86,7 +86,7 @@ export const vipPricingTiers = [
     rewardTime: { frame: "50 days", entry: "50 days", monthlyBonus: "Enabled" },
   },
   {
-    id: "legend", name: "LEGEND IMISVIP", icon: "👑", tierIcon: "👑",
+    id: "legend", name: "LEGEND IMISVIP", icon: "👑", tierIcon: "👑", iconVideo: "https://media.base44.com/videos/public/6a461e2b7cac52b13d542424/e13594ba7_K7H5644AFO.mp4",
     color: "#6366F1", gradient: "from-indigo-500 to-purple-600",
     coins: "50,000,000", cash: "$2,500", dailyCoins: "50,000",
     benefits: ["Legend Crown Badge", "Legendary Profile Frame", "Mythical Entrance Effect", "Custom Chat Bubble", "Exclusive Username Style", "Special VIP Events", "Monthly 1,500,000 Bonus Coins", "Custom Profile Background", "Priority Feature Testing Access", "Dedicated VIP Support", "20% Gift Cashback"],
@@ -94,7 +94,7 @@ export const vipPricingTiers = [
     rewardTime: { frame: "60 days", entry: "60 days", monthlyBonus: "Enabled" },
   },
   {
-    id: "royal", name: "ROYAL IMISSVIP", icon: "🌌", tierIcon: "🌌",
+    id: "royal", name: "ROYAL IMISSVIP", icon: "🌌", tierIcon: "🌌", iconVideo: "https://media.base44.com/videos/public/6a461e2b7cac52b13d542424/3817bfdaa_FEZTFI2U4L.mp4",
     color: "#FFD700", gradient: "from-amber-400 via-yellow-500 to-orange-500",
     coins: "100,000,000", cash: "$5,000", dailyCoins: "100,000",
     benefits: ["Royal King Crown Badge", "Ultimate Animated Frame", "Royal Entrance Effect", "Royal Vehicle Effect", "Custom Username Color", "Custom Profile Theme", "Exclusive Royal Gifts", "Highest Room Priority", "Dedicated Account Manager", "Premium 24/7 Support", "Private VIP Events", "Monthly 5,000,000 Bonus Coins", "Custom Animated Profile Background", "Royal Leaderboard Badge", "Early Access To New Features", "25% Gift Cashback"],

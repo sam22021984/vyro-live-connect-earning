@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Coins, TrendingUp, Crown, Check, Shield, Clock, Gift } from "lucide-react";
 import { vipPricingTiers, globalVipBenefits } from "@/components/vip/vipData";
+import VipIcon from "@/components/vip/VipIcon";
 
 export default function VipPricingTab() {
   const [expandedTier, setExpandedTier] = useState(null);
@@ -61,11 +62,7 @@ export default function VipPricingTab() {
                       boxShadow: `0 6px 16px ${tier.color}30, inset 0 2px 4px rgba(255,255,255,0.1)`,
                     }}
                   >
-                    {tier.iconImage ? (
-                      <img src={tier.iconImage} alt={tier.name} className="w-full h-full object-cover" style={{ filter: `drop-shadow(0 2px 4px ${tier.color}80)` }} />
-                    ) : (
-                      <span style={{ filter: `drop-shadow(0 2px 4px ${tier.color}80)` }}>{tier.tierIcon}</span>
-                    )}
+                    <VipIcon iconVideo={tier.iconVideo} iconImage={tier.iconImage} icon={tier.tierIcon} alt={tier.name} style={{ filter: `drop-shadow(0 2px 4px ${tier.color}80)` }} />
                   </div>
 
                   <div className="flex-1 min-w-0">
