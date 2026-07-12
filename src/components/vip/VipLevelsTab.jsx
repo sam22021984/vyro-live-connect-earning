@@ -23,7 +23,7 @@ export default function VipLevelsTab() {
               style={{ boxShadow: `0 2px 12px ${l.glow}15` }}
             >
               <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden"
+                className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden"
                 style={{
                   background: `linear-gradient(135deg, ${l.color}30, ${l.glow}20)`,
                   border: `1px solid ${l.color}40`,

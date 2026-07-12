@@ -22,7 +22,7 @@ export default function VipLevelDetailHero({ level, detail, pricingTier }) {
           style={{ background: `radial-gradient(circle, ${level.glow}, transparent)` }}
         />
         <div
-          className="relative w-28 h-28 rounded-full flex items-center justify-center text-6xl overflow-hidden animate-fadeIn"
+          className="relative w-36 h-36 rounded-full flex items-center justify-center text-6xl overflow-hidden animate-fadeIn"
           style={{
             background: `linear-gradient(135deg, ${level.color}30, ${level.glow}20)`,
             border: `2px solid ${level.color}60`,
