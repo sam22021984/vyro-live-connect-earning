@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useAuth } from "@/lib/AuthContext";
+import { useProfileQuery } from "@/hooks/useProfileQuery";
 import MyProfileHeader from "@/components/my-profile/MyProfileHeader";
 import MyStatsDashboard from "@/components/my-profile/MyStatsDashboard";
 import QuickActions from "@/components/my-profile/QuickActions";
@@ -12,37 +12,15 @@ import MyMoreMenu from "@/components/my-profile/MyMoreMenu";
 import MoreServices from "@/components/profile/MoreServices";
 
 export default function ProfileDashboard() {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: profile, isLoading: loading } = useProfileQuery();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [achievements, setAchievements] = useState([]);
-  const { user: me } = useAuth();
 
   useEffect(() => {
-    if (!me?.id) return;
-    const load = async () => {
-      try {
-        const res = await base44.functions.invoke("userOnboarding", {
-          action: "initProfile",
-          role: "user",
-          username: me.full_name || me.email?.split("@")[0] || "VYRO User",
-        });
-        setProfile(res.data?.profile || res.data);
-
-        const achs = await base44.entities.Achievement.filter({}).catch(() => []);
-        setAchievements(achs);
-      } catch (e) {
-        // fallback — try direct query
-        try {
-          const profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
-          if (profiles.length > 0) setProfile(profiles[0]);
-        } catch {}
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [me?.id]);
+    base44.entities.Achievement.filter({})
+      .then(setAchievements)
+      .catch(() => setAchievements([]));
+  }, []);
 
   if (loading) {
     return (
