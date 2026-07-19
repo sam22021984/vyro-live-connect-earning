@@ -92,6 +92,8 @@ import WelcomeAnimation from '@/pages/WelcomeAnimation';
 import ProfileDashboard from '@/pages/ProfileDashboard';
 import Discover from '@/pages/Discover';
 import BottomNavigation from '@/components/BottomNavigation';
+import GlobalRealtimeProvider from '@/components/GlobalRealtimeProvider';
+import RealtimeStatusIndicator from '@/components/RealtimeStatusIndicator';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -215,11 +217,14 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <ScrollToTop />
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
+        <GlobalRealtimeProvider>
+          <Router>
+            <ScrollToTop />
+            <AuthenticatedApp />
+          </Router>
+          <RealtimeStatusIndicator />
+          <Toaster />
+        </GlobalRealtimeProvider>
       </QueryClientProvider>
     </AuthProvider>
   )
