@@ -22,8 +22,15 @@ export function useVipProfile() {
         profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
       }
       if (profiles.length > 0) {
-        setProfile(profiles[0]);
-        return profiles[0];
+        let p = profiles[0];
+        // Use canonical global_id from user_identities (by auth.uid), not the
+        // stored profile value, which may be stale.
+        try {
+          const canon = await base44.functions.invoke("userOnboarding", { action: "getCanonicalId" });
+          p = { ...p, global_id: canon.data?.global_id ?? null };
+        } catch {}
+        setProfile(p);
+        return p;
       }
       const newProfile = await base44.entities.UserProfile.create({
         username: me.full_name || me.email?.split("@")[0] || "User",

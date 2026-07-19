@@ -104,6 +104,24 @@ function getZodiac(dateStr: string): string {
   return 'Capricorn';
 }
 
+// Canonical global_id from user_identities keyed by auth.uid().
+// Single source of truth for the logged-in user's ID — no username matching,
+// no serial fallback, no first-row heuristic.
+async function getCanonicalGlobalId(supabaseUrl: string, serviceRoleKey: string, uid: string): Promise<string | null> {
+  if (!supabaseUrl || !serviceRoleKey || !uid) return null;
+  try {
+    const r = await fetch(
+      `${supabaseUrl}/rest/v1/user_identities?select=global_id&user_id=eq.${encodeURIComponent(uid)}&limit=1`,
+      { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}`, Accept: 'application/json' } }
+    );
+    const text = await r.text();
+    const rows = JSON.parse(text);
+    return Array.isArray(rows) && rows[0]?.global_id ? rows[0].global_id : null;
+  } catch {
+    return null;
+  }
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -224,13 +242,19 @@ Deno.serve(async (req) => {
       return Response.json({ profile, isNew: true, global_id: applicationId });
     }
 
-    // Get current user's profile + global_id
+    // Get current user's profile + canonical global_id (from user_identities)
     if (action === 'getProfile') {
       const p = await findProfile(base44, user.id);
       if (!p) {
         return Response.json({ error: 'Profile not found', profile: null }, { status: 200 });
       }
-      return Response.json({ profile: p, global_id: p.global_id });
+      const supabaseUrl = (Deno.env.get('SUPABASE_URL') || '').replace(/\/$/, '');
+      const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+      const canonicalId = await getCanonicalGlobalId(supabaseUrl, serviceRoleKey, user.id);
+      if (canonicalId && p.global_id !== canonicalId) {
+        await base44.asServiceRole.entities.UserProfile.update(p.id, { global_id: canonicalId });
+      }
+      return Response.json({ profile: { ...p, global_id: canonicalId }, global_id: canonicalId });
     }
 
     // Look up a user by their global_id
@@ -314,6 +338,30 @@ Deno.serve(async (req) => {
         welcome_bonus_claimed: true,
       });
       return Response.json({ profile: updated, bonus: 500 });
+    }
+
+    // Canonical global_id from user_identities keyed by auth.uid() — the
+    // single source of truth for the logged-in user's ID. No username
+    // matching, no serial fallback, no first-row heuristic.
+    if (action === 'getCanonicalId') {
+      const supabaseUrl = (Deno.env.get('SUPABASE_URL') || '').replace(/\/$/, '');
+      const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+      const uid = user.id;
+      const canonicalId = await getCanonicalGlobalId(supabaseUrl, serviceRoleKey, uid);
+
+      // Synchronize canonical ID into the existing profile state.
+      if (canonicalId) {
+        const p = await findProfile(base44, uid);
+        if (p && p.global_id !== canonicalId) {
+          await base44.asServiceRole.entities.UserProfile.update(p.id, { global_id: canonicalId });
+        }
+      }
+      return Response.json({
+        supabase_url: supabaseUrl,
+        auth_uid: uid,
+        global_id: canonicalId,
+        source: 'user_identities',
+      });
     }
 
     return Response.json({ error: 'Invalid action' }, { status: 400 });
