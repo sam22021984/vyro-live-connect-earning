@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { fetchCanonicalIdentity } from "@/lib/refreshBackendIdentity";
 
 export function useVipProfile() {
   const { user: authUser } = useAuth();
@@ -23,11 +24,11 @@ export function useVipProfile() {
       }
       if (profiles.length > 0) {
         let p = profiles[0];
-        // Use canonical global_id from user_identities (by auth.uid), not the
-        // stored profile value, which may be stale.
+        // Canonical global_id from the Supabase RPC vyro_refresh_my_backend
+        // (runs as auth.uid). Never generated in the frontend.
         try {
-          const canon = await base44.functions.invoke("userOnboarding", { action: "getCanonicalId" });
-          p = { ...p, global_id: canon.data?.global_id ?? null };
+          const { canonicalId } = await fetchCanonicalIdentity();
+          p = { ...p, global_id: canonicalId ?? null };
         } catch {}
         setProfile(p);
         return p;

@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getSupabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/lib/AuthContext";
 import { TABLE_QUERY_MAP } from "@/lib/realtimeTableMap";
+import { refreshBackendIdentity } from "@/lib/refreshBackendIdentity";
 
 const RealtimeContext = createContext({ status: "DISCONNECTED" });
 export const useRealtimeStatus = () => useContext(RealtimeContext);
@@ -151,13 +152,14 @@ export default function GlobalRealtimeProvider({ children }) {
     const onVisibility = () => {
       if (document.visibilityState !== "visible") return;
       if (isAuthenticated) {
-        queryClient.invalidateQueries();
+        refreshBackendIdentity();
         if (!channelRef.current) connect();
       }
     };
     const onOnline = () => {
       if (!isAuthenticated) return;
       setStatus("RECONNECTING");
+      refreshBackendIdentity();
       if (!channelRef.current) connect();
     };
     const onOffline = () => setStatus("DISCONNECTED");

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { fetchCanonicalIdentity } from "@/lib/refreshBackendIdentity";
 
 /**
  * Canonical React Query for the current user's profile (incl. global_id).
@@ -21,21 +22,13 @@ async function fetchProfile(me) {
     });
     profile = res.data?.profile || res.data;
   } catch {
-    // fall through to direct query fallback
-  }
-  if (!profile) {
-    const profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
-    profile = profiles[0] || null;
+    // initProfile unavailable — no fallback to the first user row.
   }
   if (!profile) return null;
-  // Override with the canonical global_id from user_identities (by auth.uid).
-  try {
-    const canon = await base44.functions.invoke("userOnboarding", { action: "getCanonicalId" });
-    profile = { ...profile, global_id: canon.data?.global_id ?? null };
-  } catch {
-    // keep loaded profile on transient error
-  }
-  return profile;
+  // Canonical global_id from the Supabase RPC vyro_refresh_my_backend
+  // (runs as auth.uid). Never generated in the frontend.
+  const { canonicalId } = await fetchCanonicalIdentity();
+  return { ...profile, global_id: canonicalId ?? null };
 }
 
 export function useProfileQuery() {

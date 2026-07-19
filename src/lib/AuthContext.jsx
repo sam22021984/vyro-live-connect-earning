@@ -4,6 +4,7 @@ import { supabaseAuth } from '@/lib/supabaseAuth';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 import { trackEvent } from '@/lib/eventTracker';
+import { refreshBackendIdentity } from '@/lib/refreshBackendIdentity';
 
 const AuthContext = createContext();
 
@@ -56,6 +57,8 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         // Track login event → event-tracker → database → live-analytics dashboard
         trackEvent('login');
+        // Refresh canonical backend identity (RPC) + invalidate profile/dashboard.
+        refreshBackendIdentity();
       } else {
         // me() returned null. If token was cleared by me() (real 401/403/refresh
         // failure), this is a real logout — clear auth state. If token still

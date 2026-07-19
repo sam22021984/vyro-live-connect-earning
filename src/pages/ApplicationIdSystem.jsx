@@ -320,7 +320,7 @@ export default function ApplicationIdSystem() {
                 <input
                   value={actionId}
                   onChange={(e) => setActionId(e.target.value)}
-                  placeholder="Application ID (e.g. QAT-9740000000001)"
+                  placeholder="Application ID (e.g. QAT-974-0000000005)"
                   className="w-full px-3 py-2 rounded-lg bg-gray-50 text-xs font-mono font-medium border border-gray-100 mb-2"
                 />
                 <input

@@ -10,11 +10,18 @@ import AnalyticsDashboard from "@/components/my-profile/AnalyticsDashboard";
 import MyAchievements from "@/components/my-profile/MyAchievements";
 import MyMoreMenu from "@/components/my-profile/MyMoreMenu";
 import MoreServices from "@/components/profile/MoreServices";
+import { refreshBackendIdentity } from "@/lib/refreshBackendIdentity";
 
 export default function ProfileDashboard() {
   const { data: profile, isLoading: loading } = useProfileQuery();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [achievements, setAchievements] = useState([]);
+
+  useEffect(() => {
+    // Profile opening: refresh canonical backend identity (RPC) and
+    // invalidate profile/dashboard queries so the active screen refetches.
+    refreshBackendIdentity();
+  }, []);
 
   useEffect(() => {
     base44.entities.Achievement.filter({})
