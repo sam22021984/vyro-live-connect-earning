@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
 import { useAuth } from "@/lib/AuthContext";
 
 export function useTasksRewardsData() {
@@ -13,9 +13,9 @@ export function useTasksRewardsData() {
     if (!user?.id) { setLoading(false); return; }
     try {
       const [ach, txns, userTasks] = await Promise.all([
-        base44.entities.Achievement.filter({ created_by_id: user.id }).catch(() => []),
-        base44.entities.Transaction.filter({ user_id: user.id, type: "reward" }, "-created_date", 50).catch(() => []),
-        base44.entities.UserTask.filter({ user_id: user.id, status: "completed" }).catch(() => []),
+        backendGateway.readTable("achievements", { filter: { created_by: user.id }, limit: 100 }).catch(() => []),
+        backendGateway.readTable("wallet_transactions", { filter: { user_id: user.id, type: "reward" }, limit: 50, order: "created_at", ascending: false }).catch(() => []),
+        backendGateway.readTable("user_tasks", { filter: { user_id: user.id, status: "completed" }, limit: 100 }).catch(() => []),
       ]);
       setAchievements(ach || []);
       setRewardTxns(txns || []);
@@ -29,15 +29,7 @@ export function useTasksRewardsData() {
 
   useEffect(() => {
     load();
-    let unsubAch, unsubTxn, unsubTask;
-    try { unsubAch = base44.entities.Achievement.subscribe(() => load()); } catch (e) {}
-    try { unsubTxn = base44.entities.Transaction.subscribe(() => load()); } catch (e) {}
-    try { unsubTask = base44.entities.UserTask.subscribe(() => load()); } catch (e) {}
-    return () => {
-      try { unsubAch?.(); } catch (e) {}
-      try { unsubTxn?.(); } catch (e) {}
-      try { unsubTask?.(); } catch (e) {}
-    };
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, [load]);
 
   // Map Achievement records to display format

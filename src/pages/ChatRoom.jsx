@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 import ChatHeader from "@/components/chat/ChatHeader";
 import MessageBubble from "@/components/chat/MessageBubble";
@@ -48,8 +49,7 @@ export default function ChatRoom() {
 
   useEffect(() => {
     loadMessages();
-    const sub = base44.entities.ChatMessage.subscribe(() => loadMessages());
-    return sub;
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, [id]);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function ChatRoom() {
 
   const loadMessages = async () => {
     try {
-      const list = await base44.entities.ChatMessage.filter({ conversation_id: id });
+      const list = await backendGateway.readTable("room_messages", { filter: { conversation_id: id }, order: "created_at" }).catch(() => []);
       list.sort((a, b) => new Date(a.created_date || 0) - new Date(b.created_date || 0));
       setMessages(list);
     } catch (e) {
@@ -84,18 +84,19 @@ export default function ChatRoom() {
       translation: transLang ? `[${transLang}] ${text}` : "",
       translation_lang: transLang || "",
     };
-    const created = await base44.entities.ChatMessage.create(msgData);
+    await backendGateway.rooms.sendMessage(id, text).catch(() => {});
+    const created = { ...msgData, id: "local-" + Date.now(), created_date: new Date().toISOString() };
     setMessages((prev) => [...prev, created]);
 
     // simulate delivered
     setTimeout(async () => {
-      await base44.entities.ChatMessage.update(created.id, { is_delivered: true, is_read: false });
+      await backendGateway.updateTable("room_messages", { id: created.id }, { is_delivered: true, is_read: false }).catch(() => {});
       setMessages((prev) => prev.map((m) => m.id === created.id ? { ...m, is_delivered: true } : m));
     }, 800);
 
     // simulate read + reply
     setTimeout(async () => {
-      await base44.entities.ChatMessage.update(created.id, { is_delivered: true, is_read: true });
+      await backendGateway.updateTable("room_messages", { id: created.id }, { is_delivered: true, is_read: true }).catch(() => {});
       setMessages((prev) => prev.map((m) => m.id === created.id ? { ...m, is_delivered: true, is_read: true } : m));
       setIsTyping(true);
       setTimeout(async () => {
@@ -113,23 +114,23 @@ export default function ChatRoom() {
         };
         setMessages((prev) => [...prev, reply]);
         if (conv) {
-          await base44.entities.ChatConversation.update(id, {
+          await backendGateway.updateTable("chat_conversations", { id }, {
             last_message: reply.text,
             last_message_time: reply.time,
             last_message_date: reply.date,
             unread_count: 0,
             is_online: true,
-          });
+          }).catch(() => {});
         }
       }, 2000);
     }, 2500);
 
     if (conv) {
-      await base44.entities.ChatConversation.update(id, {
+      await backendGateway.updateTable("chat_conversations", { id }, {
         last_message: text,
         last_message_time: msgData.time,
         last_message_date: msgData.date,
-      });
+      }).catch(() => {});
     }
   };
 
@@ -142,7 +143,7 @@ export default function ChatRoom() {
     setGiftOpen(false);
     const now = new Date();
     const price = gift.price_coins || gift.price || 0;
-    const msg = await base44.entities.ChatMessage.create({
+    const msg = await (async () => { const { getSupabase } = await import("@/lib/supabaseClient"); const sb = await getSupabase(); const { data: _r } = await sb.from("room_messages").insert({
       conversation_id: id,
       type: "gift",
       is_delivered: true,
@@ -153,7 +154,7 @@ export default function ChatRoom() {
       gift_price: price,
       date: formatDate(now),
       time: formatTime(now),
-    });
+    }).select().single(); return _r; })();
     setMessages((prev) => [...prev, msg]);
     toast({ title: `🎁 ${gift.name} sent!`, description: `${formatCoins(price * quantity)} coins deducted` });
 
@@ -207,11 +208,11 @@ export default function ChatRoom() {
 
   const handleTranslate = async (msg) => {
     if (msg.translation) {
-      await base44.entities.ChatMessage.update(msg.id, { translation: "", translation_lang: "" });
+      await backendGateway.updateTable("room_messages", { id: msg.id }, { translation: "", translation_lang: "" }).catch(() => {});
       setMessages((prev) => prev.map((m) => m.id === msg.id ? { ...m, translation: "" } : m));
     } else {
       const translated = `[Auto] ${msg.text}`;
-      await base44.entities.ChatMessage.update(msg.id, { translation: translated, translation_lang: "auto" });
+      await backendGateway.updateTable("room_messages", { id: msg.id }, { translation: translated, translation_lang: "auto" }).catch(() => {});
       setMessages((prev) => prev.map((m) => m.id === msg.id ? { ...m, translation: translated } : m));
     }
   };

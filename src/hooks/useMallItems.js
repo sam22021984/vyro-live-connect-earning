@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
 import { useAuth } from "@/lib/AuthContext";
 
 export function useMallItems() {
@@ -13,14 +14,14 @@ export function useMallItems() {
   const loadData = useCallback(async () => {
     try {
       const [itemList, myProfile] = await Promise.all([
-        base44.entities.MallItem.list("sort_order", 200),
-        authUser?.id ? base44.entities.UserProfile.filter({ user_id: authUser.id }) : Promise.resolve([]),
+        backendGateway.mall.listItems().catch(() => []),
+        authUser?.id ? backendGateway.readTable("user_profiles", { filter: { user_id: authUser.id }, limit: 1 }).catch(() => []) : Promise.resolve([]),
       ]);
-      setItems(itemList);
-      if (myProfile.length > 0) {
+      setItems(itemList || []);
+      if (myProfile && myProfile.length > 0) {
         setProfile(myProfile[0]);
-        const myPurchases = await base44.entities.UserPurchase.filter({ user_id: authUser.id });
-        setPurchases(myPurchases);
+        const myPurchases = await backendGateway.mall.getUserPurchases(authUser.id).catch(() => []);
+        setPurchases(myPurchases || []);
       }
     } catch (e) {
       console.error("Failed to load mall data:", e);
@@ -46,7 +47,6 @@ export function useMallItems() {
       });
       const result = res.data || res;
       if (result.error) throw new Error(result.error);
-      // Refresh data
       await loadData();
       return result;
     } finally {
@@ -56,15 +56,14 @@ export function useMallItems() {
 
   const equipItem = useCallback(async (purchaseId) => {
     try {
-      // Unequip other items in same section
       const purchase = purchases.find((p) => p.id === purchaseId);
       if (purchase) {
         const sameSection = purchases.filter((p) => p.section === purchase.section && p.status === "equipped");
         for (const p of sameSection) {
-          await base44.entities.UserPurchase.update(p.id, { status: "owned" });
+          await backendGateway.updateTable("user_purchases", { id: p.id }, { status: "owned" });
         }
       }
-      await base44.entities.UserPurchase.update(purchaseId, { status: "equipped" });
+      await backendGateway.updateTable("user_purchases", { id: purchaseId }, { status: "equipped" });
       await loadData();
     } catch (e) {
       console.error("Failed to equip item:", e);
@@ -73,7 +72,7 @@ export function useMallItems() {
 
   const unequipItem = useCallback(async (purchaseId) => {
     try {
-      await base44.entities.UserPurchase.update(purchaseId, { status: "owned" });
+      await backendGateway.updateTable("user_purchases", { id: purchaseId }, { status: "owned" });
       await loadData();
     } catch (e) {
       console.error("Failed to unequip item:", e);

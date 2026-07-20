@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 
+import { backendGateway } from "@/lib/backendGateway";
 export function useTrustReputation() {
   const { user: authUser } = useAuth();
   const [data, setData] = useState(null);
@@ -11,12 +12,12 @@ export function useTrustReputation() {
     if (!authUser?.id) return;
     try {
       const [securityEvents, enforcementActions, verificationRecords, badges, achievements, profile] = await Promise.all([
-        base44.entities.SecurityEvent.filter({ user_id: authUser.id }, "-created_date", 50).catch(() => []),
-        base44.entities.EnforcementAction.filter({ user_id: authUser.id }, "-created_date", 50).catch(() => []),
-        base44.entities.VerificationRecord.filter({ user_id: authUser.id }, "-created_date", 50).catch(() => []),
-        base44.entities.Badge.list().catch(() => []),
-        base44.entities.Achievement.filter({ created_by_id: authUser.id }).catch(() => []),
-        base44.entities.UserProfile.filter({ user_id: authUser.id }).catch(() => []),
+        backendGateway.readTable("security_events", { filter: { user_id: authUser.id }, limit: 50, order: "created_date", ascending: false }).catch(() => []),
+        backendGateway.readTable("enforcement_actions", { filter: { user_id: authUser.id }, limit: 50, order: "created_date", ascending: false }).catch(() => []),
+        backendGateway.readTable("verification_records", { filter: { user_id: authUser.id }, limit: 50, order: "created_date", ascending: false }).catch(() => []),
+        backendGateway.readTable("badges", { limit: 100, order: "created_at", ascending: true }).catch(() => []),
+        backendGateway.readTable("achievements", { filter: { created_by: authUser.id }, limit: 100, order: "created_at", ascending: true }).catch(() => []),
+        backendGateway.readTable("user_profiles", { filter: { user_id: authUser.id }, limit: 100, order: "created_at", ascending: true }).catch(() => []),
       ]);
 
       const userProfile = profile?.[0] || {};

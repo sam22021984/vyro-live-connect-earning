@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Users, Radio, Loader2, RefreshCw, Crown, Eye, Search } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function LiveRoomsDashboard() {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState([]);
@@ -14,21 +15,21 @@ export default function LiveRoomsDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const activeRooms = await base44.entities.PartyRoom.filter(
-        { status: "live", live_type: "audio" },
-        "-started_at",
-        100
-      );
+      const activeRooms = await backendGateway.readTable("party_rooms", {
+        filter: { status: "live", live_type: "audio" },
+        limit: 100,
+        order: "started_at",
+        ascending: false,
+      }).catch(() => []);
       const list = activeRooms || [];
 
       // Fetch participant counts per room in parallel
       const enriched = await Promise.all(
         list.map(async (room) => {
           try {
-            const participants = await base44.entities.RoomParticipant.filter({
-              room_id: room.id,
-              status: "active",
-            });
+            const participants = await backendGateway.readTable("room_participants", {
+              filter: { room_id: room.id, status: "active" },
+            }).catch(() => []);
             const seated = (participants || []).filter(
               (p) => p.role !== "viewer"
             ).length;
@@ -52,8 +53,7 @@ export default function LiveRoomsDashboard() {
 
   useEffect(() => {
     fetchRooms();
-    const unsub = base44.entities.PartyRoom.subscribe(fetchRooms);
-    return () => unsub && unsub();
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, [fetchRooms]);
 
   const filtered = rooms.filter((r) => {

@@ -4,14 +4,15 @@ import { giftingTiers, giftingConfig } from "@/components/levels/gifting/gifting
 import { base44 } from "@/api/base44Client";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function GiftingCurrentLevelCard() {
   const [profile, setProfile] = useState(null);
   useEffect(() => {
     (async () => {
       try {
         const me = await getCurrentUser();
-        let p = await base44.entities.UserProfile.filter({ user_id: me.id });
-        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        let p = await backendGateway.readTable("user_profiles", { filter: { user_id: me.id }, limit: 100, order: "created_at", ascending: true });
+        if (p.length === 0) p = await backendGateway.readTable("user_profiles", { filter: { created_by: me.id }, limit: 100, order: "created_at", ascending: true });
         if (p.length > 0) setProfile(p[0]);
       } catch (e) {}
     })();

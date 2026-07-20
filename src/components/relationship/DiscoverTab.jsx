@@ -5,6 +5,7 @@ import UserCard from "./UserCard";
 import { RELATIONSHIP_COLORS, DISCOVER_FILTERS } from "./relationshipData";
 import { useToast } from "@/components/ui/use-toast";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function DiscoverTab({ onSendRequest, existingRelations }) {
   const { toast } = useToast();
   const [users, setUsers] = useState([]);
@@ -18,7 +19,7 @@ export default function DiscoverTab({ onSendRequest, existingRelations }) {
 
   const loadUsers = async () => {
     try {
-      let list = await base44.entities.UserProfile.list();
+      let list = await backendGateway.readTable("user_profiles", { limit: 100, order: "created_at", ascending: true });
       if (!list) list = [];
       if (search.trim()) {
         const q = search.toLowerCase();

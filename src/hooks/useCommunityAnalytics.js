@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 
+import { backendGateway } from "@/lib/backendGateway";
 function getLast7DaysLabels() {
   const days = [];
   const today = new Date();
@@ -37,11 +38,11 @@ export function useCommunityAnalytics() {
   const fetch = useCallback(async () => {
     try {
       const [posts, profiles, transactions, rooms, groups] = await Promise.all([
-        base44.entities.CommunityPost.list("-created_date", 500).catch(() => []),
-        base44.entities.UserProfile.list("-created_date", 500).catch(() => []),
-        base44.entities.Transaction.list("-created_date", 500).catch(() => []),
-        base44.entities.RoomSession.list("-created_date", 500).catch(() => []),
-        base44.entities.CommunityGroup.list("-members", 500).catch(() => []),
+        backendGateway.readTable("community_posts", { limit: 500, order: "created_date", ascending: false }).catch(() => []),
+        backendGateway.readTable("user_profiles", { limit: 500, order: "created_date", ascending: false }).catch(() => []),
+        backendGateway.readTable("wallet_transactions", { limit: 500, order: "created_date", ascending: false }).catch(() => []),
+        backendGateway.readTable("room_sessions", { limit: 500, order: "created_date", ascending: false }).catch(() => []),
+        backendGateway.readTable("community_groups", { limit: 500, order: "members", ascending: false }).catch(() => []),
       ]);
 
       const postActivity = groupByDay(posts);

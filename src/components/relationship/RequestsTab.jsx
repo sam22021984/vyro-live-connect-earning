@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { RELATIONSHIP_COLORS, GRADIENT_PINK_PURPLE, formatDate, formatTime } from "./relationshipData";
 import { useToast } from "@/components/ui/use-toast";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function RequestsTab({ refreshKey }) {
   const { toast } = useToast();
   const [tab, setTab] = useState("incoming");
@@ -22,7 +23,7 @@ export default function RequestsTab({ refreshKey }) {
   const loadRequests = async () => {
     if (!currentUserId) return;
     try {
-      const all = await base44.entities.Relationship.list();
+      const all = await backendGateway.readTable("relationships", { limit: 100, order: "created_at", ascending: true });
       let filtered;
       if (tab === "incoming") {
         filtered = all.filter((r) => r.created_by_id !== currentUserId && r.status === "pending");
@@ -39,19 +40,19 @@ export default function RequestsTab({ refreshKey }) {
   };
 
   const handleAccept = async (req) => {
-    await base44.entities.Relationship.update(req.id, { status: "accepted", start_date: formatDate() });
+    await backendGateway.updateTable("relationships", { id: req.id }, { status: "accepted", start_date: formatDate() });
     toast({ title: `❤️ Relationship with ${req.sender_name} activated!` });
     loadRequests();
   };
 
   const handleReject = async (req) => {
-    await base44.entities.Relationship.update(req.id, { status: "rejected" });
+    await backendGateway.updateTable("relationships", { id: req.id }, { status: "rejected" });
     toast({ title: "Request rejected" });
     loadRequests();
   };
 
   const handleCancel = async (req) => {
-    await base44.entities.Relationship.update(req.id, { status: "cancelled" });
+    await backendGateway.updateTable("relationships", { id: req.id }, { status: "cancelled" });
     toast({ title: "Request cancelled" });
     loadRequests();
   };

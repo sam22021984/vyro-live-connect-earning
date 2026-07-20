@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 
+import { backendGateway } from "@/lib/backendGateway";
 const MENU_ITEMS = [
   { id: "share", label: "Share Profile", icon: Link2, color: "text-gray-600" },
   { id: "copy_link", label: "Copy Profile Link", icon: Copy, color: "text-gray-600" },
@@ -58,13 +59,13 @@ export default function MoreMenu({ profile, onClose }) {
   const handleBlock = async () => {
     try {
       const me = await getCurrentUser();
-      let settings = await base44.entities.PrivacySetting.filter({ user_id: me.id });
-      if (settings.length > 0) {
+      let settings = await backendGateway.readTable("privacy_settings", { filter: { user_id: me.id }, limit: 1 }).catch(() => []);
+      if (settings && settings.length > 0) {
         const blocked = settings[0].blocked_users || [];
         if (!blocked.includes(profile.id)) {
-          await base44.entities.PrivacySetting.update(settings[0].id, {
+          await backendGateway.updateTable("privacy_settings", { id: settings[0].id }, {
             blocked_users: [...blocked, profile.id],
-          });
+          }).catch(() => {});
         }
       }
     } catch {}
@@ -77,7 +78,9 @@ export default function MoreMenu({ profile, onClose }) {
     if (!selectedReport) return;
     try {
       const me = await getCurrentUser();
-      await base44.entities.SupportTicket.create({
+      const { getSupabase } = await import("@/lib/supabaseClient");
+      const sb = await getSupabase();
+      await sb.from("support_tickets").insert({
         user_id: me.id,
         username: me.full_name || me.email,
         subject: `Report: ${profile?.username} - ${selectedReport}`,

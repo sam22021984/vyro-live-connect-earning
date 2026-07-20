@@ -14,6 +14,7 @@ import PrivilegesTab from "@/components/levels/dashboard/PrivilegesTab";
 import StatisticsTab from "@/components/levels/dashboard/StatisticsTab";
 import BottomActionBar from "@/components/levels/dashboard/BottomActionBar";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function UserLevelDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [profile, setProfile] = useState(null);
@@ -22,9 +23,9 @@ export default function UserLevelDashboard() {
     const load = async () => {
       try {
         const me = await getCurrentUser();
-        let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
+        let profiles = await backendGateway.readTable("user_profiles", { filter: { user_id: me.id }, limit: 100, order: "created_at", ascending: true });
         if (profiles.length === 0) {
-          profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+          profiles = await backendGateway.readTable("user_profiles", { filter: { created_by: me.id }, limit: 100, order: "created_at", ascending: true });
         }
         if (profiles.length > 0) setProfile(profiles[0]);
       } catch (e) { /* ignore */ }

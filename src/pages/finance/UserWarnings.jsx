@@ -6,6 +6,7 @@ import FinanceSubHeader from "@/components/finance/FinanceSubHeader";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 
+import { backendGateway } from "@/lib/backendGateway";
 const SEVERITY_STYLE = {
   low: { color: FINANCE_COLORS.info, label: "Low" },
   medium: { color: FINANCE_COLORS.warning, label: "Medium" },
@@ -33,7 +34,7 @@ export default function UserWarnings() {
     setLoading(true);
     setError(null);
     try {
-      const res = await base44.entities.EnforcementAction.filter({ user_id: user.id }, "-created_date", 50);
+      const res = await backendGateway.readTable("enforcement_actions", { filter: { user_id: user.id }, limit: 50, order: "created_date", ascending: false });
       setRecords(Array.isArray(res) ? res : []);
     } catch (e) {
       setError(e?.message || "Failed to load warning history.");

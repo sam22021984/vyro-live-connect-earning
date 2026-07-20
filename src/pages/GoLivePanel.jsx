@@ -10,6 +10,7 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
+import { backendGateway } from "@/lib/backendGateway";
 const ICON_MAP = { Mic, PartyPopper, Users, Swords, Calendar, Dumbbell };
 
 export default function GoLivePanel() {
@@ -60,7 +61,7 @@ export default function GoLivePanel() {
     try {
       let profile = null;
       try {
-        const profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
+        const profiles = await backendGateway.readTable("user_profiles", { filter: { user_id: me.id }, limit: 100, order: "created_at", ascending: true });
         profile = profiles[0];
       } catch {}
 

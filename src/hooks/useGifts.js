@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 
+import { backendGateway } from "@/lib/backendGateway";
 export function useGifts() {
   const { user: authUser } = useAuth();
   const [gifts, setGifts] = useState([]);
@@ -12,13 +13,13 @@ export function useGifts() {
   const loadGifts = useCallback(async () => {
     try {
       const [giftList, profiles] = await Promise.all([
-        base44.entities.Gift.list("sort_order", 100),
-        authUser?.id ? base44.entities.UserProfile.filter({ user_id: authUser.id }) : Promise.resolve([]),
+        backendGateway.readTable("gifts", { limit: 100, order: "sort_order", ascending: true }),
+        authUser?.id ? backendGateway.readTable("user_profiles", { filter: { user_id: authUser.id }, limit: 100, order: "created_at", ascending: true }) : Promise.resolve([]),
       ]);
       setGifts(giftList);
       if (profiles.length > 0) setProfile(profiles[0]);
       else if (authUser?.email) {
-        const profilesByEmail = await base44.entities.UserProfile.filter({ user_id: authUser.email }).catch(() => []);
+        const profilesByEmail = await backendGateway.readTable("user_profiles", { filter: { user_id: authUser.email }, limit: 100, order: "created_at", ascending: true }).catch(() => []);
         if (profilesByEmail.length > 0) setProfile(profilesByEmail[0]);
       }
     } catch (e) {

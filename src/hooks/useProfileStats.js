@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
 import { useAuth } from "@/lib/AuthContext";
 
 export function useProfileStats() {
@@ -18,26 +18,24 @@ export function useProfileStats() {
       if (!me?.id) return;
       setUser(me);
 
-      let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
-      if (profiles.length === 0 && me.email) {
-        profiles = await base44.entities.UserProfile.filter({ user_id: me.email });
+      // Read profile from RLS-protected user_profiles table
+      let profiles = await backendGateway.readTable("user_profiles", { filter: { user_id: me.id }, limit: 1 }).catch(() => []);
+      if (!profiles || profiles.length === 0) {
+        profiles = await backendGateway.readTable("user_profiles", { filter: { created_by: me.id }, limit: 1 }).catch(() => []);
       }
-      if (profiles.length === 0) {
-        profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
-      }
-      const currentProfile = profiles[0] || null;
+      const currentProfile = profiles?.[0] || null;
       setProfile(currentProfile);
 
       const [badgeRecords, achRecords, txns, topUsers] = await Promise.all([
-        base44.entities.Badge.list().catch(() => []),
-        base44.entities.Achievement.filter({ created_by_id: me.id }).catch(() => []),
-        base44.entities.Transaction.filter({ user_id: me.id }, "-created_date", 100).catch(() => []),
-        base44.entities.UserProfile.list("-total_xp", 20).catch(() => []),
+        backendGateway.readTable("badges", { limit: 100 }).catch(() => []),
+        backendGateway.readTable("achievements", { filter: { created_by: me.id }, limit: 100 }).catch(() => []),
+        backendGateway.wallet.getMyTransactions(100).catch(() => []),
+        backendGateway.readTable("user_profiles", { limit: 20, order: "total_xp", ascending: false }).catch(() => []),
       ]);
-      setBadges(badgeRecords);
-      setAchievements(achRecords);
-      setTransactions(txns);
-      setLeaderboard(topUsers);
+      setBadges(badgeRecords || []);
+      setAchievements(achRecords || []);
+      setTransactions(Array.isArray(txns) ? txns : (txns?.transactions || []));
+      setLeaderboard(topUsers || []);
     } catch (e) {
       console.error("useProfileStats error:", e);
     } finally {

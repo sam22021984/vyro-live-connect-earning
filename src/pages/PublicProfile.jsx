@@ -15,6 +15,7 @@ import AchievementsSection from "@/components/public-profile/AchievementsSection
 import DecorationsSection from "@/components/public-profile/DecorationsSection";
 import ProfileSkeleton from "@/components/public-profile/ProfileSkeleton";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function PublicProfile() {
   const { id } = useParams();
   const [profile, setProfile] = useState(null);
@@ -39,10 +40,10 @@ export default function PublicProfile() {
   const loadProfile = async () => {
     try {
       // Load the target profile — try by id, user_id, or global_id
-      let profiles = await base44.entities.UserProfile.filter({ user_id: id });
-      if (profiles.length === 0) profiles = await base44.entities.UserProfile.filter({ id });
-      if (profiles.length === 0) profiles = await base44.entities.UserProfile.filter({ global_id: id });
-      if (profiles.length === 0) profiles = await base44.entities.UserProfile.list();
+      let profiles = await backendGateway.readTable("user_profiles", { filter: { user_id: id }, limit: 1 }).catch(() => []);
+      if (!profiles || profiles.length === 0) profiles = await backendGateway.readTable("user_profiles", { filter: { id }, limit: 1 }).catch(() => []);
+      if (!profiles || profiles.length === 0) profiles = await backendGateway.readTable("user_profiles", { filter: { global_id: id }, limit: 1 }).catch(() => []);
+      if (!profiles || profiles.length === 0) profiles = await backendGateway.readTable("user_profiles", { limit: 20 }).catch(() => []);
 
       const target = profiles.find((p) => p.user_id === id || p.id === id || p.global_id === id) || profiles[0];
       if (!target) { setLoading(false); return; }
@@ -50,13 +51,13 @@ export default function PublicProfile() {
 
       // Load my profile for coins + relationship
       const me = await getCurrentUser();
-      let myProfiles = await base44.entities.UserProfile.filter({ user_id: me.id });
-      setMyProfile(myProfiles[0]);
+      let myProfiles = await backendGateway.readTable("user_profiles", { filter: { user_id: me.id }, limit: 1 }).catch(() => []);
+      setMyProfile(myProfiles?.[0]);
 
       // Check relationship
-      const friendReqs = await base44.entities.FriendRequest.filter({
-        $or: [{ sender_id: me.id }, { receiver_id: me.id }],
-      }).catch(() => []);
+      const sentReqs = await backendGateway.readTable("friend_requests", { filter: { sender_id: me.id } }).catch(() => []);
+      const receivedReqs = await backendGateway.readTable("friend_requests", { filter: { receiver_id: me.id } }).catch(() => []);
+      const friendReqs = [...(sentReqs || []), ...(receivedReqs || [])];
       const existingRel = friendReqs.find(
         (r) => (r.sender_id === me.id && r.receiver_id === target.user_id) || (r.receiver_id === me.id && r.sender_id === target.user_id)
       );
@@ -72,16 +73,16 @@ export default function PublicProfile() {
       setIsFollower(reverseReqs.length > 0);
 
       // Check live rooms
-      const live = await base44.entities.RoomSession.filter({ host_id: target.user_id, status: "live" }).catch(() => []);
-      if (live.length > 0) setLiveRoom(live[0]);
+      const live = await backendGateway.readTable("room_sessions", { filter: { host_id: target.user_id, status: "live" } }).catch(() => []);
+      if (live && live.length > 0) setLiveRoom(live[0]);
 
-      const parties = await base44.entities.PartyRoom.filter({}).catch(() => []);
-      const myParty = parties.find((p) => p.host?.name === target.username);
+      const parties = await backendGateway.readTable("party_rooms", { limit: 100 }).catch(() => []);
+      const myParty = (parties || []).find((p) => p.host?.name === target.username);
       if (myParty) setPartyRoom(myParty);
 
       // Load achievements
-      const achs = await base44.entities.Achievement.filter({}).catch(() => []);
-      setAchievements(achs);
+      const achs = await backendGateway.readTable("achievements", { limit: 100 }).catch(() => []);
+      setAchievements(achs || []);
     } catch (e) {
       console.error(e);
     }

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
 import { useAuth } from "@/lib/AuthContext";
 import { tasks as staticTasks } from "@/components/tasks-rewards/tasksData";
 
@@ -15,9 +16,9 @@ export function useUserTasks() {
 
   const loadUserTasks = async () => {
     try {
-      const records = await base44.entities.UserTask.filter({ user_id: user.id });
+      const records = await backendGateway.readTable("user_tasks", { filter: { user_id: user.id }, limit: 100 }).catch(() => []);
       const map = {};
-      records.forEach((r) => { map[r.task_id] = r; });
+      (records || []).forEach((r) => { map[r.task_id] = r; });
       setUserTasks(map);
     } catch (e) {
       // first-time users have no records
@@ -45,11 +46,13 @@ export function useUserTasks() {
       reward_amount: task.reward_amount,
     };
     if (existing?.id) {
-      const updated = await base44.entities.UserTask.update(existing.id, payload);
-      setUserTasks((prev) => ({ ...prev, [task.id]: updated }));
+      const updated = await backendGateway.updateTable("user_tasks", { id: existing.id }, payload);
+      setUserTasks((prev) => ({ ...prev, [task.id]: updated?.[0] || { ...existing, ...payload } }));
     } else {
-      const created = await base44.entities.UserTask.create(payload);
-      setUserTasks((prev) => ({ ...prev, [task.id]: created }));
+      const { getSupabase } = await import("@/lib/supabaseClient");
+      const supabase = await getSupabase();
+      const { data: created } = await supabase.from("user_tasks").insert(payload).select().single();
+      if (created) setUserTasks((prev) => ({ ...prev, [task.id]: created }));
     }
   }, [user, userTasks]);
 
@@ -66,11 +69,13 @@ export function useUserTasks() {
       claimed_date: new Date().toISOString(),
     };
     if (existing?.id) {
-      const updated = await base44.entities.UserTask.update(existing.id, payload);
-      setUserTasks((prev) => ({ ...prev, [task.id]: updated }));
+      const updated = await backendGateway.updateTable("user_tasks", { id: existing.id }, payload);
+      setUserTasks((prev) => ({ ...prev, [task.id]: updated?.[0] || { ...existing, ...payload } }));
     } else {
-      const created = await base44.entities.UserTask.create(payload);
-      setUserTasks((prev) => ({ ...prev, [task.id]: created }));
+      const { getSupabase } = await import("@/lib/supabaseClient");
+      const supabase = await getSupabase();
+      const { data: created } = await supabase.from("user_tasks").insert(payload).select().single();
+      if (created) setUserTasks((prev) => ({ ...prev, [task.id]: created }));
     }
 
     // Centralized: credit coins + XP, create Transaction, send Notification — atomically on backend
@@ -85,7 +90,6 @@ export function useUserTasks() {
         icon: task.reward_icon,
       });
     } catch (e) {
-      // UserTask is already marked claimed; coin credit may still succeed on retry
       console.error("Reward credit failed:", e);
     }
   }, [user, userTasks]);

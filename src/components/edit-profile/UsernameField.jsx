@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Loader2, Check, X, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function UsernameField({ value, onChange, currentUserId }) {
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState(null);
@@ -28,7 +29,7 @@ export default function UsernameField({ value, onChange, currentUserId }) {
     setChecking(true);
     debounceRef.current = setTimeout(async () => {
       try {
-        const existing = await base44.entities.UserProfile.filter({ username: value });
+        const existing = await backendGateway.readTable("user_profiles", { filter: { username: value }, limit: 100, order: "created_at", ascending: true });
         const taken = existing.some((p) => p.user_id !== currentUserId);
         setAvailable(!taken);
       } catch { setAvailable(null); }

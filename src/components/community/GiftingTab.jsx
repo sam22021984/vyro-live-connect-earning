@@ -5,6 +5,7 @@ import { useGifts } from "@/hooks/useGifts";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function GiftingTab() {
   const { toast } = useToast();
   const { gifts, coins, loading, sendGift } = useGifts();
@@ -15,11 +16,7 @@ export default function GiftingTab() {
   useEffect(() => {
     const fetchTopGifters = async () => {
       try {
-        const transactions = await base44.entities.Transaction.filter(
-          { type: "gift", status: "completed" },
-          "-created_date",
-          500
-        );
+        const transactions = await backendGateway.readTable("wallet_transactions", { filter: { type: "gift", status: "completed" }, limit: 500, order: "created_date", ascending: false });
         const gifterMap = {};
         (transactions || []).forEach((t) => {
           if (t.user_id) {
@@ -36,7 +33,7 @@ export default function GiftingTab() {
         // Fetch profiles
         const uids = sorted.map(([uid]) => uid);
         const profiles = await Promise.all(
-          uids.map((uid) => base44.entities.UserProfile.filter({ user_id: uid }).catch(() => []))
+          uids.map((uid) => backendGateway.readTable("user_profiles", { filter: { user_id: uid }, limit: 100, order: "created_at", ascending: true }).catch(() => []))
         );
 
         const enriched = sorted.map(([uid, data], i) => {

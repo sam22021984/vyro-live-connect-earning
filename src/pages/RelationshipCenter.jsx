@@ -12,6 +12,7 @@ import { RELATIONSHIP_COLORS, GRADIENT_DARK, GRADIENT_PINK_PURPLE, formatDate, f
 import { useToast } from "@/components/ui/use-toast";
 import { useBackNav } from "@/hooks/useBackNav";
 
+import { backendGateway } from "@/lib/backendGateway";
 const TABS = [
   { key: "discover", label: "Discover", icon: Search },
   { key: "requests", label: "Requests", icon: Inbox },
@@ -35,7 +36,7 @@ export default function RelationshipCenter() {
 
   const loadRelations = async () => {
     try {
-      const list = await base44.entities.Relationship.list();
+      const list = await backendGateway.readTable("relationships", { limit: 100, order: "created_at", ascending: true });
       setExistingRelations(list || []);
     } catch (e) {
       setExistingRelations([]);
@@ -62,7 +63,7 @@ export default function RelationshipCenter() {
     setSending(true);
     try {
       const me = await getCurrentUser();
-      await base44.entities.Relationship.create({
+      await (async () => { const { getSupabase } = await import("@/lib/supabaseClient"); const sb = await getSupabase(); const { data: _r } = await sb.from("relationships").insert({
         sender_name: me.full_name || "You",
         sender_avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop",
         sender_id: me.id,
@@ -74,7 +75,7 @@ export default function RelationshipCenter() {
         status: "pending",
         request_date: formatDate(),
         request_time: formatTime(),
-      });
+      }).select().single(); return _r; })();
       toast({ title: "❤️ Relationship request sent!", description: "Waiting for " + user.username + " to respond" });
       setRefreshKey((k) => k + 1);
     } catch (e) {

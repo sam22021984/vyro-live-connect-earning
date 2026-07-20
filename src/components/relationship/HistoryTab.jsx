@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { RELATIONSHIP_COLORS, HISTORY_FILTERS, formatDate, formatTime } from "./relationshipData";
 
+import { backendGateway } from "@/lib/backendGateway";
 const STATUS_STYLES = {
   accepted: { bg: "rgba(34,197,94,0.15)", color: "#86EFAC", icon: "✅" },
   rejected: { bg: "rgba(239,68,68,0.15)", color: "#FCA5A5", icon: "❌" },
@@ -27,7 +28,7 @@ export default function HistoryTab() {
   const loadHistory = async () => {
     if (!currentUserId) return;
     try {
-      const all = await base44.entities.Relationship.list();
+      const all = await backendGateway.readTable("relationships", { limit: 100, order: "created_at", ascending: true });
       let filtered = [];
       if (filter === "sent") filtered = all.filter((r) => r.created_by_id === currentUserId);
       else if (filter === "received") filtered = all.filter((r) => r.created_by_id !== currentUserId);

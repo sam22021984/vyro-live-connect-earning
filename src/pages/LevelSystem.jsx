@@ -10,6 +10,7 @@ import HostLevelDashboard from "@/components/levels/HostLevelDashboard";
 import GiftingLevelDashboard from "@/components/levels/GiftingLevelDashboard";
 import { useBackNav } from "@/hooks/useBackNav";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function LevelSystem() {
   const navigate = useNavigate();
   const handleBack = useBackNav("/more-services");
@@ -22,8 +23,8 @@ export default function LevelSystem() {
     if (!authUser?.id) return;
     const loadProfile = async () => {
       try {
-        let p = await base44.entities.UserProfile.filter({ user_id: authUser.id });
-        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: authUser.id });
+        let p = await backendGateway.readTable("user_profiles", { filter: { user_id: authUser.id }, limit: 100, order: "created_at", ascending: true });
+        if (p.length === 0) p = await backendGateway.readTable("user_profiles", { filter: { created_by: authUser.id }, limit: 100, order: "created_at", ascending: true });
         if (p.length > 0) setProfile(p[0]);
       } catch (e) {}
     };

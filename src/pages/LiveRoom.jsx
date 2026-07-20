@@ -18,6 +18,7 @@ import PostLiveSummary from "@/components/live-room/PostLiveSummary";
 import { COLORS, ROOM_THEMES, WARNING_TEXT, SEAT_POSITIONS, GIFT_CATALOG, EMOJIS_3D } from "@/components/live-room/roomData";
 import { useToast } from "@/components/ui/use-toast";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function LiveRoom() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -177,7 +178,7 @@ export default function LiveRoom() {
       return;
     }
     // Check RoomParticipant for admin/co_host/moderator role
-    base44.entities.RoomParticipant.filter({ room_id: roomId, user_id: currentUser.id })
+    backendGateway.readTable("room_participants", { filter: { room_id: roomId, user_id: currentUser.id }, limit: 100, order: "created_at", ascending: true })
       .then((participants) => {
         const p = participants?.[0];
         if (p && (p.role === "admin" || p.role === "co_host" || p.role === "moderator")) {

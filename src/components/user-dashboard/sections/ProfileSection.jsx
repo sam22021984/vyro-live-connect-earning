@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function ProfileSection() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -23,8 +24,8 @@ export default function ProfileSection() {
 
   const loadProfile = async () => {
     try {
-      let profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
-      if (profiles.length === 0) profiles = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+      let profiles = await backendGateway.readTable("user_profiles", { filter: { user_id: user.id }, limit: 100, order: "created_at", ascending: true });
+      if (profiles.length === 0) profiles = await backendGateway.readTable("user_profiles", { filter: { created_by: user.id }, limit: 100, order: "created_at", ascending: true });
       if (profiles.length > 0) setProfile(profiles[0]);
     } catch (e) {
       // profile may not exist yet
@@ -43,7 +44,7 @@ export default function ProfileSection() {
     setUploadingAvatar(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      await base44.entities.UserProfile.update(profile.id, { avatar_url: file_url });
+      await backendGateway.updateTable("user_profiles", { id: profile.id }, { avatar_url: file_url });
       setProfile({ ...profile, avatar_url: file_url });
       toast({ title: "Avatar updated successfully!" });
     } catch (err) {
@@ -59,7 +60,7 @@ export default function ProfileSection() {
     setUploadingCover(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      await base44.entities.UserProfile.update(profile.id, { cover_url: file_url });
+      await backendGateway.updateTable("user_profiles", { id: profile.id }, { cover_url: file_url });
       setProfile({ ...profile, cover_url: file_url });
       toast({ title: "Cover updated successfully!" });
     } catch (err) {

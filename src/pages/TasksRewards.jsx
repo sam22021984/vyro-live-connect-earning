@@ -11,6 +11,7 @@ import EventsTab from "@/components/tasks-rewards/EventsTab";
 import AchievementTab from "@/components/tasks-rewards/AchievementTab";
 import { useBackNav } from "@/hooks/useBackNav";
 
+import { backendGateway } from "@/lib/backendGateway";
 const tabs = [
   { key: "task-center", label: "Tasks", icon: "📋" },
   { key: "reward-center", label: "Rewards", icon: "🎁" },
@@ -30,8 +31,8 @@ export default function TasksRewards() {
     if (!user?.id) return;
     const loadProfile = async () => {
       try {
-        let p = await base44.entities.UserProfile.filter({ user_id: user.id });
-        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+        let p = await backendGateway.readTable("user_profiles", { filter: { user_id: user.id }, limit: 100, order: "created_at", ascending: true });
+        if (p.length === 0) p = await backendGateway.readTable("user_profiles", { filter: { created_by: user.id }, limit: 100, order: "created_at", ascending: true });
         if (p.length > 0) setCoins(p[0].coins || 0);
       } catch (e) {}
     };

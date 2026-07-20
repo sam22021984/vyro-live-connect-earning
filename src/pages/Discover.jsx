@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, TrendingUp, Hash, Users, Eye, X, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
+import { backendGateway } from "@/lib/backendGateway";
 const CATEGORIES = [
   { name: "Music", icon: "🎵", color: "#EC4899" },
   { name: "Gaming", icon: "🎮", color: "#8B5CF6" },
@@ -45,9 +46,9 @@ export default function Discover() {
     const load = async () => {
       try {
         const [live, creators, users] = await Promise.all([
-          base44.entities.RoomSession.filter({ status: "live" }, "-current_viewers", 10).catch(() => []),
-          base44.entities.UserProfile.filter({ is_host: true }, "-followers", 10).catch(() => []),
-          base44.entities.UserProfile.list("-created_date", 8).catch(() => []),
+          backendGateway.readTable("room_sessions", { filter: { status: "live" }, limit: 10, order: "current_viewers", ascending: false }).catch(() => []),
+          backendGateway.readTable("user_profiles", { filter: { is_host: true }, limit: 10, order: "followers", ascending: false }).catch(() => []),
+          backendGateway.readTable("user_profiles", { limit: 8, order: "created_date", ascending: false }).catch(() => []),
         ]);
         setLiveRooms(live || []);
         setTopCreators(creators || []);
@@ -64,7 +65,7 @@ export default function Discover() {
     setSearching(true);
     const timer = setTimeout(async () => {
       try {
-        const users = await base44.entities.UserProfile.filter({ username: search }).catch(() => []);
+        const users = await backendGateway.readTable("user_profiles", { filter: { username: search }, limit: 100, order: "created_at", ascending: true }).catch(() => []);
         setSearchResults(users.slice(0, 10));
       } catch { setSearchResults([]); }
       setSearching(false);

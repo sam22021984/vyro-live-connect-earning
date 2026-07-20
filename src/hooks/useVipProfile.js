@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
 import { useAuth } from "@/lib/AuthContext";
 import { fetchCanonicalIdentity } from "@/lib/refreshBackendIdentity";
 
@@ -15,17 +16,12 @@ export function useVipProfile() {
       const me = authUser;
       if (!me?.id) return null;
       setUser(me);
-      let profiles = await base44.entities.UserProfile.filter({ user_id: me.id });
-      if (profiles.length === 0 && me.email) {
-        profiles = await base44.entities.UserProfile.filter({ user_id: me.email });
+      let profiles = await backendGateway.readTable("user_profiles", { filter: { user_id: me.id }, limit: 1 }).catch(() => []);
+      if (!profiles || profiles.length === 0) {
+        profiles = await backendGateway.readTable("user_profiles", { filter: { created_by: me.id }, limit: 1 }).catch(() => []);
       }
-      if (profiles.length === 0) {
-        profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
-      }
-      if (profiles.length > 0) {
+      if (profiles && profiles.length > 0) {
         let p = profiles[0];
-        // Canonical global_id from the Supabase RPC vyro_refresh_my_backend
-        // (runs as auth.uid). Never generated in the frontend.
         try {
           const { canonicalId } = await fetchCanonicalIdentity();
           p = { ...p, global_id: canonicalId ?? null };
@@ -33,15 +29,8 @@ export function useVipProfile() {
         setProfile(p);
         return p;
       }
-      const newProfile = await base44.entities.UserProfile.create({
-        username: me.full_name || me.email?.split("@")[0] || "User",
-        user_id: me.id,
-        is_vip: false,
-        coins: 0,
-        role: "user",
-      });
-      setProfile(newProfile);
-      return newProfile;
+      // No profile found — do not create directly; let backend provisioning handle it
+      return null;
     } catch (e) {
       console.error("Failed to load VIP profile:", e);
       return null;
@@ -50,12 +39,13 @@ export function useVipProfile() {
 
   const loadHistory = useCallback(async (userId) => {
     try {
-      const txns = await base44.entities.Transaction.filter(
-        { user_id: userId, type: "recharge" },
-        "-created_date",
-        50
-      );
-      setHistory(txns);
+      const txns = await backendGateway.readTable("wallet_transactions", {
+        filter: { user_id: userId, type: "recharge" },
+        limit: 50,
+        order: "created_at",
+        ascending: false,
+      }).catch(() => []);
+      setHistory(txns || []);
     } catch (e) {
       console.error(e);
     }
@@ -135,7 +125,7 @@ export function useVipProfile() {
   const isRewardClaimedToday = useCallback((rewardName) => {
     const today = new Date().toDateString();
     return history.some((h) => {
-      const d = new Date(h.created_date).toDateString();
+      const d = new Date(h.created_date || h.created_at).toDateString();
       return d === today && h.description?.includes(rewardName);
     });
   }, [history]);

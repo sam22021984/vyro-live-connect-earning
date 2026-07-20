@@ -7,6 +7,7 @@ import LongPressMenu from "@/components/chat/LongPressMenu";
 import { COLORS } from "@/components/chat/chatData";
 import { useToast } from "@/components/ui/use-toast";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function Messages() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -18,13 +19,12 @@ export default function Messages() {
 
   useEffect(() => {
     loadConversations();
-    const sub = base44.entities.ChatConversation.subscribe(() => loadConversations());
-    return sub;
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, []);
 
   const loadConversations = async () => {
     try {
-      const list = await base44.entities.ChatConversation.list();
+      const list = await backendGateway.readTable("chat_conversations", { limit: 100, order: "updated_at", ascending: false }).catch(() => []);
       const sorted = list.sort((a, b) => {
         if (a.is_pinned && !b.is_pinned) return -1;
         if (!a.is_pinned && b.is_pinned) return 1;
@@ -45,18 +45,20 @@ export default function Messages() {
   const handleAction = async (key) => {
     const c = longPressConv;
     if (key === "pin") {
-      await base44.entities.ChatConversation.update(c.id, { is_pinned: !c.is_pinned });
+      await backendGateway.updateTable("chat_conversations", { id: c.id }, { is_pinned: !c.is_pinned }).catch(() => {});
       toast({ title: c.is_pinned ? "Chat unpinned" : "Chat pinned" });
     } else if (key === "mute") {
-      await base44.entities.ChatConversation.update(c.id, { is_muted: !c.is_muted });
+      await backendGateway.updateTable("chat_conversations", { id: c.id }, { is_muted: !c.is_muted }).catch(() => {});
       toast({ title: c.is_muted ? "Chat unmuted" : "Chat muted" });
     } else if (key === "block") {
       toast({ title: "User blocked" });
     } else if (key === "report") {
       toast({ title: "User reported" });
     } else if (key === "delete") {
-      await base44.entities.ChatConversation.delete(c.id);
-      await base44.entities.ChatMessage.deleteMany({ conversation_id: c.id });
+      const { getSupabase } = await import("@/lib/supabaseClient");
+      const sb = await getSupabase();
+      await sb.from("chat_conversations").delete().eq("id", c.id);
+      await sb.from("room_messages").delete().eq("conversation_id", c.id);
       toast({ title: "Conversation deleted" });
     }
     setLongPressConv(null);

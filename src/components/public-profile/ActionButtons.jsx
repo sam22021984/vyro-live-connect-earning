@@ -4,6 +4,7 @@ import { UserPlus, UserCheck, MessageCircle, Phone, Video, Gift, Users, ChevronD
 import { base44 } from "@/api/base44Client";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 import { useToast } from "@/components/ui/use-toast";
+import { backendGateway } from "@/lib/backendGateway";
 
 export default function ActionButtons({ profile, isFollowing, onFollowChange, onSendGift, myCoins }) {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function ActionButtons({ profile, isFollowing, onFollowChange, on
     onFollowChange(newState);
     try {
       if (newState) {
-        await base44.entities.FriendRequest.create({
+        await (async () => { const { getSupabase } = await import("@/lib/supabaseClient"); const sb = await getSupabase(); const { data: _r } = await sb.from("friend_requests").insert({
           sender_id: (await getCurrentUser()).id,
           receiver_id: profile.user_id || profile.id,
           sender_name: "You",
@@ -27,7 +28,7 @@ export default function ActionButtons({ profile, isFollowing, onFollowChange, on
           receiver_avatar: profile.avatar_url,
           status: "pending",
           request_date: new Date().toISOString(),
-        });
+        }).select().single(); return _r; })();
       }
     } catch {}
   };

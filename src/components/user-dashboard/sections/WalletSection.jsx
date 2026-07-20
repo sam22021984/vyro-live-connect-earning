@@ -5,6 +5,7 @@ import { WALLET_DATA } from "../userDashboardData";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function WalletSection() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -14,8 +15,8 @@ export default function WalletSection() {
     if (!user?.id) return;
     (async () => {
       try {
-        let p = await base44.entities.UserProfile.filter({ user_id: user.id });
-        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+        let p = await backendGateway.readTable("user_profiles", { filter: { user_id: user.id }, limit: 100, order: "created_at", ascending: true });
+        if (p.length === 0) p = await backendGateway.readTable("user_profiles", { filter: { created_by: user.id }, limit: 100, order: "created_at", ascending: true });
         if (p.length > 0) setProfile(p[0]);
       } catch (e) {}
     })();

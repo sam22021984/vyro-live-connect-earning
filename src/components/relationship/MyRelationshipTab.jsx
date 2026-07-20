@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { RELATIONSHIP_COLORS, GRADIENT_PINK_PURPLE, formatDate, daysSince } from "./relationshipData";
 import { useToast } from "@/components/ui/use-toast";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function MyRelationshipTab({ refreshKey }) {
   const { toast } = useToast();
   const [relationship, setRelationship] = useState(null);
@@ -21,7 +22,7 @@ export default function MyRelationshipTab({ refreshKey }) {
 
   const loadRelationship = async () => {
     try {
-      const all = await base44.entities.Relationship.list();
+      const all = await backendGateway.readTable("relationships", { limit: 100, order: "created_at", ascending: true });
       const active = all.find((r) => r.status === "accepted");
       setRelationship(active || null);
     } catch (e) {
@@ -32,7 +33,7 @@ export default function MyRelationshipTab({ refreshKey }) {
   };
 
   const handleEnd = async () => {
-    await base44.entities.Relationship.update(relationship.id, { status: "ended", end_date: formatDate() });
+    await backendGateway.updateTable("relationships", { id: relationship.id }, { status: "ended", end_date: formatDate() });
     toast({ title: "💔 Relationship ended" });
     setConfirmEnd(false);
     loadRelationship();

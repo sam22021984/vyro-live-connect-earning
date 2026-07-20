@@ -6,6 +6,7 @@ import FinanceSubHeader from "@/components/finance/FinanceSubHeader";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 
+import { backendGateway } from "@/lib/backendGateway";
 const STATUS_STYLE = {
   verified: { color: FINANCE_COLORS.success, label: "Verified" },
   in_progress: { color: FINANCE_COLORS.info, label: "In Progress" },
@@ -30,7 +31,7 @@ export default function UserVerification() {
     setLoading(true);
     setError(null);
     try {
-      const res = await base44.entities.VerificationRecord.filter({ user_id: user.id }, "-created_date", 50);
+      const res = await backendGateway.readTable("verification_records", { filter: { user_id: user.id }, limit: 50, order: "created_date", ascending: false });
       setRecords(Array.isArray(res) ? res : []);
     } catch (e) {
       setError(e?.message || "Failed to load verification records.");

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 
+import { backendGateway } from "@/lib/backendGateway";
 export function useHomeFeed() {
   const [liveRooms, setLiveRooms] = useState([]);
   const [partyRooms, setPartyRooms] = useState([]);
@@ -21,10 +22,10 @@ export function useHomeFeed() {
 
     try {
       const [live, parties, hosts, users, profileRes] = await Promise.all([
-        base44.entities.RoomSession.filter({ status: "live" }, "-current_viewers", 20).catch(() => []),
-        base44.entities.PartyRoom.list("-viewers", 20).catch(() => []),
-        base44.entities.UserProfile.filter({ is_host: true }, "-followers", 10).catch(() => []),
-        base44.entities.UserProfile.list("-created_date", 10).catch(() => []),
+        backendGateway.readTable("room_sessions", { filter: { status: "live" }, limit: 20, order: "current_viewers", ascending: false }).catch(() => []),
+        backendGateway.readTable("party_rooms", { limit: 20, order: "viewers", ascending: false }).catch(() => []),
+        backendGateway.readTable("user_profiles", { filter: { is_host: true }, limit: 10, order: "followers", ascending: false }).catch(() => []),
+        backendGateway.readTable("user_profiles", { limit: 10, order: "created_date", ascending: false }).catch(() => []),
         base44.functions.invoke("userOnboarding", { action: "getProfile" }).catch(() => null),
       ]);
 

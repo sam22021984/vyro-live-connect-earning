@@ -27,33 +27,11 @@ export function useSecurityMonitor() {
 
   useEffect(() => {
     refresh();
-
-    // Subscribe to real-time SecurityAlert changes
-    const unsubAlerts = base44.entities.SecurityAlert.subscribe((event) => {
-      if (event.type === "create") {
-        setLiveAlerts((prev) => [event.data, ...prev].slice(0, 50));
-      } else if (event.type === "update") {
-        setLiveAlerts((prev) =>
-          prev.map((a) => (a.id === event.data.id ? event.data : a))
-        );
-      } else if (event.type === "delete") {
-        setLiveAlerts((prev) => prev.filter((a) => a.id !== event.data.id));
-      }
-    });
-
-    // Subscribe to real-time SecurityEvent changes
-    const unsubEvents = base44.entities.SecurityEvent.subscribe((event) => {
-      if (event.type === "create") {
-        setLiveEvents((prev) => [event.data, ...prev].slice(0, 100));
-      }
-    });
-
+    // Realtime invalidation handled by GlobalRealtimeProvider.
     // Auto-refresh every 30 seconds
     const interval = setInterval(refresh, 30000);
 
     return () => {
-      unsubAlerts();
-      unsubEvents();
       clearInterval(interval);
     };
   }, [refresh]);

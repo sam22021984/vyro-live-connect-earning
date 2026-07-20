@@ -27,6 +27,21 @@ async function rpc(name, params = {}) {
   return data;
 }
 
+// ─── RLS Table Update Helper ─────────────────────────────────────────────────
+
+async function updateTable(table, filter, updates) {
+  const supabase = await getClient();
+  let query = supabase.from(table).update(updates);
+  for (const [key, value] of Object.entries(filter)) {
+    if (value !== undefined && value !== null) {
+      query = query.eq(key, value);
+    }
+  }
+  const { data, error } = await query.select();
+  if (error) throw error;
+  return data;
+}
+
 // ─── RLS Table Read Helper ──────────────────────────────────────────────────
 
 async function readTable(table, { select = "*", filter = {}, limit = 100, order, ascending = false, single = false } = {}) {
@@ -289,6 +304,7 @@ export const backendGateway = {
   managerRpc,
   rpc,
   readTable,
+  updateTable,
 };
 
 export default backendGateway;

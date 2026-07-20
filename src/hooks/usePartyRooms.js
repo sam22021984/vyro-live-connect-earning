@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
+import { getSupabase as getSupabaseClient } from "@/lib/supabaseClient";
 
 export function usePartyRooms() {
   const [rooms, setRooms] = useState([]);
@@ -8,7 +9,7 @@ export function usePartyRooms() {
   const fetchRooms = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await base44.entities.PartyRoom.list("-viewers", 100);
+      const data = await backendGateway.readTable("party_rooms", { limit: 100, order: "viewers", ascending: false }).catch(() => []);
       setRooms(data || []);
     } catch (err) {
       console.error("Failed to fetch party rooms:", err);
@@ -19,10 +20,7 @@ export function usePartyRooms() {
 
   useEffect(() => {
     fetchRooms();
-    const unsubscribe = base44.entities.PartyRoom.subscribe(() => {
-      fetchRooms();
-    });
-    return unsubscribe;
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, [fetchRooms]);
 
   const recommended = rooms.filter((r) => r.recommended);
@@ -44,9 +42,18 @@ export function usePartyRooms() {
     { type: "Trending", data: trending.slice(0, 5) },
   ];
 
-  const createRoom = async (roomData) => await base44.entities.PartyRoom.create(roomData);
-  const updateRoom = async (id, roomData) => await base44.entities.PartyRoom.update(id, roomData);
-  const deleteRoom = async (id) => await base44.entities.PartyRoom.delete(id);
+  const createRoom = async (roomData) => {
+    const supabase = await getSupabaseClient();
+    const { data, error } = await supabase.from("party_rooms").insert(roomData).select().single();
+    if (error) throw error;
+    return data;
+  };
+  const updateRoom = async (id, roomData) => backendGateway.updateTable("party_rooms", { id }, roomData);
+  const deleteRoom = async (id) => {
+    const supabase = await getSupabaseClient();
+    const { error } = await supabase.from("party_rooms").delete().eq("id", id);
+    if (error) throw error;
+  };
 
   return {
     rooms, loading, recommended, popular, trending, stats, rankings,

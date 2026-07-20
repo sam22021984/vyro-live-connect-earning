@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
 import { useAuth } from "@/lib/AuthContext";
 
-// Country flag mapping for common countries
 const COUNTRY_FLAGS = {
   AE: "🇦🇪", SA: "🇸🇦", EG: "🇪🇬", IN: "🇮🇳", KR: "🇰🇷", US: "🇺🇸", GB: "🇬🇧", CA: "🇨🇦",
   QA: "🇶🇦", KW: "🇰🇼", BH: "🇧🇭", OM: "🇴🇲", JO: "🇯🇴", LB: "🇱🇧", IQ: "🇮🇶", SY: "🇸🇾",
@@ -43,26 +42,24 @@ export function usePartySocial() {
     try {
       setLoading(true);
 
-      // 1. Fetch accepted friend requests for current user
-      const sent = await base44.entities.FriendRequest.filter({ sender_id: user.id, status: "accepted" });
-      const received = await base44.entities.FriendRequest.filter({ receiver_id: user.id, status: "accepted" });
-      const friendIds = [
-        ...sent.map((r) => r.receiver_id),
-        ...received.map((r) => r.sender_id),
-      ];
+      // 1. Fetch accepted friend requests for current user (RLS tables)
+      const [sent, received] = await Promise.all([
+        backendGateway.readTable("friend_requests", { filter: { sender_id: user.id, status: "accepted" } }).catch(() => []),
+        backendGateway.readTable("friend_requests", { filter: { receiver_id: user.id, status: "accepted" } }).catch(() => []),
+      ]);
       const friendProfiles = [
         ...sent.map((r) => ({ id: r.receiver_id, name: r.receiver_name, avatar: r.receiver_avatar })),
         ...received.map((r) => ({ id: r.sender_id, name: r.sender_name, avatar: r.sender_avatar })),
       ];
 
-      // 2. Fetch chat conversations as "following" proxy
-      const conversations = await base44.entities.ChatConversation.list("-updated_date", 50);
+      // 2. Fetch chat conversations (RLS table)
+      const conversations = await backendGateway.readTable("chat_conversations", { limit: 50, order: "updated_at", ascending: false }).catch(() => []);
 
-      // 3. Fetch active room participants (to find who's in rooms right now)
-      const activeParticipants = await base44.entities.RoomParticipant.filter({ status: "active" });
+      // 3. Fetch active room participants (RLS table)
+      const activeParticipants = await backendGateway.readTable("room_participants", { filter: { status: "active" } }).catch(() => []);
 
-      // 4. Fetch party rooms for enrichment
-      const partyRooms = await base44.entities.PartyRoom.list("-viewers", 100);
+      // 4. Fetch party rooms for enrichment (RLS table)
+      const partyRooms = await backendGateway.readTable("party_rooms", { limit: 100, order: "viewers", ascending: false }).catch(() => []);
       const roomMap = new Map(partyRooms.map((r) => [r.id, r]));
 
       // Build friends activity: friends who are currently in active rooms
@@ -107,7 +104,7 @@ export function usePartySocial() {
       setFollowingActivity(followingInRooms);
 
       // Build recent rooms: user's own past room participations
-      const myParticipation = await base44.entities.RoomParticipant.filter({ user_id: user.id });
+      const myParticipation = await backendGateway.readTable("room_participants", { filter: { user_id: user.id } }).catch(() => []);
       const recent = myParticipation
         .filter((p) => p.left_at || p.status === "left" || p.status === "inactive")
         .sort((a, b) => new Date(b.left_at || b.joined_at || 0) - new Date(a.left_at || a.joined_at || 0))
@@ -163,28 +160,7 @@ export function usePartySocial() {
 
   useEffect(() => {
     fetchData();
-
-    // Subscribe to real-time updates
-    let unsubRoom, unsubParticipant, unsubFriend, unsubChat;
-    try {
-      unsubRoom = base44.entities.PartyRoom.subscribe(() => fetchData());
-    } catch (e) {}
-    try {
-      unsubParticipant = base44.entities.RoomParticipant.subscribe(() => fetchData());
-    } catch (e) {}
-    try {
-      unsubFriend = base44.entities.FriendRequest.subscribe(() => fetchData());
-    } catch (e) {}
-    try {
-      unsubChat = base44.entities.ChatConversation.subscribe(() => fetchData());
-    } catch (e) {}
-
-    return () => {
-      try { unsubRoom?.(); } catch (e) {}
-      try { unsubParticipant?.(); } catch (e) {}
-      try { unsubFriend?.(); } catch (e) {}
-      try { unsubChat?.(); } catch (e) {}
-    };
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, [fetchData]);
 
   return {

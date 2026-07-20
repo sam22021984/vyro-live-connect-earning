@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Home, Compass, Plus, MessageCircle, User, WifiOff, Users } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
+import { backendGateway } from "@/lib/backendGateway";
 const HIDE_DELAY = 5000;
 const AUTH_PATHS = ["/login", "/register", "/forgot-password", "/reset-password", "/splash", "/welcome", "/language-selection", "/region-selection", "/permissions-intro", "/mobile-register", "/create-password", "/profile-setup", "/welcome-animation"];
 
@@ -46,7 +47,7 @@ export default function BottomNavigation() {
   useEffect(() => {
     const loadUnread = async () => {
       try {
-        const conversations = await base44.entities.ChatConversation.list();
+        const conversations = await backendGateway.readTable("chat_conversations", { limit: 100, order: "created_at", ascending: true });
         const unread = conversations.reduce((sum, c) => sum + (c.unread_count || 0), 0);
         setUnreadCount(unread);
       } catch {}

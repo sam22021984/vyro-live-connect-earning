@@ -12,6 +12,7 @@ import MyMoreMenu from "@/components/my-profile/MyMoreMenu";
 import MoreServices from "@/components/profile/MoreServices";
 import { refreshBackendIdentity } from "@/lib/refreshBackendIdentity";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function ProfileDashboard() {
   const { data: profile, isLoading: loading } = useProfileQuery();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -24,7 +25,7 @@ export default function ProfileDashboard() {
   }, []);
 
   useEffect(() => {
-    base44.entities.Achievement.filter({})
+    backendGateway.readTable("achievements", { limit: 100 })
       .then(setAchievements)
       .catch(() => setAchievements([]));
   }, []);

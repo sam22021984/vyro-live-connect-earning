@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 
+import { backendGateway } from "@/lib/backendGateway";
 export function useCommunitySecurity() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -8,10 +9,10 @@ export function useCommunitySecurity() {
   const fetch = useCallback(async () => {
     try {
       const [alerts, events, devices, moderationLogs] = await Promise.all([
-        base44.entities.SecurityAlert.list("-created_date", 100).catch(() => []),
-        base44.entities.SecurityEvent.list("-created_date", 100).catch(() => []),
-        base44.entities.DeviceRecord.list("-last_active", 100).catch(() => []),
-        base44.entities.ContentModerationLog.list("-created_date", 100).catch(() => []),
+        backendGateway.readTable("security_alerts", { limit: 100, order: "created_date", ascending: false }).catch(() => []),
+        backendGateway.readTable("security_events", { limit: 100, order: "created_date", ascending: false }).catch(() => []),
+        backendGateway.readTable("device_records", { limit: 100, order: "last_active", ascending: false }).catch(() => []),
+        backendGateway.readTable("content_moderation_logs", { limit: 100, order: "created_date", ascending: false }).catch(() => []),
       ]);
 
       const activeAlerts = (alerts || []).filter((a) => a.status === "active" || a.status === "investigating");

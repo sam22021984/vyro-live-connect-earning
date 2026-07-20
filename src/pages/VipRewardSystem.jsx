@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import VipSystemHeader from "@/components/vip-systems/VipSystemHeader";
 import VipSystemLoader from "@/components/vip-systems/VipSystemLoader";
 
+import { backendGateway } from "@/lib/backendGateway";
 export default function VipRewardSystem({ embedded }) {
   const { profile, loading } = useVipProfile();
   const { toast } = useToast();
@@ -39,7 +40,7 @@ export default function VipRewardSystem({ embedded }) {
         rewardCoins = 1000;
       }
 
-      await base44.entities.UserProfile.update(profile.id, {
+      await backendGateway.updateTable("user_profiles", { id: profile.id }, {
         coins: coins + rewardCoins,
       });
 

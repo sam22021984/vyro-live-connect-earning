@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
 import { useAuth } from "@/lib/AuthContext";
 
 function formatNum(n) {
@@ -63,24 +63,24 @@ export function useLevelSubDashboard(levelType) {
       setLoading(true);
 
       try {
-        let p = await base44.entities.UserProfile.filter({ user_id: user.id });
-        if (p.length === 0) p = await base44.entities.UserProfile.filter({ created_by_id: user.id });
-        if (p.length > 0) setProfile(p[0]);
+        let p = await backendGateway.readTable("user_profiles", { filter: { user_id: user.id }, limit: 1 }).catch(() => []);
+        if (!p || p.length === 0) p = await backendGateway.readTable("user_profiles", { filter: { created_by: user.id }, limit: 1 }).catch(() => []);
+        if (p && p.length > 0) setProfile(p[0]);
       } catch (e) {}
 
       try {
-        const ach = await base44.entities.Achievement.list("-created_date", 50);
+        const ach = await backendGateway.readTable("achievements", { limit: 50, order: "created_at", ascending: false }).catch(() => []);
         setAchievements(ach || []);
       } catch (e) { setAchievements([]); }
 
       try {
-        const bdg = await base44.entities.Badge.list("-created_date", 50);
+        const bdg = await backendGateway.readTable("badges", { limit: 50, order: "created_at", ascending: false }).catch(() => []);
         setBadges(bdg || []);
       } catch (e) { setBadges([]); }
 
       try {
-        const txns = await base44.entities.Transaction.list("-created_date", 200);
-        setTransactions(txns || []);
+        const txns = await backendGateway.wallet.getMyTransactions(200).catch(() => []);
+        setTransactions(Array.isArray(txns) ? txns : (txns?.transactions || []));
       } catch (e) { setTransactions([]); }
     } catch (err) {
       console.error(`Failed to fetch ${levelType} dashboard data:`, err);
@@ -91,17 +91,7 @@ export function useLevelSubDashboard(levelType) {
 
   useEffect(() => {
     fetchData();
-    let unsubProfile, unsubAch, unsubBadge, unsubTxn;
-    try { unsubProfile = base44.entities.UserProfile.subscribe(() => fetchData()); } catch (e) {}
-    try { unsubAch = base44.entities.Achievement.subscribe(() => fetchData()); } catch (e) {}
-    try { unsubBadge = base44.entities.Badge.subscribe(() => fetchData()); } catch (e) {}
-    try { unsubTxn = base44.entities.Transaction.subscribe(() => fetchData()); } catch (e) {}
-    return () => {
-      try { unsubProfile?.(); } catch (e) {}
-      try { unsubAch?.(); } catch (e) {}
-      try { unsubBadge?.(); } catch (e) {}
-      try { unsubTxn?.(); } catch (e) {}
-    };
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, [fetchData]);
 
   const level = profile?.[config.levelField] || 1;

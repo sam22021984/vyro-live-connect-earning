@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { useBackNav } from "@/hooks/useBackNav";
 
+import { backendGateway } from "@/lib/backendGateway";
 const COINS_PER_USD = 20000;
 const formatNum = (n) => n.toLocaleString();
 
@@ -33,9 +34,9 @@ export default function Withdraw() {
   const loadData = async () => {
     if (!user?.id) { setLoading(false); return; }
     try {
-      const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
+      const profiles = await backendGateway.readTable("user_profiles", { filter: { user_id: user.id }, limit: 100, order: "created_at", ascending: true });
       if (profiles.length > 0) setCoinBalance(profiles[0].coins || 0);
-      const txns = await base44.entities.Transaction.filter({ user_id: user.id, type: "withdraw" });
+      const txns = await backendGateway.readTable("wallet_transactions", { filter: { user_id: user.id, type: "withdraw" }, limit: 100, order: "created_at", ascending: true });
       setWithdrawals(txns);
     } catch (e) {}
     setLoading(false);

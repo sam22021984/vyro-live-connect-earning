@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { useBackNav } from "@/hooks/useBackNav";
 
+import { backendGateway } from "@/lib/backendGateway";
 const formatNum = (n) => n.toLocaleString();
 
 export default function CoinsRecharge() {
@@ -37,9 +38,9 @@ export default function CoinsRecharge() {
   const loadWalletData = async () => {
     if (!user?.id) return;
     try {
-      const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
+      const profiles = await backendGateway.readTable("user_profiles", { filter: { user_id: user.id }, limit: 100, order: "created_at", ascending: true });
       if (profiles.length > 0) setCoinBalance(profiles[0].coins || 0);
-      const txns = await base44.entities.Transaction.filter({ user_id: user.id, type: "recharge" });
+      const txns = await backendGateway.readTable("wallet_transactions", { filter: { user_id: user.id, type: "recharge" }, limit: 100, order: "created_at", ascending: true });
       setTransactions(txns);
     } catch (e) {}
   };
