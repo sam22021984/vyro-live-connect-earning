@@ -32,7 +32,10 @@ const SECTIONS = {
 
 export default function UserDashboard() {
   const navigate = useNavigate();
-  const { info: USER_INFO, modules: USER_MODULES, quickActions: QUICK_ACTIONS, loading } = useDashboardData("user", { info: USER_INFO_D, modules: USER_MODULES_D, quickActions: QUICK_ACTIONS_D });
+  const { info, modules, quickActions, loading } = useDashboardData("user");
+  const USER_INFO = info || USER_INFO_D;
+  const USER_MODULES = modules || USER_MODULES_D;
+  const QUICK_ACTIONS = quickActions || QUICK_ACTIONS_D;
   const [activeModule, setActiveModule] = useState("home");
   const ActiveComponent = SECTIONS[activeModule] || HomeSection;
   const moduleList = Array.isArray(USER_MODULES) ? USER_MODULES : USER_MODULES_D;
