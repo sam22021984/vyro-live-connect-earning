@@ -172,6 +172,18 @@ export const TABLE_QUERY_MAP = {
   audit_logs: [["audit"], ["security"]],
   device_records: [["security"], ["device"]],
 
+  // ── Dashboard registry (Creator Center control tables) ─────────────
+  creator_center: [["dashboard-registry"], ["dashboard"]],
+  creator_center_dashboards: [["dashboard-registry"], ["dashboard"]],
+  dashboard_registry: [["dashboard-registry"]],
+  dashboard_access_matrix: [["dashboard-registry"], ["dashboard"]],
+  role_access_matrix: [["dashboard-registry"]],
+  role_permissions: [["dashboard-registry"]],
+  role_module_access: [["dashboard-registry"]],
+  user_role_identities: [["dashboard-registry"], ["user"]],
+  vyro_role_ids: [["dashboard-registry"], ["user"]],
+  dashboard_action_registry: [["dashboard-registry"], ["dashboard"]],
+
   // ── Invites / friends / support / settings ────────────────────────
   invites: [["social"]],
   friend_requests: [["social"]],

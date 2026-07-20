@@ -8,7 +8,27 @@ import { base44 } from "@/api/base44Client";
 import { dashboards } from "@/components/creator/creatorData";
 import CreatorStatsBanner from "@/components/creator/CreatorStatsBanner";
 import { useCreatorCenter } from "@/hooks/useCreatorCenter";
+import { useDashboardRegistry, selectModulesByDashboard } from "@/hooks/useDashboardRegistry";
 import { useBackNav } from "@/hooks/useBackNav";
+
+// Maps static dashboard id → registry dashboard_code (creator_center_dashboards).
+// Used to enrich cards with live module counts from dashboard_action_registry.
+const DASHBOARD_CODE_MAP = {
+  owner: ["AO_DASHBOARD"],
+  sam: ["SAM_DASHBOARD", "SUPER_ADMIN_DASHBOARD"],
+  country: ["CM_DASHBOARD"],
+  bdev: ["BD_DASHBOARD"],
+  business: ["BM_DASHBOARD"],
+  support: ["SUPPORT_DASHBOARD"],
+  finance: ["FINANCE_DASHBOARD", "FINANCE_MANAGER_DASHBOARD"],
+  marketing: ["MARKETING_DASHBOARD"],
+  vip: ["VIP_MANAGER_DASHBOARD"],
+  reward: ["REWARD_DASHBOARD"],
+  event: ["EVENT_DASHBOARD"],
+  pkmanager: ["PK_DASHBOARD"],
+  superadmin: ["SUPER_ADMIN_DASHBOARD"],
+  admin: ["ADMIN_DASHBOARD"],
+};
 
 const ICON_MAP = {
   Crown, Shield, LifeBuoy, Gift, Swords, Megaphone, DollarSign, PartyPopper,
@@ -21,6 +41,17 @@ export default function CreatorCenter() {
   const navigate = useNavigate();
   const handleBack = useBackNav("/more-services");
   const { profile, stats, hasRealStats, loading, approvedApplications } = useCreatorCenter();
+  const { data: registry } = useDashboardRegistry();
+  const modulesByDashboard = selectModulesByDashboard(registry);
+
+  const liveModulesFor = (id) => {
+    const codes = DASHBOARD_CODE_MAP[id];
+    if (!codes) return null;
+    for (const c of codes) {
+      if (modulesByDashboard[c]?.length) return modulesByDashboard[c];
+    }
+    return null;
+  };
 
   const userRole = profile?.role || "user";
   const { visible: visibleDashboards, locked: lockedDashboards } = getCreatorCenterDashboards(dashboards, userRole);
@@ -106,7 +137,7 @@ export default function CreatorCenter() {
             <h3 className="text-xs font-bold uppercase tracking-wider px-1" style={{ color: "#9CA3AF" }}>Your Dashboards</h3>
           )}
           {finalVisible.map((d) => (
-            <DashboardCard key={d.id} d={d} onNavigate={handleNavigate} stats={stats} />
+            <DashboardCard key={d.id} d={d} onNavigate={handleNavigate} stats={stats} liveModules={liveModulesFor(d.id)} />
           ))}
 
           {finalLocked.length > 0 && (
@@ -123,8 +154,9 @@ export default function CreatorCenter() {
   );
 }
 
-function DashboardCard({ d, onNavigate, stats, locked }) {
+function DashboardCard({ d, onNavigate, stats, locked, liveModules }) {
   const Icon = ICON_MAP[d.icon] || Crown;
+  const moduleCount = liveModules?.length ?? d.modules.length;
 
   const liveStat = (() => {
     if (!stats || locked) return null;
@@ -163,8 +195,13 @@ function DashboardCard({ d, onNavigate, stats, locked }) {
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-bold" style={{ color: "#0F1B3D" }}>{d.title}</h3>
             <span className="text-[7px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${d.color}10`, color: d.color }}>{d.badge}</span>
+            {liveModules && (
+              <span className="text-[7px] px-1.5 py-0.5 rounded-full font-bold flex items-center gap-0.5" style={{ background: "#10B98115", color: "#059669" }}>
+                <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" /> LIVE
+              </span>
+            )}
           </div>
-          <p className="text-[10px]" style={{ color: "#9CA3AF" }}>{d.modules.length} modules available</p>
+          <p className="text-[10px]" style={{ color: "#9CA3AF" }}>{moduleCount} modules available</p>
         </div>
         {!locked && <ChevronRight size={20} style={{ color: "#D1D5DB" }} />}
       </div>
@@ -175,14 +212,14 @@ function DashboardCard({ d, onNavigate, stats, locked }) {
         </div>
       )}
       <div className="flex flex-wrap gap-1.5">
-        {d.modules.slice(0, 8).map((m, i) => (
+        {(liveModules ? liveModules.slice(0, 8).map((m) => m.module_code) : d.modules.slice(0, 8)).map((m, i) => (
           <span key={i} className="text-[9px] px-2 py-1 rounded-full font-medium" style={{ background: `${d.color}08`, color: d.color }}>
             {m}
           </span>
         ))}
-        {d.modules.length > 8 && (
+        {moduleCount > 8 && (
           <span className="text-[9px] px-2 py-1 rounded-full font-medium" style={{ background: `${d.color}08`, color: d.color }}>
-            +{d.modules.length - 8} more
+            +{moduleCount - 8} more
           </span>
         )}
       </div>
