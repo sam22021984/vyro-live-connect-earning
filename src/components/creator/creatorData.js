@@ -76,7 +76,7 @@ export const dashboards = [
     title: "Finance Manager Dashboard",
     description: "Central financial management, revenue monitoring, commission control, withdrawal management, payment verification, wallet auditing, financial reporting, and business profitability control center of the platform",
     icon: "DollarSign",
-    path: "/finance-manager-dashboard",
+    path: "/finance-module",
     gradient: "linear-gradient(135deg, #F59E0B, #D97706)",
     color: "#F59E0B",
     badge: "FINANCE MGR",

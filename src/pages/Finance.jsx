@@ -103,29 +103,7 @@ export default function Finance() {
               </div>
             </div>
 
-            {/* Finance Module Access Button */}
-            <button
-              onClick={() => navigate("/finance-module")}
-              className="w-full rounded-2xl p-4 flex items-center gap-3 active:scale-[0.98] transition"
-              style={{
-                background: FINANCE_COLORS.navyGradient,
-                boxShadow: "0 4px 16px rgba(15,27,61,0.2)",
-              }}
-            >
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: `${FINANCE_COLORS.gold}20`, border: `1px solid ${FINANCE_COLORS.gold}40` }}
-              >
-                <span className="text-xl">🗂️</span>
-              </div>
-              <div className="flex-1 text-left">
-                <h3 className="text-sm font-bold text-white">Finance Module</h3>
-                <p className="text-[10px] text-white/60">All 84 finance options & categories</p>
-              </div>
-              <div className="px-3 py-1 rounded-full" style={{ background: `${FINANCE_COLORS.gold}20`, border: `1px solid ${FINANCE_COLORS.gold}40` }}>
-                <span className="text-xs font-bold" style={{ color: FINANCE_COLORS.goldLight }}>View All →</span>
-              </div>
-            </button>
+            {/* Finance Module is accessible only from Creator Center */}
 
             {/* Coins Recharge Access Button */}
             <button

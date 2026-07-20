@@ -928,7 +928,7 @@ export default function FinanceManagerDashboard() {
     <div className="min-h-screen" style={{ background: SOFT_BG }}>
       <div className="max-w-md mx-auto pb-8">
         <div className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3" style={{ background: "linear-gradient(135deg, #0F1B3D 0%, #1A2952 50%, #78350F 100%)", boxShadow: "0 4px 16px rgba(15,27,61,0.15)" }}>
-          <button onClick={() => navigate("/creator-center")} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "rgba(255,255,255,0.1)" }}>
+          <button onClick={() => navigate("/finance-module")} className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition" style={{ background: "rgba(255,255,255,0.1)" }}>
             <ArrowLeft size={18} className="text-white" />
           </button>
           <div className="flex-1">

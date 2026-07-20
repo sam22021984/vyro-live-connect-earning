@@ -73,6 +73,7 @@ export default function BottomNavigation() {
   if (AUTH_PATHS.includes(location.pathname)) return null;
   if (location.pathname.startsWith("/live-room")) return null;
   if (location.pathname.startsWith("/finance-manager")) return null;
+  if (location.pathname === "/finance-module") return null;
   if (location.pathname === "/access-denied") return null;
 
   const tabs = [

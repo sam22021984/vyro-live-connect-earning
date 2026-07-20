@@ -13,7 +13,7 @@ const COLOR_MAP = {
 
 export default function FinanceModule() {
   const navigate = useNavigate();
-  const handleBack = useBackNav("/finance");
+  const handleBack = useBackNav("/creator-center");
   const [expanded, setExpanded] = useState("dashboard");
   const [search, setSearch] = useState("");
 
@@ -103,7 +103,7 @@ export default function FinanceModule() {
           </div>
         </button>
         <button
-          onClick={() => navigate("/finance")}
+          onClick={() => navigate("/finance-manager/dashboard")}
           className="rounded-xl p-3 flex items-center gap-2 active:scale-95 transition"
           style={{ background: FINANCE_COLORS.navyGradient, boxShadow: "0 2px 8px rgba(15,27,61,0.2)" }}
         >

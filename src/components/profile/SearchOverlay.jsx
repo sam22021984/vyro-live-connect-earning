@@ -19,7 +19,7 @@ const SEARCH_CATEGORIES = [
       { label: "SAM Dashboard", path: "/sam-dashboard" },
       { label: "Control Center", path: "/control-center" },
       { label: "Creator Center", path: "/creator-center" },
-      { label: "Finance Manager", path: "/finance-manager-dashboard" },
+      { label: "Finance Manager", path: "/finance-module" },
       { label: "Marketing Manager", path: "/marketing-manager-dashboard" },
       { label: "Support Manager", path: "/support-manager-dashboard" },
       { label: "Event Manager", path: "/event-manager-dashboard" },

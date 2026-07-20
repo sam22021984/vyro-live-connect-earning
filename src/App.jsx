@@ -163,7 +163,6 @@ const AuthenticatedApp = () => {
         <Route path="/live-room/:id" element={<LiveRoom />} />
         <Route path="/go-live" element={<GoLivePanel />} />
         <Route path="/finance" element={<Finance />} />
-        <Route path="/finance-module" element={<FinanceModule />} />
         <Route path="/coins-recharge" element={<CoinsRecharge />} />
         <Route path="/withdraw" element={<Withdraw />} />
         <Route path="/control-center" element={<ControlCenter />} />
@@ -180,6 +179,7 @@ const AuthenticatedApp = () => {
         <Route path="/pk-manager-dashboard" element={<PkManagerDashboard />} />
         <Route path="/marketing-manager-dashboard" element={<MarketingManagerDashboard />} />
         <Route element={<FinanceManagerLayout />}>
+          <Route path="/finance-module" element={<FinanceModule />} />
           <Route path="/finance-manager-dashboard" element={<FinanceManagerDashboard />} />
           <Route path="/finance-manager" element={<Navigate to="/finance-manager/dashboard" replace />} />
           <Route path="/finance-manager/:section" element={<FinanceManagerDashboard />} />

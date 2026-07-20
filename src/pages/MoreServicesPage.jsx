@@ -14,7 +14,6 @@ const services = [
   { name: "Creator Center", icon: "🎤", gradient: "from-rose-400 to-red-500", path: "/creator-center", highlight: true },
   { name: "Message Center", icon: "📨", gradient: "from-blue-400 to-sky-500", path: "/message-center" },
   { name: "Trust & Reputation", icon: "🛡️", gradient: "from-green-400 to-teal-500", path: "/trust-reputation" },
-  { name: "Finance", icon: "💰", gradient: "from-amber-400 to-yellow-500", path: "/finance" },
   { name: "Tasks & Rewards", icon: "🎁", gradient: "from-teal-400 to-green-500", path: "/tasks-rewards" },
   { name: "Social", icon: "🤝", gradient: "from-purple-400 to-violet-500", path: "/social" },
   { name: "VIP Membership", icon: "👑", gradient: "from-yellow-400 to-amber-500", path: "/vip-membership", highlight: true },
