@@ -21,6 +21,7 @@ import {
 } from "@/components/finance-manager/financeManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
 import FinanceManagerPolicyTab from "@/components/finance-manager/FinanceManagerPolicyTab";
+import { useToast } from "@/components/ui/use-toast";
 
 const ICONS = {
   LayoutDashboard, TrendingUp, Banknote, CreditCard, Wallet, Coins, Gift,
@@ -516,28 +517,115 @@ function ReportsSection() {
 }
 
 function AuditSection() {
+  const { toast } = useToast();
+  const [selectedId, setSelectedId] = useState(null);
+  const [flagged, setFlagged] = useState({});
+  const [reviewed, setReviewed] = useState({});
+
+  const selected = FIN_AUDIT_LOGS.find((a) => a.id === selectedId);
+
+  const requireSelected = () => {
+    if (!selected) {
+      toast({
+        title: "No transaction selected",
+        description: "Tap an audit card first to select it.",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleReview = () => {
+    if (!requireSelected()) return;
+    setReviewed((r) => ({ ...r, [selected.id]: true }));
+    toast({
+      title: "Transaction Reviewed",
+      description: `${selected.id} — ${selected.action} marked as reviewed.`,
+    });
+  };
+
+  const handleAudit = () => {
+    if (!requireSelected()) return;
+    toast({
+      title: "Audit Started",
+      description: `Auditing ${selected.id} (${selected.target}).`,
+    });
+  };
+
+  const handleFlag = () => {
+    if (!requireSelected()) return;
+    const isFlagged = !!flagged[selected.id];
+    setFlagged((f) => ({ ...f, [selected.id]: !isFlagged }));
+    toast({
+      title: isFlagged ? "Flag Removed" : "Flagged Suspicious",
+      description: `${selected.id} ${isFlagged ? "unflagged" : "flagged for investigation"}.`,
+    });
+  };
+
+  const handleExport = () => {
+    const headers = ["ID", "Action", "Target", "Date", "Result"];
+    const rows = FIN_AUDIT_LOGS.map((a) => [a.id, a.action, a.target, a.date, a.result]);
+    const csv = [headers, ...rows]
+      .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "vyro-audit-report.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast({
+      title: "Audit Report Exported",
+      description: `${FIN_AUDIT_LOGS.length} records exported to CSV.`,
+    });
+  };
+
+  const actions = [
+    { label: "Review Transaction", onClick: handleReview },
+    { label: "Audit Transaction", onClick: handleAudit },
+    { label: "Flag Suspicious", onClick: handleFlag },
+    { label: "Export Audit Report", onClick: handleExport },
+  ];
+
   return (
     <div className="space-y-3">
       <SectionHeader title="🔍 Transaction Audit Center" subtitle="Audit all platform transactions" />
       <div className="space-y-2">
-        {FIN_AUDIT_LOGS.map((a, i) => (
-          <Card key={i}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${a.color}10` }}>
-                <Search size={16} style={{ color: a.color }} />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs font-bold" style={{ color: DARK }}>{a.id} — {a.action}</p>
-                <p className="text-[10px]" style={{ color: GRAY }}>{a.target} • {a.date}</p>
-              </div>
-              <StatusBadge status={a.result} color={a.color} />
-            </div>
-          </Card>
-        ))}
+        {FIN_AUDIT_LOGS.map((a, i) => {
+          const isSelected = a.id === selectedId;
+          const isFlagged = !!flagged[a.id];
+          const isReviewed = !!reviewed[a.id];
+          return (
+            <button
+              key={i}
+              onClick={() => setSelectedId(a.id)}
+              className="w-full text-left active:scale-[0.99] transition"
+            >
+              <Card className={isSelected ? "ring-2 ring-amber-400" : ""}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${a.color}10` }}>
+                    <Search size={16} style={{ color: a.color }} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-bold" style={{ color: DARK }}>{a.id} — {a.action}</p>
+                    <p className="text-[10px]" style={{ color: GRAY }}>{a.target} • {a.date}</p>
+                  </div>
+                  <div className="text-right flex flex-col items-end gap-1">
+                    <StatusBadge status={isReviewed ? "Reviewed" : a.result} color={isReviewed ? "#27AE60" : a.color} />
+                    {isFlagged && <span className="text-[8px] font-bold text-red-500">⚠ Flagged</span>}
+                  </div>
+                </div>
+              </Card>
+            </button>
+          );
+        })}
       </div>
       <div className="flex flex-wrap gap-2">
-        {["Review Transaction", "Audit Transaction", "Flag Suspicious", "Export Audit Report"].map((a, i) => (
-          <button key={i} className="text-[10px] px-3 py-1.5 rounded-full font-semibold" style={{ background: `${SLATE}10`, color: SLATE }}>{a}</button>
+        {actions.map((a, i) => (
+          <button key={i} onClick={a.onClick} className="text-[10px] px-3 py-1.5 rounded-full font-semibold active:scale-95 transition" style={{ background: `${SLATE}10`, color: SLATE }}>{a.label}</button>
         ))}
       </div>
     </div>

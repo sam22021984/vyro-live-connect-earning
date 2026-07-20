@@ -51,6 +51,8 @@ import RewardManagerDashboard from '@/pages/RewardManagerDashboard';
 import PkManagerDashboard from '@/pages/PkManagerDashboard';
 import MarketingManagerDashboard from '@/pages/MarketingManagerDashboard';
 import FinanceManagerDashboard from '@/pages/FinanceManagerDashboard';
+import FinanceManagerLayout from '@/components/FinanceManagerLayout';
+import AccessDenied from '@/pages/AccessDenied';
 import EventManagerDashboard from '@/pages/EventManagerDashboard';
 import CountryManagerDashboard from '@/pages/CountryManagerDashboard';
 import BusinessManagerDashboard from '@/pages/BusinessManagerDashboard';
@@ -177,9 +179,12 @@ const AuthenticatedApp = () => {
         <Route path="/reward-manager-dashboard" element={<RewardManagerDashboard />} />
         <Route path="/pk-manager-dashboard" element={<PkManagerDashboard />} />
         <Route path="/marketing-manager-dashboard" element={<MarketingManagerDashboard />} />
-        <Route path="/finance-manager-dashboard" element={<FinanceManagerDashboard />} />
-        <Route path="/finance-manager" element={<Navigate to="/finance-manager/dashboard" replace />} />
-        <Route path="/finance-manager/:section" element={<FinanceManagerDashboard />} />
+        <Route element={<FinanceManagerLayout />}>
+          <Route path="/finance-manager-dashboard" element={<FinanceManagerDashboard />} />
+          <Route path="/finance-manager" element={<Navigate to="/finance-manager/dashboard" replace />} />
+          <Route path="/finance-manager/:section" element={<FinanceManagerDashboard />} />
+        </Route>
+        <Route path="/access-denied" element={<AccessDenied />} />
         <Route path="/event-manager-dashboard" element={<EventManagerDashboard />} />
         <Route path="/country-manager-dashboard" element={<CountryManagerDashboard />} />
         <Route path="/business-manager-dashboard" element={<BusinessManagerDashboard />} />
