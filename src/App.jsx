@@ -178,6 +178,8 @@ const AuthenticatedApp = () => {
         <Route path="/pk-manager-dashboard" element={<PkManagerDashboard />} />
         <Route path="/marketing-manager-dashboard" element={<MarketingManagerDashboard />} />
         <Route path="/finance-manager-dashboard" element={<FinanceManagerDashboard />} />
+        <Route path="/finance-manager" element={<Navigate to="/finance-manager/dashboard" replace />} />
+        <Route path="/finance-manager/:section" element={<FinanceManagerDashboard />} />
         <Route path="/event-manager-dashboard" element={<EventManagerDashboard />} />
         <Route path="/country-manager-dashboard" element={<CountryManagerDashboard />} />
         <Route path="/business-manager-dashboard" element={<BusinessManagerDashboard />} />

@@ -21,10 +21,13 @@ export default function FinanceModule() {
     setExpanded(expanded === id ? null : id);
   };
 
-  const handleOptionClick = (optionName) => {
-    if (optionName === "Coins Recharge") {
-      navigate("/coins-recharge");
+  const handleOptionClick = (opt) => {
+    console.log("Finance item clicked", opt.name, opt.route);
+    if (!opt?.route) {
+      console.error("Missing route for finance item:", opt);
+      return;
     }
+    navigate(opt.route);
   };
 
   const filteredCategories = FINANCE_CATEGORIES.map((cat) => ({
@@ -180,8 +183,8 @@ export default function FinanceModule() {
                   {cat.options.map((opt, i) => (
                     <button
                       key={i}
-                      onClick={() => handleOptionClick(opt.name)}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 active:scale-[0.98] transition"
+                      onClick={() => handleOptionClick(opt)}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 active:scale-[0.98] transition cursor-pointer"
                       style={{ background: "rgba(245,247,250,0.5)" }}
                     >
                       <div

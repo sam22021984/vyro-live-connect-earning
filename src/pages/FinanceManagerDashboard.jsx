@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, ChevronRight, ChevronDown, Search, DollarSign, Shield,
   LayoutDashboard, TrendingUp, Banknote, CreditCard, Wallet, Coins,
@@ -38,6 +38,21 @@ const DARK = "#0F1B3D";
 const GRAY = "#6B7280";
 const SLATE = "#475569";
 const FIN_GOLD = "#F59E0B";
+
+// Maps /finance-manager/:section URL segments to internal section ids and back.
+// The URL segment is the single source of truth for the active section so
+// deep links, the browser back button, and direct route access all work.
+const ROUTE_TO_SECTION = {
+  dashboard: "overview", revenue: "revenue", withdrawals: "withdrawals",
+  payments: "payments", wallets: "wallets", coins: "coins", gifts: "giftrevenue",
+  commissions: "commissions", "profit-loss": "pnl", reports: "reports",
+  audit: "audit", fraud: "fraud", analytics: "analytics", countries: "country",
+  "top-earners": "topearners", intelligence: "ai", communication: "communication",
+  team: "team", settings: "settings", tools: "exclusive",
+};
+const SECTION_TO_ROUTE = Object.fromEntries(
+  Object.entries(ROUTE_TO_SECTION).map(([r, s]) => [s, r])
+);
 
 function Card({ children, className = "" }) {
   return <div className={`rounded-2xl p-3 ${className}`} style={{ background: WHITE, border: "1px solid #E5E7EB", boxShadow: "0 4px 12px rgba(0,0,0,0.04)" }}>{children}</div>;
@@ -809,8 +824,14 @@ const SECTIONS = {
 
 export default function FinanceManagerDashboard() {
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState("overview");
+  const { section: routeSection } = useParams();
+  const activeSection = ROUTE_TO_SECTION[routeSection] || "overview";
   const [showSidebar, setShowSidebar] = useState(false);
+
+  const goToSection = (id) => {
+    navigate(`/finance-manager/${SECTION_TO_ROUTE[id] || "dashboard"}`);
+    setShowSidebar(false);
+  };
 
   const ActiveComponent = SECTIONS[activeSection] || HomeSection;
   const activeSectionData = FIN_SECTIONS.find(s => s.id === activeSection) || FIN_SECTIONS[0];
@@ -851,7 +872,7 @@ export default function FinanceManagerDashboard() {
                   const Icon = ICONS[s.icon] || BarChart3;
                   const isActive = s.id === activeSection;
                   return (
-                    <button key={i} onClick={() => { setActiveSection(s.id); setShowSidebar(false); }} className="rounded-xl p-2 flex flex-col items-center gap-1 active:scale-95 transition" style={{ background: isActive ? `${s.color}10` : "#F7F9FC", border: isActive ? `1px solid ${s.color}30` : "1px solid transparent" }}>
+                    <button key={i} onClick={() => goToSection(s.id)} className="rounded-xl p-2 flex flex-col items-center gap-1 active:scale-95 transition" style={{ background: isActive ? `${s.color}10` : "#F7F9FC", border: isActive ? `1px solid ${s.color}30` : "1px solid transparent" }}>
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${s.color}10` }}>
                         <Icon size={14} style={{ color: s.color }} />
                       </div>
@@ -869,7 +890,7 @@ export default function FinanceManagerDashboard() {
         </div>
 
         <div className="px-4 pt-3">
-          <ActiveComponent onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }} />
+          <ActiveComponent onNavigate={(id) => goToSection(id)} />
         </div>
       </div>
     </div>
