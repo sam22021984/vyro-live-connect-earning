@@ -1,0 +1,817 @@
+{
+  "source_zip": "vyrolivesuoabase.zip",
+  "counts": {
+    "base44_entity_refs": 31,
+    "base44_function_invokes": 119,
+    "all_subscribe_refs": 33
+  },
+  "invoke_names": {
+    "aiSafetyMonitor": 1,
+    "aiTools": 1,
+    "applicationIdSystem": 12,
+    "claimReward": 4,
+    "createLiveRoom": 1,
+    "dashboardApi": 1,
+    "dashboardData": 2,
+    "dashboardRegistry": 1,
+    "deviceSettings": 5,
+    "endLiveRoom": 1,
+    "enterpriseHierarchy": 4,
+    "faceVerification": 7,
+    "getPlatformStats": 2,
+    "getSystemDashboard": 1,
+    "homeFeedActions": 4,
+    "joinLiveRoom": 1,
+    "mobileSettings": 7,
+    "moderateContent": 1,
+    "moderateRoom": 4,
+    "paypalRecharge": 2,
+    "paypalWithdraw": 1,
+    "privacySettings": 4,
+    "processPurchase": 1,
+    "processVipPurchase": 3,
+    "refreshBackendIdentity": 1,
+    "roleApplications": 3,
+    "securitySystem": 1,
+    "sellerOperations": 2,
+    "sendGift": 2,
+    "servicesData": 7,
+    "supabaseAuth": 1,
+    "supabaseConfig": 1,
+    "supabaseProxy": 1,
+    "uploadFile": 3,
+    "userData": 2,
+    "userOnboarding": 19,
+    "userSearch": 3
+  },
+  "entity_locations": [
+    {
+      "file": "src/hooks/useTrustReputation.js",
+      "line": 188,
+      "text": "base44.entities.SecurityEvent?.subscribe?.(load),"
+    },
+    {
+      "file": "src/hooks/useTrustReputation.js",
+      "line": 189,
+      "text": "base44.entities.EnforcementAction?.subscribe?.(load),"
+    },
+    {
+      "file": "src/hooks/useTrustReputation.js",
+      "line": 190,
+      "text": "base44.entities.VerificationRecord?.subscribe?.(load),"
+    },
+    {
+      "file": "src/hooks/useTrustReputation.js",
+      "line": 191,
+      "text": "base44.entities.Badge?.subscribe?.(load),"
+    },
+    {
+      "file": "src/hooks/useTrustReputation.js",
+      "line": 192,
+      "text": "base44.entities.Achievement?.subscribe?.(load),"
+    },
+    {
+      "file": "src/hooks/useHomeFeed.js",
+      "line": 64,
+      "text": "const unsubLive = base44.entities.RoomSession?.subscribe?.(() => load(true)) || (() => {});"
+    },
+    {
+      "file": "src/hooks/useHomeFeed.js",
+      "line": 65,
+      "text": "const unsubParty = base44.entities.PartyRoom?.subscribe?.(() => load(true)) || (() => {});"
+    },
+    {
+      "file": "src/hooks/useCommunitySecurity.js",
+      "line": 78,
+      "text": "base44.entities.SecurityAlert?.subscribe?.(fetch),"
+    },
+    {
+      "file": "src/hooks/useCommunitySecurity.js",
+      "line": 79,
+      "text": "base44.entities.SecurityEvent?.subscribe?.(fetch),"
+    },
+    {
+      "file": "src/hooks/useCommunitySecurity.js",
+      "line": 80,
+      "text": "base44.entities.DeviceRecord?.subscribe?.(fetch),"
+    },
+    {
+      "file": "src/hooks/useCommunitySecurity.js",
+      "line": 81,
+      "text": "base44.entities.ContentModerationLog?.subscribe?.(fetch),"
+    },
+    {
+      "file": "src/hooks/useMobileSettings.js",
+      "line": 34,
+      "text": "const unsub = base44.entities[name]?.subscribe?.(() => loadAll());"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 26,
+      "text": "base44.entities.Notification?.subscribe?.(() => fetchData()),"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 27,
+      "text": "base44.entities.SupportTicket?.subscribe?.(() => fetchData()),"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 28,
+      "text": "base44.entities.MallItem?.subscribe?.(() => fetchData()),"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 29,
+      "text": "base44.entities.UserProfile?.subscribe?.(() => fetchData()),"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 30,
+      "text": "base44.entities.Badge?.subscribe?.(() => fetchData()),"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 31,
+      "text": "base44.entities.Achievement?.subscribe?.(() => fetchData()),"
+    },
+    {
+      "file": "src/hooks/useCommunityAnalytics.js",
+      "line": 128,
+      "text": "base44.entities.CommunityPost?.subscribe?.(fetch),"
+    },
+    {
+      "file": "src/hooks/useCommunityAnalytics.js",
+      "line": 129,
+      "text": "base44.entities.UserProfile?.subscribe?.(fetch),"
+    },
+    {
+      "file": "src/hooks/useCommunityAnalytics.js",
+      "line": 130,
+      "text": "base44.entities.Transaction?.subscribe?.(fetch),"
+    },
+    {
+      "file": "src/hooks/useCommunityAnalytics.js",
+      "line": 131,
+      "text": "base44.entities.RoomSession?.subscribe?.(fetch),"
+    },
+    {
+      "file": "src/hooks/useCommunityAnalytics.js",
+      "line": 132,
+      "text": "base44.entities.CommunityGroup?.subscribe?.(fetch),"
+    },
+    {
+      "file": "src/hooks/useRealtimeStats.js",
+      "line": 42,
+      "text": "unsubRoomSession = base44.entities.RoomSession?.subscribe?.(() => fetchStats());"
+    },
+    {
+      "file": "src/hooks/useRealtimeStats.js",
+      "line": 43,
+      "text": "unsubUserProfile = base44.entities.UserProfile?.subscribe?.(() => fetchStats());"
+    },
+    {
+      "file": "src/hooks/useRealtimeStats.js",
+      "line": 44,
+      "text": "unsubTransaction = base44.entities.Transaction?.subscribe?.(() => fetchStats());"
+    },
+    {
+      "file": "src/pages/TasksRewards.jsx",
+      "line": 41,
+      "text": "try { unsub = base44.entities.UserProfile?.subscribe?.(() => loadProfile()); } catch (e) {}"
+    },
+    {
+      "file": "src/pages/LevelSystem.jsx",
+      "line": 36,
+      "text": "unsub = base44.entities.UserProfile?.subscribe?.(() => loadProfile());"
+    },
+    {
+      "file": "src/components/BottomNavigation.jsx",
+      "line": 56,
+      "text": "const sub = base44.entities.ChatConversation?.subscribe?.(() => loadUnread());"
+    },
+    {
+      "file": "src/components/LeftNav.jsx",
+      "line": 30,
+      "text": "const sub = base44.entities.ChatConversation?.subscribe?.(() => loadUnread());"
+    },
+    {
+      "file": "src/components/community/GiftingTab.jsx",
+      "line": 56,
+      "text": "const unsub = base44.entities.Transaction?.subscribe?.(fetchTopGifters);"
+    }
+  ],
+  "invoke_locations": [
+    {
+      "file": "src/lib/dashboardApi.js",
+      "line": 15,
+      "text": "const res = await base44.functions.invoke(\"dashboardApi\", { action, payload });"
+    },
+    {
+      "file": "src/lib/refreshBackendIdentity.js",
+      "line": 35,
+      "text": "const res = await base44.functions.invoke(\"refreshBackendIdentity\", { access_token });"
+    },
+    {
+      "file": "src/lib/supabaseAuth.js",
+      "line": 7,
+      "text": "const invoke = (payload) => base44.functions.invoke(\"supabaseAuth\", payload);"
+    },
+    {
+      "file": "src/lib/supabaseClient.js",
+      "line": 14,
+      "text": "const res = await base44.functions.invoke(\"supabaseConfig\", {});"
+    },
+    {
+      "file": "src/hooks/useVipProfile.js",
+      "line": 75,
+      "text": "const res = await base44.functions.invoke(\"processVipPurchase\", {"
+    },
+    {
+      "file": "src/hooks/useVipProfile.js",
+      "line": 95,
+      "text": "const res = await base44.functions.invoke(\"processVipPurchase\", {"
+    },
+    {
+      "file": "src/hooks/useVipProfile.js",
+      "line": 113,
+      "text": "const res = await base44.functions.invoke(\"processVipPurchase\", {"
+    },
+    {
+      "file": "src/hooks/useRoleGuard.js",
+      "line": 21,
+      "text": "const res = await base44.functions.invoke(\"dashboardData\", {"
+    },
+    {
+      "file": "src/hooks/useAiTools.js",
+      "line": 18,
+      "text": "const res = await base44.functions.invoke(\"aiTools\", payload);"
+    },
+    {
+      "file": "src/hooks/useMallItems.js",
+      "line": 40,
+      "text": "const res = await base44.functions.invoke(\"processPurchase\", {"
+    },
+    {
+      "file": "src/hooks/useUserTasks.js",
+      "line": 83,
+      "text": "await base44.functions.invoke(\"claimReward\", {"
+    },
+    {
+      "file": "src/hooks/useSecuritySystem.js",
+      "line": 16,
+      "text": "const res = await base44.functions.invoke(\"securitySystem\", payload);"
+    },
+    {
+      "file": "src/hooks/useProfileQuery.js",
+      "line": 18,
+      "text": "const res = await base44.functions.invoke(\"userOnboarding\", {"
+    },
+    {
+      "file": "src/hooks/useEnterpriseRoles.js",
+      "line": 11,
+      "text": "const res = await base44.functions.invoke(\"enterpriseHierarchy\", { action: \"getAll\" });"
+    },
+    {
+      "file": "src/hooks/useEnterpriseRoles.js",
+      "line": 39,
+      "text": "const res = await base44.functions.invoke(\"enterpriseHierarchy\", {"
+    },
+    {
+      "file": "src/hooks/useEnterpriseRoles.js",
+      "line": 65,
+      "text": "const res = await base44.functions.invoke(\"enterpriseHierarchy\", {"
+    },
+    {
+      "file": "src/hooks/useHomeFeed.js",
+      "line": 29,
+      "text": "base44.functions.invoke(\"userOnboarding\", { action: \"getProfile\" }).catch(() => null),"
+    },
+    {
+      "file": "src/hooks/useHomeFeed.js",
+      "line": 45,
+      "text": "const followRes = await base44.functions.invoke(\"homeFeedActions\", { action: \"check_following\", target_ids: ids });"
+    },
+    {
+      "file": "src/hooks/useAdminDashboard.js",
+      "line": 18,
+      "text": "const res = await base44.functions.invoke(\"getPlatformStats\", {});"
+    },
+    {
+      "file": "src/hooks/useAiSafetyMonitor.js",
+      "line": 17,
+      "text": "const res = await base44.functions.invoke(\"aiSafetyMonitor\", payload);"
+    },
+    {
+      "file": "src/hooks/useMobileSettings.js",
+      "line": 12,
+      "text": "const res = await base44.functions.invoke(\"mobileSettings\", {"
+    },
+    {
+      "file": "src/hooks/useMobileSettings.js",
+      "line": 42,
+      "text": "const res = await base44.functions.invoke(\"mobileSettings\", {"
+    },
+    {
+      "file": "src/hooks/useMobileSettings.js",
+      "line": 55,
+      "text": "const res = await base44.functions.invoke(\"mobileSettings\", {"
+    },
+    {
+      "file": "src/hooks/useMobileSettings.js",
+      "line": 65,
+      "text": "const res = await base44.functions.invoke(\"mobileSettings\", {"
+    },
+    {
+      "file": "src/hooks/useMobileSettings.js",
+      "line": 75,
+      "text": "const res = await base44.functions.invoke(\"mobileSettings\", {"
+    },
+    {
+      "file": "src/hooks/useMobileSettings.js",
+      "line": 85,
+      "text": "const res = await base44.functions.invoke(\"mobileSettings\", {"
+    },
+    {
+      "file": "src/hooks/useMobileSettings.js",
+      "line": 92,
+      "text": "const res = await base44.functions.invoke(\"mobileSettings\", {"
+    },
+    {
+      "file": "src/hooks/useRewardClaim.js",
+      "line": 31,
+      "text": "const res = await base44.functions.invoke(\"claimReward\", {"
+    },
+    {
+      "file": "src/hooks/useRewardClaim.js",
+      "line": 69,
+      "text": "const res = await base44.functions.invoke(\"claimReward\", {"
+    },
+    {
+      "file": "src/hooks/useRewardClaim.js",
+      "line": 104,
+      "text": "const res = await base44.functions.invoke(\"claimReward\", { action: \"getDailyStatus\" });"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 10,
+      "text": "const res = await base44.functions.invoke(\"servicesData\", { action: \"getServicesData\" });"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 45,
+      "text": "const res = await base44.functions.invoke(\"servicesData\", {"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 54,
+      "text": "const res = await base44.functions.invoke(\"servicesData\", { action: \"markAllAsRead\" });"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 60,
+      "text": "const res = await base44.functions.invoke(\"servicesData\", {"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 69,
+      "text": "const res = await base44.functions.invoke(\"servicesData\", {"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 78,
+      "text": "const res = await base44.functions.invoke(\"servicesData\", {"
+    },
+    {
+      "file": "src/hooks/useServicesData.js",
+      "line": 87,
+      "text": "const res = await base44.functions.invoke(\"servicesData\", {"
+    },
+    {
+      "file": "src/hooks/useGifts.js",
+      "line": 39,
+      "text": "const res = await base44.functions.invoke(\"sendGift\", {"
+    },
+    {
+      "file": "src/hooks/useSellerDashboard.js",
+      "line": 12,
+      "text": "const res = await base44.functions.invoke(\"sellerOperations\", { action: \"list\" });"
+    },
+    {
+      "file": "src/hooks/useSellerDashboard.js",
+      "line": 28,
+      "text": "const res = await base44.functions.invoke(\"sellerOperations\", {"
+    },
+    {
+      "file": "src/hooks/useDashboardRegistry.js",
+      "line": 23,
+      "text": "const res = await base44.functions.invoke(\"dashboardRegistry\", {});"
+    },
+    {
+      "file": "src/hooks/useLiveAnalytics.js",
+      "line": 19,
+      "text": "const res = await base44.functions.invoke('getSystemDashboard', {});"
+    },
+    {
+      "file": "src/hooks/useLiveRoomApi.js",
+      "line": 5,
+      "text": "base44.functions.invoke(\"supabaseProxy\", { function_name, payload });"
+    },
+    {
+      "file": "src/hooks/useContentModeration.js",
+      "line": 10,
+      "text": "const res = await base44.functions.invoke(\"moderateContent\", {"
+    },
+    {
+      "file": "src/hooks/useRealtimeStats.js",
+      "line": 19,
+      "text": "const res = await base44.functions.invoke(\"dashboardData\", {"
+    },
+    {
+      "file": "src/hooks/usePlatformStats.js",
+      "line": 10,
+      "text": "const res = await base44.functions.invoke(\"getPlatformStats\", {});"
+    },
+    {
+      "file": "src/pages/LiveRoom.jsx",
+      "line": 86,
+      "text": "base44.functions.invoke(\"joinLiveRoom\", { room_id: roomId, password: pw })"
+    },
+    {
+      "file": "src/pages/LiveRoom.jsx",
+      "line": 225,
+      "text": "const res = await base44.functions.invoke(\"moderateRoom\", {"
+    },
+    {
+      "file": "src/pages/LiveRoom.jsx",
+      "line": 324,
+      "text": "const res = await base44.functions.invoke(\"sendGift\", {"
+    },
+    {
+      "file": "src/pages/LiveRoom.jsx",
+      "line": 397,
+      "text": "const res = await base44.functions.invoke(\"moderateRoom\", {"
+    },
+    {
+      "file": "src/pages/LiveRoom.jsx",
+      "line": 420,
+      "text": "const res = await base44.functions.invoke(\"endLiveRoom\", { room_id: roomId });"
+    },
+    {
+      "file": "src/pages/CoinsRecharge.jsx",
+      "line": 54,
+      "text": "const res = await base44.functions.invoke(\"paypalRecharge\", {"
+    },
+    {
+      "file": "src/pages/CoinsRecharge.jsx",
+      "line": 85,
+      "text": "const res = await base44.functions.invoke(\"paypalRecharge\", {"
+    },
+    {
+      "file": "src/pages/WelcomeAnimation.jsx",
+      "line": 14,
+      "text": "const res = await base44.functions.invoke(\"userOnboarding\", { action: \"getProfile\" });"
+    },
+    {
+      "file": "src/pages/RoomManagement.jsx",
+      "line": 44,
+      "text": "const res = await base44.functions.invoke(current.api, { action, ...payload });"
+    },
+    {
+      "file": "src/pages/RoomManagement.jsx",
+      "line": 63,
+      "text": "const res = await base44.functions.invoke(current.api, { action, session_id: sessionId, target_user_id: targetUserId, reason, duration_minutes: duration, ...extra });"
+    },
+    {
+      "file": "src/pages/FaceVerification.jsx",
+      "line": 41,
+      "text": "await base44.functions.invoke(\"faceVerification\", {"
+    },
+    {
+      "file": "src/pages/FaceVerification.jsx",
+      "line": 65,
+      "text": "const res = await base44.functions.invoke(\"faceVerification\", { action: \"startVerification\" });"
+    },
+    {
+      "file": "src/pages/FaceVerification.jsx",
+      "line": 116,
+      "text": "const res = await base44.functions.invoke(\"faceVerification\", {"
+    },
+    {
+      "file": "src/pages/FaceVerification.jsx",
+      "line": 168,
+      "text": "const res = await base44.functions.invoke(\"faceVerification\", {"
+    },
+    {
+      "file": "src/pages/Withdraw.jsx",
+      "line": 56,
+      "text": "const res = await base44.functions.invoke(\"paypalWithdraw\", {"
+    },
+    {
+      "file": "src/pages/ProfileSetup.jsx",
+      "line": 38,
+      "text": "const res = await base44.functions.invoke(\"userOnboarding\", { action: \"getProfile\" });"
+    },
+    {
+      "file": "src/pages/VerificationAdmin.jsx",
+      "line": 240,
+      "text": "const res = await base44.functions.invoke(\"faceVerification\", { action: \"getPendingVerifications\" });"
+    },
+    {
+      "file": "src/pages/VerificationAdmin.jsx",
+      "line": 254,
+      "text": "const res = await base44.functions.invoke(\"faceVerification\", {"
+    },
+    {
+      "file": "src/pages/VerificationAdmin.jsx",
+      "line": 276,
+      "text": "const res = await base44.functions.invoke(\"faceVerification\", {"
+    },
+    {
+      "file": "src/pages/EditProfile.jsx",
+      "line": 44,
+      "text": "const res = await base44.functions.invoke(\"userOnboarding\", { action: \"getProfile\" });"
+    },
+    {
+      "file": "src/pages/EditProfile.jsx",
+      "line": 119,
+      "text": "await base44.functions.invoke(\"userOnboarding\", {"
+    },
+    {
+      "file": "src/pages/ApplyCenter.jsx",
+      "line": 17,
+      "text": "const res = await base44.functions.invoke(\"roleApplications\", { action: \"list\" });"
+    },
+    {
+      "file": "src/pages/Login.jsx",
+      "line": 28,
+      "text": "base44.functions.invoke(\"userOnboarding\", { action: \"getProfile\" })"
+    },
+    {
+      "file": "src/pages/Login.jsx",
+      "line": 31,
+      "text": "res = await base44.functions.invoke(\"userOnboarding\", { action: \"initProfile\", country: \"QAT\" });"
+    },
+    {
+      "file": "src/pages/Login.jsx",
+      "line": 50,
+      "text": "let res = await base44.functions.invoke(\"userOnboarding\", { action: \"getProfile\" });"
+    },
+    {
+      "file": "src/pages/Login.jsx",
+      "line": 53,
+      "text": "res = await base44.functions.invoke(\"userOnboarding\", { action: \"initProfile\", country: \"QAT\" });"
+    },
+    {
+      "file": "src/pages/Login.jsx",
+      "line": 78,
+      "text": "const res = await base44.functions.invoke(\"userOnboarding\", { action: \"getProfile\" });"
+    },
+    {
+      "file": "src/pages/GoLivePanel.jsx",
+      "line": 68,
+      "text": "const res = await base44.functions.invoke(\"createLiveRoom\", {"
+    },
+    {
+      "file": "src/pages/CreatePassword.jsx",
+      "line": 49,
+      "text": "await base44.functions.invoke(\"userOnboarding\", {"
+    },
+    {
+      "file": "src/pages/ApplicationDetail.jsx",
+      "line": 33,
+      "text": "const res = await base44.functions.invoke(\"roleApplications\", {"
+    },
+    {
+      "file": "src/pages/ApplicationDetail.jsx",
+      "line": 83,
+      "text": "const res = await base44.functions.invoke(\"uploadFile\", {"
+    },
+    {
+      "file": "src/pages/ApplicationDetail.jsx",
+      "line": 110,
+      "text": "const res = await base44.functions.invoke(\"roleApplications\", {"
+    },
+    {
+      "file": "src/pages/ApplicationIdSystem.jsx",
+      "line": 40,
+      "text": "const res = await base44.functions.invoke(\"applicationIdSystem\", { action: \"getStats\" });"
+    },
+    {
+      "file": "src/pages/ApplicationIdSystem.jsx",
+      "line": 43,
+      "text": "const res = await base44.functions.invoke(\"applicationIdSystem\", {"
+    },
+    {
+      "file": "src/pages/ApplicationIdSystem.jsx",
+      "line": 52,
+      "text": "const res = await base44.functions.invoke(\"applicationIdSystem\", { action: \"getAllLuckyIds\" });"
+    },
+    {
+      "file": "src/pages/ApplicationIdSystem.jsx",
+      "line": 55,
+      "text": "const res = await base44.functions.invoke(\"applicationIdSystem\", { action: \"getHistory\", limit: 50 });"
+    },
+    {
+      "file": "src/pages/ApplicationIdSystem.jsx",
+      "line": 72,
+      "text": "const res = await base44.functions.invoke(\"applicationIdSystem\", {"
+    },
+    {
+      "file": "src/pages/ApplicationIdSystem.jsx",
+      "line": 93,
+      "text": "await base44.functions.invoke(\"applicationIdSystem\", {"
+    },
+    {
+      "file": "src/pages/Register.jsx",
+      "line": 46,
+      "text": "const res = await base44.functions.invoke(\"userOnboarding\", {"
+    },
+    {
+      "file": "src/pages/MobileRegistration.jsx",
+      "line": 72,
+      "text": "const res = await base44.functions.invoke(\"userOnboarding\", { action: \"getProfile\" });"
+    },
+    {
+      "file": "src/pages/LuckyIdStore.jsx",
+      "line": 23,
+      "text": "base44.functions.invoke(\"applicationIdSystem\", { action: \"getMyId\" }),"
+    },
+    {
+      "file": "src/pages/LuckyIdStore.jsx",
+      "line": 24,
+      "text": "base44.functions.invoke(\"applicationIdSystem\", { action: \"listLuckyIds\" }),"
+    },
+    {
+      "file": "src/pages/LuckyIdStore.jsx",
+      "line": 43,
+      "text": "const res = await base44.functions.invoke(\"applicationIdSystem\", {"
+    },
+    {
+      "file": "src/pages/LuckyIdStore.jsx",
+      "line": 54,
+      "text": "base44.functions.invoke(\"applicationIdSystem\", { action: \"getMyId\" }),"
+    },
+    {
+      "file": "src/pages/LuckyIdStore.jsx",
+      "line": 55,
+      "text": "base44.functions.invoke(\"applicationIdSystem\", { action: \"listLuckyIds\" }),"
+    },
+    {
+      "file": "src/pages/LuckyIdStore.jsx",
+      "line": 68,
+      "text": "const res = await base44.functions.invoke(\"applicationIdSystem\", { action: \"getMyHistory\" });"
+    },
+    {
+      "file": "src/components/shared/roleHierarchy.js",
+      "line": 54,
+      "text": "const res = await base44.functions.invoke(\"enterpriseHierarchy\", { action: \"getAll\" });"
+    },
+    {
+      "file": "src/components/live-room/SeatProfilePopup.jsx",
+      "line": 71,
+      "text": "const res = await base44.functions.invoke(\"moderateRoom\", {"
+    },
+    {
+      "file": "src/components/live-room/SeatProfilePopup.jsx",
+      "line": 95,
+      "text": "const res = await base44.functions.invoke(\"moderateRoom\", {"
+    },
+    {
+      "file": "src/components/home/RoomFeeds.jsx",
+      "line": 8,
+      "text": "await base44.functions.invoke(\"homeFeedActions\", {"
+    },
+    {
+      "file": "src/components/home/LiveFeed.jsx",
+      "line": 19,
+      "text": "await base44.functions.invoke(\"homeFeedActions\", {"
+    },
+    {
+      "file": "src/components/home/HomeSearchOverlay.jsx",
+      "line": 31,
+      "text": "await base44.functions.invoke(\"userSearch\", {"
+    },
+    {
+      "file": "src/components/home/HomeSearchOverlay.jsx",
+      "line": 67,
+      "text": "const res = await base44.functions.invoke(\"userSearch\", { action: \"search\", query: query.trim() });"
+    },
+    {
+      "file": "src/components/home/WelcomeBonusPopup.jsx",
+      "line": 22,
+      "text": "await base44.functions.invoke(\"userOnboarding\", { action: \"claimWelcomeBonus\" });"
+    },
+    {
+      "file": "src/components/home/PeopleSuggestions.jsx",
+      "line": 17,
+      "text": "await base44.functions.invoke(\"homeFeedActions\", {"
+    },
+    {
+      "file": "src/components/owner-dashboard/UserDataSection.jsx",
+      "line": 68,
+      "text": "const res = await base44.functions.invoke(\"userData\", { action: \"listUsers\", search, limit: 100 });"
+    },
+    {
+      "file": "src/components/owner-dashboard/UserDataSection.jsx",
+      "line": 86,
+      "text": "const res = await base44.functions.invoke(\"userData\", { action: \"getDetection\", target_user_id: userId });"
+    },
+    {
+      "file": "src/components/owner-dashboard/GlobalSearch.jsx",
+      "line": 17,
+      "text": "const res = await base44.functions.invoke(\"userSearch\", {"
+    },
+    {
+      "file": "src/components/settings/DeviceSettingsTab.jsx",
+      "line": 20,
+      "text": "const res = await base44.functions.invoke(\"deviceSettings\", { action: \"get\" });"
+    },
+    {
+      "file": "src/components/settings/DeviceSettingsTab.jsx",
+      "line": 37,
+      "text": "const res = await base44.functions.invoke(\"deviceSettings\", { action: \"update\", [key]: value });"
+    },
+    {
+      "file": "src/components/settings/DeviceSettingsTab.jsx",
+      "line": 52,
+      "text": "const res = await base44.functions.invoke(\"deviceSettings\", { action: \"send_otp\", phone_number: phoneInput.trim() });"
+    },
+    {
+      "file": "src/components/settings/DeviceSettingsTab.jsx",
+      "line": 69,
+      "text": "const res = await base44.functions.invoke(\"deviceSettings\", { action: \"verify_otp\", phone_number: phoneInput.trim(), otp: otpInput.trim() });"
+    },
+    {
+      "file": "src/components/settings/DeviceSettingsTab.jsx",
+      "line": 83,
+      "text": "const res = await base44.functions.invoke(\"deviceSettings\", { action: \"update\", [field]: value });"
+    },
+    {
+      "file": "src/components/settings/PrivacySettingsTab.jsx",
+      "line": 16,
+      "text": "const res = await base44.functions.invoke(\"privacySettings\", { action: \"get\" });"
+    },
+    {
+      "file": "src/components/settings/PrivacySettingsTab.jsx",
+      "line": 33,
+      "text": "const res = await base44.functions.invoke(\"privacySettings\", { action: \"update\", [key]: value });"
+    },
+    {
+      "file": "src/components/settings/PrivacySettingsTab.jsx",
+      "line": 44,
+      "text": "const res = await base44.functions.invoke(\"privacySettings\", { action: \"update\", [key]: value });"
+    },
+    {
+      "file": "src/components/settings/PrivacySettingsTab.jsx",
+      "line": 53,
+      "text": "const res = await base44.functions.invoke(\"privacySettings\", { action: \"request_verification\" });"
+    },
+    {
+      "file": "src/components/my-profile/MyProfileHeader.jsx",
+      "line": 40,
+      "text": "await base44.functions.invoke(\"userOnboarding\", {"
+    },
+    {
+      "file": "src/components/my-profile/MyProfileHeader.jsx",
+      "line": 52,
+      "text": "await base44.functions.invoke(\"userOnboarding\", {"
+    },
+    {
+      "file": "src/components/edit-profile/MediaUploader.jsx",
+      "line": 23,
+      "text": "const res = await base44.functions.invoke(\"uploadFile\", {"
+    },
+    {
+      "file": "src/components/profile-setup/PhotoStep.jsx",
+      "line": 27,
+      "text": "const res = await base44.functions.invoke(\"uploadFile\", {"
+    },
+    {
+      "file": "src/components/profile-setup/UsernameStep.jsx",
+      "line": 20,
+      "text": "const res = await base44.functions.invoke(\"userOnboarding\", { action: \"checkUsername\", username });"
+    },
+    {
+      "file": "src/components/profile-setup/AccountCreationStep.jsx",
+      "line": 12,
+      "text": "await base44.functions.invoke(\"userOnboarding\", {"
+    }
+  ],
+  "invalid_table_mappings": [
+    "chat_conversations",
+    "community_channels",
+    "community_media",
+    "community_reports",
+    "content_moderation_logs",
+    "device_records",
+    "enforcement_actions",
+    "enterprise_roles",
+    "friend_requests",
+    "privacy_settings",
+    "room_sessions",
+    "security_alerts",
+    "user_purchases",
+    "verification_records"
+  ]
+}

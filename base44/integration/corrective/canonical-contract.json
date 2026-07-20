@@ -1,0 +1,169 @@
+{
+  "supabase_project": "zohtjywggezadhqwfzrh",
+  "description": "Canonical RPC/table/realtime mapping for VYRO Live Connect. All frontend data access must use these canonical Supabase objects via src/lib/backendGateway.js or the RLS-protected table reads via the global Supabase client.",
+  "temporary_bridges": {
+    "supabaseAuth": "Auth session management — kept until direct Supabase auth.setSession is wired",
+    "supabaseConfig": "Returns SUPABASE_URL + SUPABASE_ANON_KEY to the browser — no authoritative data",
+    "uploadFile": "File upload to Base44 storage — no authoritative data",
+    "aiTools": "InvokeLLM wrapper — no authoritative data",
+    "aiSafetyMonitor": "AI safety monitoring — no authoritative data",
+    "schemaDiscovery": "Temporary schema introspection — delete after migration"
+  },
+  "rpc_mapping": {
+    "identity": {
+      "vyro_refresh_my_backend": { "purpose": "Refresh backend identity after login", "invoker": "SECURITY DEFINER", "auth": true },
+      "vyro_get_my_identity": { "purpose": "Get current user identity", "invoker": "SECURITY DEFINER", "auth": true },
+      "vyro_get_my_profile_identity": { "purpose": "Get current user profile + identity", "invoker": "SECURITY DEFINER", "auth": true },
+      "vyro_sync_identity": { "purpose": "Sync identity records", "invoker": "SECURITY DEFINER", "auth": true },
+      "vyro_update_my_profile": { "purpose": "Update current user profile", "invoker": "SECURITY DEFINER", "auth": true }
+    },
+    "profile": {
+      "vyro_get_my_profile_home": { "purpose": "Get profile home data", "auth": true },
+      "vyro_get_public_profile": { "purpose": "Get public profile by user_id/global_id", "auth": true },
+      "vyro_get_user_profile_posts": { "purpose": "Get user's community posts", "auth": true },
+      "vyro_user_profile_action": { "purpose": "Profile CRUD action", "auth": true },
+      "vyro_profile_stats_action": { "purpose": "Profile stats action", "auth": true }
+    },
+    "wallet": {
+      "vyro_get_my_wallet_transactions": { "purpose": "Get wallet transaction history", "auth": true },
+      "vyro_create_recharge_intent": { "purpose": "Create coin recharge intent", "auth": true },
+      "vyro_complete_recharge_payment": { "purpose": "Complete recharge payment", "auth": true },
+      "vyro_request_withdrawal": { "purpose": "Request coin withdrawal", "auth": true },
+      "vyro_review_withdrawal": { "purpose": "Review withdrawal (admin)", "auth": true },
+      "vyro_transfer_coins": { "purpose": "Transfer coins between users", "auth": true },
+      "vyro_wallet_apply": { "purpose": "Apply wallet operation", "auth": true }
+    },
+    "room": {
+      "vyro_create_live_room": { "purpose": "Create a live room", "auth": true },
+      "vyro_join_live_room": { "purpose": "Join a live room", "auth": true },
+      "vyro_leave_live_room": { "purpose": "Leave a live room", "auth": true },
+      "vyro_start_live_room": { "purpose": "Start live room session", "auth": true },
+      "vyro_close_live_room": { "purpose": "Close live room", "auth": true },
+      "vyro_send_room_message": { "purpose": "Send chat message in room", "auth": true },
+      "vyro_delete_room_message": { "purpose": "Delete room message", "auth": true },
+      "vyro_manage_seat": { "purpose": "Manage seat in live room", "auth": true },
+      "vyro_invite_to_seat": { "purpose": "Invite user to seat", "auth": true },
+      "vyro_refresh_live_room_state": { "purpose": "Refresh live room state", "auth": true },
+      "vyro_get_room_finance_realtime": { "purpose": "Get room finance realtime data", "auth": true },
+      "vyro_save_live_room_draft": { "purpose": "Save live room draft", "auth": true },
+      "vyro_get_or_create_private_chat": { "purpose": "Get or create private chat", "auth": true }
+    },
+    "social": {
+      "vyro_user_social_action": { "purpose": "Follow/unfollow/block user", "auth": true },
+      "vyro_social_actor": { "purpose": "Social action actor", "auth": true },
+      "vyro_respond_friend_request": { "purpose": "Accept/reject friend request", "auth": true },
+      "vyro_block_user": { "purpose": "Block a user", "auth": true },
+      "vyro_is_blocked_between": { "purpose": "Check if blocked between users", "auth": true }
+    },
+    "community": {
+      "vyro_get_community_feed": { "purpose": "Get community feed", "auth": true },
+      "vyro_get_community_home": { "purpose": "Get community home data", "auth": true },
+      "vyro_create_community_post": { "purpose": "Create community post", "auth": true },
+      "vyro_edit_community_post": { "purpose": "Edit community post", "auth": true },
+      "vyro_delete_community_post": { "purpose": "Delete community post", "auth": true },
+      "vyro_toggle_post_like": { "purpose": "Like/unlike post", "auth": true },
+      "vyro_toggle_saved_post": { "purpose": "Save/unsave post", "auth": true },
+      "vyro_report_community_post": { "purpose": "Report community post", "auth": true },
+      "vyro_get_post_comments": { "purpose": "Get post comments", "auth": true },
+      "vyro_create_post_comment": { "purpose": "Create post comment", "auth": true },
+      "vyro_send_post_gift": { "purpose": "Send gift on post", "auth": true },
+      "vyro_share_post": { "purpose": "Share post", "auth": true }
+    },
+    "vip": {
+      "vyro_get_my_vip_context": { "purpose": "Get VIP context for current user", "auth": true },
+      "vyro_vip_membership_action": { "purpose": "VIP membership purchase/upgrade/renew", "auth": true },
+      "vyro_vip_membership_home": { "purpose": "VIP membership home data", "auth": true },
+      "vyro_claim_vip_daily_reward": { "purpose": "Claim VIP daily reward", "auth": true },
+      "vyro_claim_vip_monthly_bonus": { "purpose": "Claim VIP monthly bonus", "auth": true },
+      "vyro_user_has_active_vip": { "purpose": "Check if user has active VIP", "auth": true },
+      "vyro_vip_manager_action": { "purpose": "VIP manager dashboard action", "auth": true }
+    },
+    "gift": {
+      "vyro_send_gift": { "purpose": "Send gift (atomic wallet debit + commission)", "auth": true }
+    },
+    "role": {
+      "vyro_submit_role_application": { "purpose": "Submit role application", "auth": true },
+      "vyro_review_role_application": { "purpose": "Review role application (admin)", "auth": true },
+      "vyro_resubmit_role_application": { "purpose": "Resubmit role application", "auth": true },
+      "vyro_user_has_role": { "purpose": "Check if user has role", "auth": true },
+      "vyro_resolve_role": { "purpose": "Resolve role for user", "auth": true },
+      "vyro_apply_center_home": { "purpose": "Apply center home data", "auth": true },
+      "vyro_apply_center_submit": { "purpose": "Submit application via apply center", "auth": true }
+    },
+    "dashboard": {
+      "vyro_user_dashboard_home": { "purpose": "User dashboard home", "auth": true },
+      "vyro_user_dashboard_manifest": { "purpose": "User dashboard manifest", "auth": true },
+      "vyro_sync_dashboard_access_for_user": { "purpose": "Sync dashboard access", "auth": true },
+      "vyro_dashboard_code_for_role": { "purpose": "Get dashboard code for role", "auth": true }
+    },
+    "notification": {
+      "vyro_user_notification_action": { "purpose": "Notification CRUD", "auth": true }
+    },
+    "task_reward": {
+      "vyro_user_reward_action": { "purpose": "Claim reward", "auth": true },
+      "vyro_claim_user_level_reward": { "purpose": "Claim level reward", "auth": true },
+      "vyro_user_level_action": { "purpose": "Level system action", "auth": true }
+    },
+    "mall": {
+      "vyro_user_action": { "purpose": "User action (mall/purchase)", "auth": true }
+    },
+    "verification": {
+      "vyro_user_safety_action": { "purpose": "Safety/verification action", "auth": true }
+    },
+    "security": {
+      "vyro_moderate_room_user": { "purpose": "Moderate room user", "auth": true }
+    }
+  },
+  "table_mapping": {
+    "UserProfile": { "canonical_table": "user_profiles", "access": "rls_read", "write_rpc": "vyro_user_profile_action" },
+    "PartyRoom": { "canonical_table": "party_rooms", "access": "rls_read", "write_rpc": "vyro_create_live_room" },
+    "Transaction": { "canonical_table": "wallet_transactions", "access": "rpc_only", "read_rpc": "vyro_get_my_wallet_transactions" },
+    "ChatMessage": { "canonical_table": "room_messages", "access": "rpc_only", "write_rpc": "vyro_send_room_message" },
+    "ChatConversation": { "canonical_table": "chat_conversations", "access": "rpc_only", "write_rpc": "vyro_get_or_create_private_chat" },
+    "Relationship": { "canonical_table": "relationships", "access": "rpc_only", "write_rpc": "vyro_user_social_action" },
+    "Achievement": { "canonical_table": "achievements", "access": "rls_read" },
+    "RoomParticipant": { "canonical_table": "room_participants", "access": "rls_read", "write_rpc": "vyro_join_live_room" },
+    "UserTask": { "canonical_table": "user_tasks", "access": "rls_read" },
+    "FriendRequest": { "canonical_table": "friend_requests", "access": "rls_read", "write_rpc": "vyro_respond_friend_request" },
+    "RoomSession": { "canonical_table": "room_sessions", "access": "rls_read" },
+    "Badge": { "canonical_table": "badges", "access": "rls_read" },
+    "UserPurchase": { "canonical_table": "user_purchases", "access": "rls_read", "write_rpc": "vyro_user_action" },
+    "PrivacySetting": { "canonical_table": "privacy_settings", "access": "rls_read", "write_rpc": "vyro_user_settings_action" },
+    "SecurityEvent": { "canonical_table": "security_events", "access": "rpc_only" },
+    "CommunityPost": { "canonical_table": "community_posts", "access": "rpc_only", "write_rpc": "vyro_create_community_post" },
+    "CommunityGroup": { "canonical_table": "community_groups", "access": "rpc_only", "write_rpc": "vyro_create_community_group" },
+    "EnforcementAction": { "canonical_table": "enforcement_actions", "access": "rpc_only" },
+    "VerificationRecord": { "canonical_table": "verification_records", "access": "rpc_only" },
+    "SupportTicket": { "canonical_table": "support_tickets", "access": "rls_read" },
+    "SecurityAlert": { "canonical_table": "security_alerts", "access": "rpc_only" },
+    "CommunityChannel": { "canonical_table": "community_channels", "access": "rpc_only" },
+    "CommunityMedia": { "canonical_table": "community_media", "access": "rpc_only" },
+    "CommunityReport": { "canonical_table": "community_reports", "access": "rpc_only" },
+    "DeviceRecord": { "canonical_table": "device_records", "access": "rpc_only" },
+    "ContentModerationLog": { "canonical_table": "content_moderation_logs", "access": "rpc_only" },
+    "Gift": { "canonical_table": "gifts", "access": "rls_read" },
+    "MallItem": { "canonical_table": "mall_items", "access": "rls_read" },
+    "EnterpriseRole": { "canonical_table": "enterprise_roles", "access": "rls_read" },
+    "RoleApplication": { "canonical_table": "role_applications", "access": "rpc_only", "write_rpc": "vyro_submit_role_application" }
+  },
+  "realtime_tables": [
+    "user_profiles", "wallet_transactions", "wallets", "coin_wallets", "wallet_ledger",
+    "party_rooms", "live_rooms", "voice_rooms", "room_participants", "room_members",
+    "room_seats", "room_messages", "room_gifts", "live_sessions",
+    "messages", "chats", "follows", "friends", "relationships", "relationship_requests",
+    "blocked_users", "community_posts", "post_comments", "post_likes",
+    "notifications", "gift_transactions", "vip_memberships", "user_vip_memberships",
+    "achievements", "badges", "user_achievements", "user_badges",
+    "tasks", "rewards", "user_tasks", "user_rewards",
+    "mall_items", "user_purchases", "support_tickets",
+    "security_events", "security_alerts", "enforcement_actions", "fraud_detections",
+    "verification_records", "device_records", "role_applications",
+    "admin_dashboard_modules", "sam_dashboard_modules", "vip_manager_dashboard_modules",
+    "bd_dashboard_modules", "bm_dashboard_modules", "reward_dashboard_modules",
+    "support_dashboard_modules", "marketing_dashboard_modules", "event_dashboard_modules",
+    "pk_dashboard_modules", "finance_dashboard_modules", "agency_dashboard_modules",
+    "agent_dashboard_modules", "ao_dashboard_modules",
+    "creator_center_dashboards", "dashboard_access_matrix", "role_access_matrix",
+    "dashboard_action_registry", "user_role_identities", "vyro_role_ids"
+  ]
+}
