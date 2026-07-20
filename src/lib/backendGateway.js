@@ -222,7 +222,7 @@ export const dashboard = {
   userHome: () => rpc("vyro_user_dashboard_home", {}),
   userManifest: () => rpc("vyro_user_dashboard_manifest", {}),
   syncAccess: () => rpc("vyro_sync_dashboard_access_for_user", {}),
-  codeForRole: (roleCode) => rpc("vyro_dashboard_code_for_role", { role_code: roleCode }),
+  codeForRole: (roleCode) => rpc("vyro_dashboard_code_for_role", { p_role_code: roleCode }),
 };
 
 // ─── Notifications ─────────────────────────────────────────────────────────────
@@ -279,7 +279,7 @@ export const enterprise = {
 // ─── Generic RPC (for manager dashboards) ────────────────────────────────────────
 
 export const managerRpc = {
-  call: (rpcName, action, payload) => rpc(rpcName, { action, ...payload }),
+  call: (rpcName, action, payload) => rpc(rpcName, { p_action: action, p_payload: payload }),
 };
 
 // ─── Default export ─────────────────────────────────────────────────────────────
