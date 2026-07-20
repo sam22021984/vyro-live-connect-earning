@@ -19,6 +19,7 @@ import SystemHealthModule from "@/components/sam-dashboard/SystemHealthModule";
 import SamProfileModule from "@/components/sam-dashboard/SamProfileModule";
 import OcsReportCenterModule from "@/components/sam-dashboard/OcsReportCenterModule";
 import ReportToSection from "@/components/shared/ReportToSection";
+import LiveModuleSidebar from "@/components/shared/LiveModuleSidebar";
 
 const DARK_BG = "linear-gradient(160deg, #0A0F1E 0%, #131A2E 40%, #1A1240 100%)";
 const SOFT_WHITE = "#F4F0FA";
@@ -28,6 +29,24 @@ const GLASS = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(25
 const ICON_MAP = {
   LayoutDashboard, Users, Coins, Store, Smartphone, Wallet, ArrowDownCircle,
   Building2, Mic, Gift, BarChart3, ShieldCheck, Crown, Server, UserCog, ClipboardList,
+};
+
+// Maps DB module_code → SAM_MODULES id (used by LiveModuleSidebar resolver)
+const SAM_MODULE_MAP = {
+  overview: "overview",
+  users: "user_management",
+  coins: "coin_management",
+  coin_sellers: "seller_management",
+  offline_recharges: "offline_recharge",
+  wallets: "wallet_control",
+  withdrawals: "withdrawal_management",
+  agencies_agents: "agency_management",
+  hosts_live: "host_management",
+  gifts_revenue: "gift_revenue",
+  reports: "reports",
+  security: "security",
+  admin_control: "admin_control",
+  profile: "sam_profile",
 };
 
 function ModuleContent({ moduleId }) {
@@ -100,26 +119,17 @@ export default function SamDashboard() {
         {/* Module Grid */}
         <div className="px-4 pt-4">
           <h3 className="text-xs font-bold mb-2 px-1" style={{ color: SOFT_WHITE }}>Dashboard Modules</h3>
-          <div className="grid grid-cols-3 gap-2">
-            {SAM_MODULES.map((m) => {
-              const Icon = getIcon(m.icon);
-              return (
-                <button
-                  key={m.id}
-                  onClick={() => setActiveModule(m.id)}
-                  className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl transition active:scale-95"
-                  style={activeModule === m.id
-                    ? { background: m.gradient, boxShadow: `0 4px 12px ${m.color}40` }
-                    : { ...GLASS }}
-                >
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={activeModule === m.id ? { background: "rgba(255,255,255,0.2)" } : { background: `${m.color}20` }}>
-                    <Icon size={15} style={{ color: activeModule === m.id ? "#fff" : m.color }} />
-                  </div>
-                  <span className="text-[8px] font-bold text-center leading-tight" style={activeModule === m.id ? { color: "#fff" } : { color: SOFT_WHITE }}>{m.title}</span>
-                </button>
-              );
-            })}
-          </div>
+          <LiveModuleSidebar
+            dashboardCode="SAM_DASHBOARD"
+            iconMap={ICON_MAP}
+            activeSection={activeModule}
+            onNavigate={(id) => setActiveModule(id)}
+            staticSections={SAM_MODULES.map((m) => ({ id: m.id, label: m.title, icon: m.icon, color: m.color, gradient: m.gradient }))}
+            resolveSectionId={(m) => SAM_MODULE_MAP[m.module_code] || m.module_code}
+            defaultColor={GOLD}
+            gridCols={3}
+            theme="dark"
+          />
         </div>
 
         {/* Active Module Content */}

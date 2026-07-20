@@ -20,6 +20,7 @@ import {
   FIN_SETTINGS_GROUPS, FIN_EXCLUSIVE_TOOLS, FIN_REPORTING_STRUCTURE,
 } from "@/components/finance-manager/financeManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import LiveModuleSidebar from "@/components/shared/LiveModuleSidebar";
 import FinanceManagerPolicyTab from "@/components/finance-manager/FinanceManagerPolicyTab";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -955,20 +956,15 @@ export default function FinanceManagerDashboard() {
         {showSidebar && (
           <div className="px-4 pt-2 animate-fadeIn">
             <div className="rounded-2xl p-3" style={{ background: WHITE, border: "1px solid #E5E7EB" }}>
-              <div className="grid grid-cols-4 gap-2">
-                {FIN_SECTIONS.map((s, i) => {
-                  const Icon = ICONS[s.icon] || BarChart3;
-                  const isActive = s.id === activeSection;
-                  return (
-                    <button key={i} onClick={() => goToSection(s.id)} className="rounded-xl p-2 flex flex-col items-center gap-1 active:scale-95 transition" style={{ background: isActive ? `${s.color}10` : "#F7F9FC", border: isActive ? `1px solid ${s.color}30` : "1px solid transparent" }}>
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${s.color}10` }}>
-                        <Icon size={14} style={{ color: s.color }} />
-                      </div>
-                      <span className="text-[8px] font-semibold text-center" style={{ color: isActive ? s.color : DARK }}>{s.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <LiveModuleSidebar
+                dashboardCode="FINANCE_DASHBOARD"
+                iconMap={ICONS}
+                activeSection={activeSection}
+                onNavigate={(id) => goToSection(id)}
+                staticSections={FIN_SECTIONS}
+                resolveSectionId={(m) => ROUTE_TO_SECTION[m.module_code] || m.module_code}
+                defaultColor={FIN_GOLD}
+              />
             </div>
           </div>
         )}

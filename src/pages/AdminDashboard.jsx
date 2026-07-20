@@ -15,6 +15,7 @@ import {
   ADMIN_COMM_TYPES, ADMIN_ANALYTICS, ADMIN_AUDIT_LOGS, ADMIN_REPORTING_STRUCTURE,
 } from "@/components/admin-dashboard/adminDashboardData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import LiveModuleSidebar from "@/components/shared/LiveModuleSidebar";
 import AdminPolicyTab from "@/components/admin-dashboard/AdminPolicyTab";
 
 const ICONS = {
@@ -22,6 +23,12 @@ const ICONS = {
   BadgeCheck, LifeBuoy, AlertTriangle, PartyPopper, Swords, Megaphone,
   BarChart3, ScrollText, FileText, Bell, Radio, MessageSquare, Plus,
   Shield, Briefcase, ChevronDown, ArrowLeft, ChevronRight,
+};
+
+// Maps DB module_code → SECTIONS key for the live sidebar resolver
+const ADMIN_MODULE_MAP = {
+  dashboard: "overview",
+  tools: "policy",
 };
 
 const WHITE = "#FFFFFF";
@@ -579,20 +586,15 @@ export default function AdminDashboard() {
         {showSidebar && (
           <div className="px-4 pt-2 animate-fadeIn">
             <div className="rounded-2xl p-3" style={{ background: WHITE, border: "1px solid #E5E7EB" }}>
-              <div className="grid grid-cols-4 gap-2">
-                {ADMIN_SECTIONS.map((s, i) => {
-                  const Icon = ICONS[s.icon] || BarChart3;
-                  const isActive = s.id === activeSection;
-                  return (
-                    <button key={i} onClick={() => { setActiveSection(s.id); setShowSidebar(false); }} className="rounded-xl p-2 flex flex-col items-center gap-1 active:scale-95 transition" style={{ background: isActive ? `${s.color}10` : "#F7F9FC", border: isActive ? `1px solid ${s.color}30` : "1px solid transparent" }}>
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${s.color}10` }}>
-                        <Icon size={14} style={{ color: s.color }} />
-                      </div>
-                      <span className="text-[8px] font-semibold text-center" style={{ color: isActive ? s.color : DARK }}>{s.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <LiveModuleSidebar
+                dashboardCode="ADMIN_DASHBOARD"
+                iconMap={ICONS}
+                activeSection={activeSection}
+                onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }}
+                staticSections={ADMIN_SECTIONS}
+                resolveSectionId={(m) => ADMIN_MODULE_MAP[m.module_code] || m.module_code}
+                defaultColor="#64748B"
+              />
             </div>
           </div>
         )}

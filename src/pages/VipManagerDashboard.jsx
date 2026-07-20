@@ -17,6 +17,13 @@ import {
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import VipManagerPolicyTab from "@/components/vip-manager/VipManagerPolicyTab";
+import LiveModuleSidebar from "@/components/shared/LiveModuleSidebar";
+
+// Maps DB module_code → SECTIONS key for the live sidebar resolver
+const VIP_MODULE_MAP = {
+  dashboard: "overview",
+  countries: "country",
+};
 import {
   VIP_SECTIONS, VIP_KPIS, VIP_QUICK_ACTIONS, VIP_REALTIME_COUNTERS,
   VIP_LIVE_STREAM, VIP_MEMBERS, VIP_LEVELS, VIP_REWARDS, VIP_EVENTS,
@@ -786,20 +793,15 @@ export default function VipManagerDashboard() {
         {showSidebar && (
           <div className="px-4 pt-2 animate-fadeIn">
             <div className="rounded-2xl p-3" style={{ background: WHITE, border: "1px solid #E5E7EB" }}>
-              <div className="grid grid-cols-4 gap-2">
-                {VIP_SECTIONS.map((s, i) => {
-                  const Icon = ICONS[s.icon] || Activity;
-                  const isActive = s.id === activeSection;
-                  return (
-                    <button key={i} onClick={() => { setActiveSection(s.id); setShowSidebar(false); }} className="rounded-xl p-2 flex flex-col items-center gap-1 active:scale-95 transition" style={{ background: isActive ? `${s.color}10` : "#F7F9FC", border: isActive ? `1px solid ${s.color}30` : "1px solid transparent" }}>
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${s.color}10` }}>
-                        <Icon size={14} style={{ color: s.color }} />
-                      </div>
-                      <span className="text-[8px] font-semibold text-center" style={{ color: isActive ? s.color : DARK }}>{s.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <LiveModuleSidebar
+                dashboardCode="VIP_MANAGER_DASHBOARD"
+                iconMap={ICONS}
+                activeSection={activeSection}
+                onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }}
+                staticSections={VIP_SECTIONS}
+                resolveSectionId={(m) => VIP_MODULE_MAP[m.module_code] || m.module_code}
+                defaultColor={GOLD}
+              />
             </div>
           </div>
         )}

@@ -21,7 +21,26 @@ import {
   SUPPORT_PERMISSIONS_ALLOWED, SUPPORT_PERMISSIONS_RESTRICTED,
 } from "@/components/support-manager/supportManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import LiveModuleSidebar from "@/components/shared/LiveModuleSidebar";
 import SupportManagerPolicyTab from "@/components/support-manager/SupportManagerPolicyTab";
+
+// Maps DB module_code → SECTIONS key for the live sidebar resolver
+const SUPPORT_MODULE_MAP = {
+  dashboard: "overview",
+  live_support: "live",
+  escalations: "tickets",
+  users: "user_support",
+  hosts: "host_support",
+  agents: "agent_support",
+  agencies: "agency_support",
+  payments: "payment",
+  categories: "knowledge",
+  sla: "tickets",
+  quality: "analytics",
+  ai: "analytics",
+  team: "staff",
+  settings: "tools",
+};
 
 const ICONS = {
   LayoutDashboard, Ticket, User, Mic, Handshake, Building2, Crown, Lock,
@@ -530,20 +549,15 @@ export default function SupportManagerDashboard() {
         {showSidebar && (
           <div className="px-4 pt-2 animate-fadeIn">
             <div className="rounded-2xl p-3" style={{ background: WHITE, border: "1px solid #E5E7EB" }}>
-              <div className="grid grid-cols-4 gap-2">
-                {SUPPORT_SECTIONS.map((s, i) => {
-                  const Icon = ICONS[s.icon] || BarChart3;
-                  const isActive = s.id === activeSection;
-                  return (
-                    <button key={i} onClick={() => { setActiveSection(s.id); setShowSidebar(false); }} className="rounded-xl p-2 flex flex-col items-center gap-1 active:scale-95 transition" style={{ background: isActive ? `${s.color}10` : "#F7F9FC", border: isActive ? `1px solid ${s.color}30` : "1px solid transparent" }}>
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${s.color}10` }}>
-                        <Icon size={14} style={{ color: s.color }} />
-                      </div>
-                      <span className="text-[8px] font-semibold text-center" style={{ color: isActive ? s.color : DARK }}>{s.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <LiveModuleSidebar
+                dashboardCode="SUPPORT_DASHBOARD"
+                iconMap={ICONS}
+                activeSection={activeSection}
+                onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }}
+                staticSections={SUPPORT_SECTIONS}
+                resolveSectionId={(m) => SUPPORT_MODULE_MAP[m.module_code] || m.module_code}
+                defaultColor="#2F80ED"
+              />
             </div>
           </div>
         )}

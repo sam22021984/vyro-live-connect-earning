@@ -19,6 +19,7 @@ import {
   PK_SETTINGS_GROUPS, PK_EXCLUSIVE_TOOLS, PK_REPORTING_STRUCTURE,
 } from "@/components/pk-manager/pkManagerData";
 import ReportToSection from "@/components/shared/ReportToSection";
+import LiveModuleSidebar from "@/components/shared/LiveModuleSidebar";
 import PkManagerPolicyTab from "@/components/pk-manager/PkManagerPolicyTab";
 
 const ICONS = {
@@ -798,20 +799,14 @@ export default function PkManagerDashboard() {
         {showSidebar && (
           <div className="px-4 pt-2 animate-fadeIn">
             <div className="rounded-2xl p-3" style={{ background: WHITE, border: "1px solid #E5E7EB" }}>
-              <div className="grid grid-cols-4 gap-2">
-                {PK_SECTIONS.map((s, i) => {
-                  const Icon = ICONS[s.icon] || BarChart3;
-                  const isActive = s.id === activeSection;
-                  return (
-                    <button key={i} onClick={() => { setActiveSection(s.id); setShowSidebar(false); }} className="rounded-xl p-2 flex flex-col items-center gap-1 active:scale-95 transition" style={{ background: isActive ? `${s.color}10` : "#F7F9FC", border: isActive ? `1px solid ${s.color}30` : "1px solid transparent" }}>
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${s.color}10` }}>
-                        <Icon size={14} style={{ color: s.color }} />
-                      </div>
-                      <span className="text-[8px] font-semibold text-center" style={{ color: isActive ? s.color : DARK }}>{s.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <LiveModuleSidebar
+                dashboardCode="PK_DASHBOARD"
+                iconMap={ICONS}
+                activeSection={activeSection}
+                onNavigate={(id) => { setActiveSection(id); setShowSidebar(false); }}
+                staticSections={PK_SECTIONS}
+                defaultColor="#EF4444"
+              />
             </div>
           </div>
         )}

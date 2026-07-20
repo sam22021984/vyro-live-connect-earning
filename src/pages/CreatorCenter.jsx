@@ -8,19 +8,19 @@ import { base44 } from "@/api/base44Client";
 import { dashboards } from "@/components/creator/creatorData";
 import CreatorStatsBanner from "@/components/creator/CreatorStatsBanner";
 import { useCreatorCenter } from "@/hooks/useCreatorCenter";
-import { useDashboardRegistry, selectModulesByDashboard } from "@/hooks/useDashboardRegistry";
+import { useDashboardRegistry, selectNormalizedModules } from "@/hooks/useDashboardRegistry";
 import { useBackNav } from "@/hooks/useBackNav";
 
 // Maps static dashboard id → registry dashboard_code (creator_center_dashboards).
 // Used to enrich cards with live module counts from dashboard_action_registry.
 const DASHBOARD_CODE_MAP = {
   owner: ["AO_DASHBOARD"],
-  sam: ["SAM_DASHBOARD", "SUPER_ADMIN_DASHBOARD"],
+  sam: ["SAM_DASHBOARD"],
   country: ["CM_DASHBOARD"],
   bdev: ["BD_DASHBOARD"],
   business: ["BM_DASHBOARD"],
   support: ["SUPPORT_DASHBOARD"],
-  finance: ["FINANCE_DASHBOARD", "FINANCE_MANAGER_DASHBOARD"],
+  finance: ["FINANCE_DASHBOARD"],
   marketing: ["MARKETING_DASHBOARD"],
   vip: ["VIP_MANAGER_DASHBOARD"],
   reward: ["REWARD_DASHBOARD"],
@@ -42,13 +42,13 @@ export default function CreatorCenter() {
   const handleBack = useBackNav("/more-services");
   const { profile, stats, hasRealStats, loading, approvedApplications } = useCreatorCenter();
   const { data: registry } = useDashboardRegistry();
-  const modulesByDashboard = selectModulesByDashboard(registry);
 
   const liveModulesFor = (id) => {
     const codes = DASHBOARD_CODE_MAP[id];
     if (!codes) return null;
     for (const c of codes) {
-      if (modulesByDashboard[c]?.length) return modulesByDashboard[c];
+      const mods = selectNormalizedModules(registry, c);
+      if (mods?.length) return mods;
     }
     return null;
   };
