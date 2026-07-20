@@ -19,10 +19,7 @@ export function useEnterpriseRoles() {
 
   useEffect(() => {
     loadRoles();
-    const unsubscribe = base44.entities.EnterpriseRole.subscribe(() => {
-      loadRoles();
-    });
-    return () => unsubscribe();
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, [loadRoles]);
 
   // Build a lookup map by role_key

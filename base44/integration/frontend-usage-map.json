@@ -1,0 +1,266 @@
+{
+  "description": "Current Base44 entity/function usage inventory and canonical Supabase targets. Each entry maps a legacy Base44 entity or function.invoke to its canonical Supabase RPC or RLS table.",
+  "entities": {
+    "UserProfile": {
+      "current_usages": 64,
+      "canonical": "table:user_profiles",
+      "read_method": "supabase.from('user_profiles').select()",
+      "write_rpc": "vyro_user_profile_action",
+      "identity_rpc": "vyro_get_my_profile_identity",
+      "status": "migrate"
+    },
+    "PartyRoom": {
+      "current_usages": 11,
+      "canonical": "table:party_rooms",
+      "read_method": "supabase.from('party_rooms').select()",
+      "write_rpc": "vyro_create_live_room",
+      "status": "migrate"
+    },
+    "Transaction": {
+      "current_usages": 10,
+      "canonical": "rpc:vyro_get_my_wallet_transactions",
+      "read_rpc": "vyro_get_my_wallet_transactions",
+      "status": "migrate"
+    },
+    "ChatMessage": {
+      "current_usages": 10,
+      "canonical": "rpc:vyro_send_room_message",
+      "write_rpc": "vyro_send_room_message",
+      "status": "migrate"
+    },
+    "ChatConversation": {
+      "current_usages": 9,
+      "canonical": "rpc:vyro_get_or_create_private_chat",
+      "write_rpc": "vyro_get_or_create_private_chat",
+      "status": "migrate"
+    },
+    "Relationship": {
+      "current_usages": 9,
+      "canonical": "rpc:vyro_user_social_action",
+      "write_rpc": "vyro_user_social_action",
+      "status": "migrate"
+    },
+    "Achievement": {
+      "current_usages": 7,
+      "canonical": "table:achievements",
+      "read_method": "supabase.from('achievements').select()",
+      "status": "migrate"
+    },
+    "RoomParticipant": {
+      "current_usages": 7,
+      "canonical": "table:room_participants",
+      "read_method": "supabase.from('room_participants').select()",
+      "write_rpc": "vyro_join_live_room",
+      "status": "migrate"
+    },
+    "UserTask": {
+      "current_usages": 6,
+      "canonical": "table:user_tasks",
+      "read_method": "supabase.from('user_tasks').select()",
+      "status": "migrate"
+    },
+    "FriendRequest": {
+      "current_usages": 4,
+      "canonical": "table:friend_requests",
+      "read_method": "supabase.from('friend_requests').select()",
+      "write_rpc": "vyro_respond_friend_request",
+      "status": "migrate"
+    },
+    "RoomSession": {
+      "current_usages": 4,
+      "canonical": "table:room_sessions",
+      "read_method": "supabase.from('room_sessions').select()",
+      "status": "migrate"
+    },
+    "Badge": {
+      "current_usages": 4,
+      "canonical": "table:badges",
+      "read_method": "supabase.from('badges').select()",
+      "status": "migrate"
+    },
+    "UserPurchase": {
+      "current_usages": 4,
+      "canonical": "table:user_purchases",
+      "read_method": "supabase.from('user_purchases').select()",
+      "write_rpc": "vyro_user_action",
+      "status": "migrate"
+    },
+    "PrivacySetting": {
+      "current_usages": 2,
+      "canonical": "table:privacy_settings",
+      "read_method": "supabase.from('privacy_settings').select()",
+      "write_rpc": "vyro_user_settings_action",
+      "status": "migrate"
+    },
+    "SecurityEvent": {
+      "current_usages": 2,
+      "canonical": "table:security_events",
+      "read_method": "supabase.from('security_events').select()",
+      "status": "migrate"
+    },
+    "CommunityPost": {
+      "current_usages": 2,
+      "canonical": "rpc:vyro_get_community_feed",
+      "read_rpc": "vyro_get_community_feed",
+      "write_rpc": "vyro_create_community_post",
+      "status": "migrate"
+    },
+    "CommunityGroup": {
+      "current_usages": 2,
+      "canonical": "rpc:vyro_get_community_home",
+      "write_rpc": "vyro_create_community_group",
+      "status": "migrate"
+    },
+    "EnforcementAction": {
+      "current_usages": 2,
+      "canonical": "table:enforcement_actions",
+      "read_method": "supabase.from('enforcement_actions').select()",
+      "status": "migrate"
+    },
+    "VerificationRecord": {
+      "current_usages": 2,
+      "canonical": "table:verification_records",
+      "read_method": "supabase.from('verification_records').select()",
+      "status": "migrate"
+    },
+    "SupportTicket": {
+      "current_usages": 1,
+      "canonical": "table:support_tickets",
+      "read_method": "supabase.from('support_tickets').select()",
+      "status": "migrate"
+    },
+    "SecurityAlert": {
+      "current_usages": 1,
+      "canonical": "table:security_alerts",
+      "read_method": "supabase.from('security_alerts').select()",
+      "status": "migrate"
+    },
+    "CommunityChannel": {
+      "current_usages": 1,
+      "canonical": "rpc:vyro_get_community_home",
+      "status": "migrate"
+    },
+    "CommunityMedia": {
+      "current_usages": 1,
+      "canonical": "rpc:vyro_get_community_feed",
+      "status": "migrate"
+    },
+    "CommunityReport": {
+      "current_usages": 1,
+      "canonical": "rpc:vyro_review_community_report",
+      "status": "migrate"
+    },
+    "DeviceRecord": {
+      "current_usages": 1,
+      "canonical": "table:device_records",
+      "read_method": "supabase.from('device_records').select()",
+      "status": "migrate"
+    },
+    "ContentModerationLog": {
+      "current_usages": 1,
+      "canonical": "table:content_moderation_logs",
+      "read_method": "supabase.from('content_moderation_logs').select()",
+      "status": "migrate"
+    },
+    "Gift": {
+      "current_usages": 1,
+      "canonical": "table:gifts",
+      "read_method": "supabase.from('gifts').select()",
+      "status": "migrate"
+    },
+    "MallItem": {
+      "current_usages": 1,
+      "canonical": "table:mall_items",
+      "read_method": "supabase.from('mall_items').select()",
+      "status": "migrate"
+    },
+    "EnterpriseRole": {
+      "current_usages": 0,
+      "canonical": "table:enterprise_roles",
+      "read_method": "supabase.from('enterprise_roles').select()",
+      "status": "migrate"
+    },
+    "RoleApplication": {
+      "current_usages": 0,
+      "canonical": "rpc:vyro_submit_role_application",
+      "write_rpc": "vyro_submit_role_application",
+      "status": "migrate"
+    }
+  },
+  "functions": {
+    "supabaseAuth": { "status": "keep_bridge", "reason": "Auth session management" },
+    "supabaseConfig": { "status": "keep_bridge", "reason": "Returns Supabase URL + anon key" },
+    "uploadFile": { "status": "keep_bridge", "reason": "File upload to storage" },
+    "aiTools": { "status": "keep_bridge", "reason": "InvokeLLM wrapper" },
+    "aiSafetyMonitor": { "status": "keep_bridge", "reason": "AI safety monitoring" },
+    "schemaDiscovery": { "status": "delete_after", "reason": "Temporary schema introspection" },
+    "refreshBackendIdentity": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_refresh_my_backend" },
+    "userOnboarding": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_profile_action" },
+    "sendGift": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_send_gift" },
+    "createLiveRoom": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_create_live_room" },
+    "joinLiveRoom": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_join_live_room" },
+    "endLiveRoom": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_close_live_room" },
+    "coinsRecharge": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_create_recharge_intent" },
+    "paypalRecharge": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_complete_recharge_payment" },
+    "paypalWithdraw": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_request_withdrawal" },
+    "processPurchase": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_action" },
+    "processVipPurchase": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_vip_membership_action" },
+    "claimReward": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_reward_action" },
+    "roleApplications": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_submit_role_application" },
+    "userData": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_profile_action" },
+    "socialData": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_social_action" },
+    "homeFeedActions": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_get_community_feed" },
+    "roomSecurity": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_moderate_room_user" },
+    "roomMonitoring": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_refresh_live_room_state" },
+    "roomProfit": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_evaluate_live_room_profitability" },
+    "roomShutDown": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_close_live_room" },
+    "roomClose": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_close_live_room" },
+    "roomUserAccounts": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_moderate_room_user" },
+    "securitySystem": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_safety_action" },
+    "moderateContent": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_moderate_room_user" },
+    "moderateRoom": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_moderate_room_user" },
+    "sellerOperations": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_submit_coin_seller_application" },
+    "enterpriseHierarchy": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_resolve_role" },
+    "zegoToken": { "status": "keep_bridge", "reason": "ZegoCloud token generation" },
+    "zimToken": { "status": "keep_bridge", "reason": "ZIM token generation" },
+    "faceVerification": { "status": "keep_bridge", "reason": "Face verification service" },
+    "applicationIdSystem": { "status": "keep_bridge", "reason": "Application ID system" },
+    "chatNotificationCenter": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_notification_action" },
+    "controlPanelApi": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_owner_wallet_action" },
+    "creatorCenterApi": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_dashboard_code_for_role" },
+    "dashboardApi": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_dashboard_home" },
+    "dashboardData": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_dashboard_home" },
+    "dashboardRegistry": { "status": "keep_bridge", "reason": "Dashboard registry aggregator" },
+    "deleteUsers": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_profile_action" },
+    "deviceSettings": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_settings_action" },
+    "eventTracker": { "status": "keep_bridge", "reason": "Event tracking" },
+    "getPlatformStats": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_dashboard_home" },
+    "getSystemDashboard": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_dashboard_home" },
+    "mobileSettings": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_settings_action" },
+    "paypalWebhook": { "status": "keep_bridge", "reason": "PayPal webhook handler" },
+    "privacySettings": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_settings_action" },
+    "servicesData": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_dashboard_home" },
+    "supabaseProxy": { "status": "keep_bridge", "reason": "Service-role proxy for Supabase edge functions" },
+    "trackEvent": { "status": "keep_bridge", "reason": "Event tracking" },
+    "userSearch": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_user_profile_action" },
+    "vipRewardSystem": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_vip_manager_reward_action" },
+    "vyroGlobalIdentity": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_get_my_identity" },
+    "vyroRoleIdentity": { "status": "migrate_to_gateway", "canonical_rpc": "vyro_resolve_role" },
+    "aiOrchestrator": { "status": "keep_bridge", "reason": "AI orchestrator" }
+  },
+  "subscribe_usages": {
+    "count": 39,
+    "action": "remove_all",
+    "replacement": "GlobalRealtimeProvider handles all realtime invalidation via single global channel",
+    "files": [
+      "src/components/live-room/GiftLeaderboard.jsx",
+      "src/components/shared/roleHierarchy.js",
+      "src/hooks/useAdminDashboard.js",
+      "src/hooks/useCommunityData.js",
+      "src/hooks/useEnterpriseRoles.js",
+      "src/hooks/useLevelDashboard.js",
+      "src/hooks/useMultiDashboardRealtime.js",
+      "src/hooks/useSocialData.js"
+    ]
+  }
+}

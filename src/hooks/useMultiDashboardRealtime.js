@@ -1,10 +1,16 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabaseClient";
 
+/**
+ * Fetches initial data from RLS-protected Supabase tables.
+ *
+ * Realtime invalidation is handled globally by GlobalRealtimeProvider
+ * (single authenticated channel at the app root). This hook no longer
+ * creates per-page channels — it only does the initial fetch.
+ */
 export function useMultiDashboardRealtime(tableNames = []) {
   const [data, setData] = useState({});
   const [status, setStatus] = useState("idle");
-  const channelsRef = useRef([]);
 
   useEffect(() => {
     let active = true;
@@ -13,7 +19,6 @@ export function useMultiDashboardRealtime(tableNames = []) {
       try {
         setStatus("connecting");
         const supabase = await getSupabase();
-        const channels = [];
 
         // Initial fetch for all tables
         const initialData = {};
@@ -23,37 +28,10 @@ export function useMultiDashboardRealtime(tableNames = []) {
             initialData[table] = rows || [];
           })
         );
-        if (active) setData(initialData);
-
-        tableNames.forEach((table) => {
-          const channel = supabase
-            .channel(`live-dashboard-${table}`)
-            .on(
-              "postgres_changes",
-              { event: "*", schema: "public", table },
-              (payload) => {
-                if (!active) return;
-                const { eventType, new: newRow, old: oldRow } = payload;
-                setData((prev) => {
-                  const arr = prev[table] || [];
-                  let next = arr;
-                  if (eventType === "INSERT") next = [...arr, newRow];
-                  else if (eventType === "UPDATE")
-                    next = arr.map((r) => (r.id === newRow.id ? newRow : r));
-                  else if (eventType === "DELETE")
-                    next = arr.filter((r) => r.id !== oldRow.id);
-                  return { ...prev, [table]: next };
-                });
-              }
-            )
-            .subscribe((subStatus) => {
-              if (active) setStatus(subStatus);
-            });
-
-          channels.push(channel);
-        });
-
-        channelsRef.current = channels;
+        if (active) {
+          setData(initialData);
+          setStatus("connected");
+        }
       } catch {
         if (active) setStatus("error");
       }
@@ -61,9 +39,8 @@ export function useMultiDashboardRealtime(tableNames = []) {
 
     return () => {
       active = false;
-      channelsRef.current.forEach((ch) => ch.unsubscribe());
-      channelsRef.current = [];
     };
+    // No per-page channel subscriptions — GlobalRealtimeProvider handles invalidation.
   }, [tableNames.join(",")]);
 
   return { data, status };

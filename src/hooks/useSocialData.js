@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
 import { callDashboardAPI } from "@/lib/dashboardApi";
 import { buildModules, SOCIAL_MODULE_CONFIG } from "@/components/social/socialData";
 
@@ -32,25 +31,7 @@ export function useSocialData() {
 
   useEffect(() => {
     fetchData();
-
-    // Real-time subscriptions — refetch on any entity change
-    let unsubscribes = [];
-    try {
-      unsubscribes = [
-        base44.entities.Invite?.subscribe?.(() => fetchData()),
-        base44.entities.FriendRequest?.subscribe?.(() => fetchData()),
-        base44.entities.Relationship?.subscribe?.(() => fetchData()),
-        base44.entities.CommunityGroup?.subscribe?.(() => fetchData()),
-      ].filter(Boolean);
-    } catch (e) {
-      // subscriptions may not be available yet — polling fallback
-    }
-
-    return () => {
-      unsubscribes.forEach((unsub) => {
-        try { unsub?.(); } catch (e) { /* ignore */ }
-      });
-    };
+    // Realtime invalidation handled by GlobalRealtimeProvider (single global channel).
   }, [fetchData]);
 
   const sendFriendRequest = useCallback(async (receiverId, receiverName, receiverAvatar) => {

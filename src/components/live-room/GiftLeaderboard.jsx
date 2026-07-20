@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Trophy, Crown, TrendingUp, Gift } from "lucide-react";
 import { COLORS } from "./roomData";
-import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
 
 const RANK_COLORS = ["#D4AF37", "#C0C0C0", "#CD7F32"];
 const PERIODS = [
@@ -19,11 +19,12 @@ export default function GiftLeaderboard({ onClose }) {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const transactions = await base44.entities.Transaction.filter(
-          { type: "gift", status: "completed" },
-          "-created_date",
-          500
-        );
+        const transactions = await backendGateway.readTable("wallet_transactions", {
+          filter: { type: "gift", status: "completed" },
+          limit: 500,
+          order: "created_at",
+          ascending: false,
+        }).catch(() => []);
 
         // Aggregate by sender (gifters) and recipient (receivers)
         const gifters = {};
@@ -50,7 +51,7 @@ export default function GiftLeaderboard({ onClose }) {
         // Fetch user profiles for names/avatars
         const allUids = [...new Set([...topGifters.map((g) => g.user_id), ...topReceivers.map((r) => r.user_id)])];
         const profiles = await Promise.all(
-          allUids.map((uid) => base44.entities.UserProfile.filter({ user_id: uid }).catch(() => []))
+          allUids.map((uid) => backendGateway.readTable("user_profiles", { filter: { user_id: uid }, limit: 1 }).catch(() => []))
         );
         const profileMap = {};
         profiles.forEach((pl, i) => {
@@ -79,10 +80,7 @@ export default function GiftLeaderboard({ onClose }) {
     };
 
     fetchLeaderboard();
-
-    // Real-time: re-fetch on any Transaction change
-    const unsub = base44.entities.Transaction.subscribe(fetchLeaderboard);
-    return () => unsub && unsub();
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, []);
 
   const list = data[tab] || [];

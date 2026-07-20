@@ -6,8 +6,8 @@ import { base44 } from "@/api/base44Client";
  * Fetches comprehensive live platform stats from the getPlatformStats
  * backend function, which aggregates real data from all Supabase entities.
  *
- * Also subscribes to real-time updates on key entities so dashboards
- * refresh automatically when data changes.
+ * Realtime invalidation is handled globally by GlobalRealtimeProvider
+ * (single global channel) — no per-page subscriptions.
  */
 export function useAdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -28,19 +28,7 @@ export function useAdminDashboard() {
 
   useEffect(() => {
     load();
-
-    // Real-time: re-fetch when any key entity changes
-    const subs = [
-      base44.entities.UserProfile.subscribe(() => load()),
-      base44.entities.Transaction.subscribe(() => load()),
-      base44.entities.RoomSession.subscribe(() => load()),
-      base44.entities.RoleApplication.subscribe(() => load()),
-      base44.entities.SupportTicket.subscribe(() => load()),
-      base44.entities.SecurityEvent.subscribe(() => load()),
-      base44.entities.SecurityAlert.subscribe(() => load()),
-    ];
-
-    return () => subs.forEach((unsub) => unsub && unsub());
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, [load]);
 
   return { stats, loading, refresh: load };

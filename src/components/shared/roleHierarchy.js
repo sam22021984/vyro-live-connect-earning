@@ -67,16 +67,7 @@ export function useRoleHierarchy() {
     };
 
     load();
-
-    // Real-time subscription — reload when EnterpriseRole changes
-    const unsubscribe = base44.entities.EnterpriseRole.subscribe(() => {
-      load();
-    });
-
-    return () => {
-      mounted = false;
-      unsubscribe();
-    };
+    // Realtime invalidation handled by GlobalRealtimeProvider.
   }, []);
 
   return { roles, loading };

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { backendGateway } from "@/lib/backendGateway";
 
 export function useCommunityData() {
   const [posts, setPosts] = useState([]);
@@ -12,12 +12,14 @@ export function useCommunityData() {
   const fetchAll = useCallback(async () => {
     try {
       setLoading(true);
+      // Read from RLS-protected Supabase tables via the backend gateway.
+      // Realtime invalidation is handled globally by GlobalRealtimeProvider.
       const [p, g, c, m, r] = await Promise.all([
-        base44.entities.CommunityPost.list("-created_date", 50).catch(() => []),
-        base44.entities.CommunityGroup.list("-members", 50).catch(() => []),
-        base44.entities.CommunityChannel.list("-updated_date", 50).catch(() => []),
-        base44.entities.CommunityMedia.list("-created_date", 50).catch(() => []),
-        base44.entities.CommunityReport.list("-created_date", 50).catch(() => []),
+        backendGateway.readTable("community_posts", { limit: 50, order: "created_at", ascending: false }).catch(() => []),
+        backendGateway.readTable("community_groups", { limit: 50, order: "member_count", ascending: false }).catch(() => []),
+        backendGateway.readTable("community_channels", { limit: 50, order: "updated_at", ascending: false }).catch(() => []),
+        backendGateway.readTable("community_media", { limit: 50, order: "created_at", ascending: false }).catch(() => []),
+        backendGateway.readTable("community_reports", { limit: 50, order: "created_at", ascending: false }).catch(() => []),
       ]);
       setPosts(p || []);
       setGroups(g || []);
@@ -33,14 +35,7 @@ export function useCommunityData() {
 
   useEffect(() => {
     fetchAll();
-    const unsubs = [
-      base44.entities.CommunityPost.subscribe(fetchAll),
-      base44.entities.CommunityGroup.subscribe(fetchAll),
-      base44.entities.CommunityChannel.subscribe(fetchAll),
-      base44.entities.CommunityMedia.subscribe(fetchAll),
-      base44.entities.CommunityReport.subscribe(fetchAll),
-    ];
-    return () => unsubs.forEach((u) => u && u());
+    // Realtime invalidation handled by GlobalRealtimeProvider (single global channel).
   }, [fetchAll]);
 
   const stats = {

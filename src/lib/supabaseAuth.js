@@ -1,4 +1,5 @@
 import { base44 } from "@/api/base44Client";
+import { syncSession, clearSession } from "@/lib/supabaseClient";
 
 const TOKEN_KEY = "sb_access_token";
 const REFRESH_KEY = "sb_refresh_token";
@@ -23,16 +24,22 @@ export const supabaseAuth = {
     return localStorage.getItem(TOKEN_KEY);
   },
 
-  setToken(token, refreshToken) {
+  async setToken(token, refreshToken) {
     localStorage.setItem(TOKEN_KEY, token);
     localStorage.setItem("base44_access_token", token);
     if (refreshToken) localStorage.setItem(REFRESH_KEY, refreshToken);
+    // Sync the Supabase client auth session so RLS reads and RPC calls carry the JWT
+    if (token) {
+      try { await syncSession(token, refreshToken); } catch { /* non-fatal */ }
+    }
   },
 
-  clearToken() {
+  async clearToken() {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem("base44_access_token");
     localStorage.removeItem(REFRESH_KEY);
+    // Clear the Supabase client auth session
+    try { await clearSession(); } catch { /* non-fatal */ }
   },
 
   // Extract tokens from OAuth redirect URL hash (#access_token=...&refresh_token=...)
@@ -194,7 +201,7 @@ export const supabaseAuth = {
     return null;
   },
 
-  logout() {
-    this.clearToken();
+  async logout() {
+    await this.clearToken();
   },
 };
