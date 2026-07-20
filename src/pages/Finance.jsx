@@ -1,156 +1,123 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Loader2, ChevronRight } from "lucide-react";
 import FinanceHeader from "@/components/finance/FinanceHeader";
 import StatsCards from "@/components/finance/StatsCards";
-import AnalyticsChart from "@/components/finance/AnalyticsChart";
-import TransactionsList from "@/components/finance/TransactionsList";
-import WalletOverview from "@/components/finance/WalletOverview";
-import ReportsView from "@/components/finance/ReportsView";
-import { FINANCE_COLORS, FINANCE_TABS } from "@/components/finance/financeData";
+import { FINANCE_COLORS } from "@/components/finance/financeData";
 import { useFinanceData } from "@/hooks/useFinanceData";
+
+// All rows map to a real, registered route. User-scoped only — no management actions.
+const SECTIONS = [
+  {
+    title: "Wallet & Payments",
+    items: [
+      { label: "Wallet", subtitle: "Balance & breakdown", icon: "👛", route: "/finance/wallet" },
+      { label: "Coins Recharge", subtitle: "Buy coins", icon: "⚡", route: "/coins-recharge" },
+      { label: "Payment Methods", subtitle: "PayPal & cards", icon: "💳", route: "/finance/wallet" },
+      { label: "Withdrawal Request", subtitle: "Cash out earnings", icon: "🏦", route: "/withdraw" },
+      { label: "Withdrawal Status", subtitle: "Track requests", icon: "📋", route: "/finance/wallet" },
+      { label: "Payout Status", subtitle: "Payout progress", icon: "💰", route: "/finance/wallet" },
+      { label: "Earnings Summary", subtitle: "Revenue & growth", icon: "📈", route: "/finance/wallet" },
+      { label: "Account Limits", subtitle: "Withdrawal caps", icon: "🛡️", route: "/finance/wallet" },
+    ],
+  },
+  {
+    title: "Transactions & Gifts",
+    items: [
+      { label: "Transaction History", subtitle: "All activity", icon: "🧾", route: "/finance/transactions" },
+      { label: "Gifts Sent", subtitle: "Gifts you sent", icon: "🎁", route: "/finance/transactions" },
+      { label: "Gifts Received", subtitle: "Gifts you received", icon: "🎀", route: "/finance/transactions" },
+    ],
+  },
+  {
+    title: "Verification & KYC",
+    items: [
+      { label: "KYC & Verification", subtitle: "All records", icon: "✅", route: "/finance/verification" },
+      { label: "Identity Verification", subtitle: "Verify identity", icon: "🪪", route: "/face-verification" },
+      { label: "Selfie Verification", subtitle: "Face liveness", icon: "🤳", route: "/face-verification" },
+      { label: "Document Verification", subtitle: "ID / age docs", icon: "📄", route: "/face-verification" },
+      { label: "Phone Verification", subtitle: "Phone status", icon: "📱", route: "/finance/verification" },
+      { label: "Email Verification", subtitle: "Email status", icon: "📧", route: "/finance/verification" },
+      { label: "Verification Status", subtitle: "Overall status", icon: "🔎", route: "/finance/verification" },
+    ],
+  },
+  {
+    title: "Account & Security",
+    items: [
+      { label: "Account Status", subtitle: "Standing", icon: "👤", route: "/finance/warnings" },
+      { label: "Warnings", subtitle: "Active warnings", icon: "⚠️", route: "/finance/warnings" },
+      { label: "Warning History", subtitle: "Past records", icon: "📜", route: "/finance/warnings" },
+      { label: "Support and Appeal", subtitle: "Open a ticket", icon: "🛟", route: "/support-center" },
+      { label: "Security Settings", subtitle: "Password & device", icon: "🔐", route: "/settings" },
+      { label: "Notifications", subtitle: "Alerts & messages", icon: "🔔", route: "/message-center" },
+    ],
+  },
+];
 
 export default function Finance() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("overview");
-  const { statsCards, revenueData, recentTransactions, walletSummary, withdrawals, reportCategories, financeNotifications, heroStats, loading } = useFinanceData();
+  const { statsCards, loading, hasRealData } = useFinanceData();
+
+  const handleNavigate = (route) => {
+    navigate(route);
+  };
 
   return (
-    <div className="min-h-screen" style={{ background: FINANCE_COLORS.bg }}>
-      <FinanceHeader title="Finance Dashboard" subtitle="VYRO Live Connect Financial Center" />
+    <div className="min-h-screen pb-24" style={{ background: FINANCE_COLORS.bg }}>
+      <FinanceHeader title="Finance" subtitle="Wallet, transactions & verification" />
 
-      {/* Search + Filter */}
-      <div className="sticky top-[60px] z-20 px-4 py-3" style={{ background: FINANCE_COLORS.bg }}>
-        <div className="flex items-center gap-2">
+      <div className="px-4 pt-4 space-y-4">
+        {/* Wallet snapshot */}
+        {loading ? (
+          <div className="flex justify-center py-6">
+            <Loader2 className="w-6 h-6 animate-spin" style={{ color: FINANCE_COLORS.royalBlue }} />
+          </div>
+        ) : hasRealData ? (
+          <StatsCards stats={statsCards} />
+        ) : (
           <div
-            className="flex-1 flex items-center gap-2 rounded-xl px-3 py-2"
+            className="rounded-2xl p-4 text-center"
             style={{ background: FINANCE_COLORS.card, border: `1px solid ${FINANCE_COLORS.border}` }}
           >
-            <Search size={15} style={{ color: FINANCE_COLORS.textSecondary }} />
-            <input
-              placeholder="Search transactions, users, reports..."
-              className="flex-1 text-xs outline-none bg-transparent"
-              style={{ color: FINANCE_COLORS.textPrimary }}
-            />
+            <p className="text-xs font-bold" style={{ color: FINANCE_COLORS.textPrimary }}>Wallet data unavailable</p>
+            <p className="text-[10px] mt-1" style={{ color: FINANCE_COLORS.textSecondary }}>Your balance will appear here once available.</p>
           </div>
-          <button
-            className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-95 transition"
-            style={{ background: FINANCE_COLORS.navyGradient, boxShadow: "0 2px 8px rgba(15,27,61,0.2)" }}
-          >
-            <SlidersHorizontal size={15} className="text-white" />
-          </button>
-        </div>
-      </div>
+        )}
 
-      {/* Tabs */}
-      <div className="sticky top-[116px] z-10 px-4 pb-2" style={{ background: FINANCE_COLORS.bg }}>
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-2 min-w-max">
-            {FINANCE_TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className="py-2 px-4 rounded-full text-xs font-bold transition active:scale-95 whitespace-nowrap"
-                style={activeTab === tab.id
-                  ? { background: FINANCE_COLORS.navyGradient, color: "#FFFFFF", boxShadow: "0 2px 8px rgba(15,27,61,0.25)" }
-                  : { background: FINANCE_COLORS.card, color: FINANCE_COLORS.textSecondary, border: `1px solid ${FINANCE_COLORS.border}` }
-                }
-              >
-                <span className="mr-1">{tab.icon}</span>{tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="px-4 pb-24 space-y-4">
-        {/* Overview tab */}
-        {activeTab === "overview" && (
-          <>
-            {/* Hero summary banner */}
+        {/* Sections */}
+        {SECTIONS.map((section) => (
+          <div key={section.title}>
+            <h3 className="text-[10px] font-bold uppercase tracking-wider px-1 mb-2" style={{ color: FINANCE_COLORS.textSecondary }}>
+              {section.title}
+            </h3>
             <div
-              className="rounded-2xl p-4 text-white"
-              style={{
-                background: FINANCE_COLORS.navyGradient,
-                boxShadow: "0 4px 20px rgba(15,27,61,0.25)",
-              }}
+              className="rounded-2xl overflow-hidden"
+              style={{ background: FINANCE_COLORS.card, border: `1px solid ${FINANCE_COLORS.border}`, boxShadow: "0 2px 12px rgba(15,27,61,0.05)" }}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="text-[10px] text-white/60">Total Financial Overview</p>
-                  <h2 className="text-xl font-bold">{heroStats.totalOverview}</h2>
-                </div>
-                <div
-                  className="px-3 py-1.5 rounded-full"
-                  style={{ background: `${FINANCE_COLORS.gold}20`, border: `1px solid ${FINANCE_COLORS.gold}40` }}
+              {section.items.map((item, idx) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => handleNavigate(item.route)}
+                  className="w-full text-left flex items-center gap-3 px-4 py-3 transition active:scale-[0.99]"
+                  style={{ borderTop: idx === 0 ? "none" : `1px solid ${FINANCE_COLORS.border}` }}
                 >
-                  <span className="text-xs font-bold" style={{ color: FINANCE_COLORS.goldLight }}>🏆 Premium</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <p className="text-[8px] text-white/50">Monthly Growth</p>
-                  <p className="text-sm font-bold" style={{ color: FINANCE_COLORS.emerald }}>{heroStats.monthlyGrowth > 0 ? "+" : ""}{heroStats.monthlyGrowth}% ↑</p>
-                </div>
-                <div className="flex-1">
-                  <p className="text-[8px] text-white/50">Active Accounts</p>
-                  <p className="text-sm font-bold">{heroStats.activeAccounts.toLocaleString()}</p>
-                </div>
-                <div className="flex-1">
-                  <p className="text-[8px] text-white/50">Pending</p>
-                  <p className="text-sm font-bold" style={{ color: FINANCE_COLORS.warning }}>{heroStats.pendingCount}</p>
-                </div>
-              </div>
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: `${FINANCE_COLORS.royalBlue}10` }}
+                  >
+                    <span className="text-base">{item.icon}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold" style={{ color: FINANCE_COLORS.textPrimary }}>{item.label}</p>
+                    <p className="text-[10px]" style={{ color: FINANCE_COLORS.textSecondary }}>{item.subtitle}</p>
+                  </div>
+                  <ChevronRight size={16} style={{ color: FINANCE_COLORS.textSecondary }} />
+                </button>
+              ))}
             </div>
-
-            {/* Finance Module is accessible only from Creator Center */}
-
-            {/* Coins Recharge Access Button */}
-            <button
-              onClick={() => navigate("/coins-recharge")}
-              className="w-full rounded-2xl p-4 flex items-center gap-3 active:scale-[0.98] transition"
-              style={{
-                background: "linear-gradient(135deg, #B8941E 0%, #D4AF37 50%, #E5C158 100%)",
-                boxShadow: "0 4px 16px rgba(212,175,55,0.3)",
-              }}
-            >
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)" }}
-              >
-                <span className="text-xl">⚡</span>
-              </div>
-              <div className="flex-1 text-left">
-                <h3 className="text-sm font-bold text-white">Coins Recharge Wallet</h3>
-                <p className="text-[10px] text-white/80">20 tiers · $1 → $5000 · Up to 22% bonus</p>
-              </div>
-              <div className="px-3 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                <span className="text-xs font-bold text-white">Recharge →</span>
-              </div>
-            </button>
-
-            <StatsCards stats={statsCards} />
-            <AnalyticsChart revenueData={revenueData} />
-            <TransactionsList transactions={recentTransactions} loading={loading} />
-          </>
-        )}
-
-        {/* Transactions tab */}
-        {activeTab === "transactions" && (
-          <>
-            <StatsCards stats={statsCards} />
-            <TransactionsList transactions={recentTransactions} loading={loading} />
-          </>
-        )}
-
-        {/* Wallet tab */}
-        {activeTab === "wallet" && <WalletOverview walletSummary={walletSummary} withdrawals={withdrawals} loading={loading} />}
-
-        {/* Withdrawals tab */}
-        {activeTab === "withdrawals" && <WalletOverview walletSummary={walletSummary} withdrawals={withdrawals} loading={loading} />}
-
-        {/* Reports tab */}
-        {activeTab === "reports" && <ReportsView reportCategories={reportCategories} notifications={financeNotifications} />}
+          </div>
+        ))}
       </div>
     </div>
   );

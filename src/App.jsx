@@ -34,6 +34,10 @@ import PartyDashboard from '@/pages/PartyDashboard';
 import LiveRoom from '@/pages/LiveRoom';
 import GoLivePanel from '@/pages/GoLivePanel';
 import Finance from '@/pages/Finance';
+import UserWallet from '@/pages/finance/UserWallet';
+import UserTransactions from '@/pages/finance/UserTransactions';
+import UserVerification from '@/pages/finance/UserVerification';
+import UserWarnings from '@/pages/finance/UserWarnings';
 import FinanceModule from '@/pages/FinanceModule';
 import CoinsRecharge from '@/pages/CoinsRecharge';
 import Withdraw from '@/pages/Withdraw';
@@ -163,6 +167,10 @@ const AuthenticatedApp = () => {
         <Route path="/live-room/:id" element={<LiveRoom />} />
         <Route path="/go-live" element={<GoLivePanel />} />
         <Route path="/finance" element={<Finance />} />
+        <Route path="/finance/wallet" element={<UserWallet />} />
+        <Route path="/finance/transactions" element={<UserTransactions />} />
+        <Route path="/finance/verification" element={<UserVerification />} />
+        <Route path="/finance/warnings" element={<UserWarnings />} />
         <Route path="/coins-recharge" element={<CoinsRecharge />} />
         <Route path="/withdraw" element={<Withdraw />} />
         <Route path="/control-center" element={<ControlCenter />} />
