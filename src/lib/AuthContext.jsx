@@ -5,6 +5,7 @@ import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 import { trackEvent } from '@/lib/eventTracker';
 import { refreshBackendIdentity } from '@/lib/refreshBackendIdentity';
+import { queryClientInstance } from '@/lib/query-client';
 
 const AuthContext = createContext();
 
@@ -83,6 +84,9 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     setAuthChecked(true);
+    // Clear all cached queries so stale user/dashboard data never leaks across accounts.
+    // The GlobalRealtimeProvider disconnects its channel via the isAuthenticated effect.
+    queryClientInstance.clear();
 
     if (shouldRedirect) {
       window.location.href = '/login';

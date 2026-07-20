@@ -18,27 +18,9 @@ export function useServicesData() {
 
   useEffect(() => {
     fetchData();
-
-    // Real-time subscriptions — refetch on any entity change
-    let unsubscribes = [];
-    try {
-      unsubscribes = [
-        base44.entities.Notification?.subscribe?.(() => fetchData()),
-        base44.entities.SupportTicket?.subscribe?.(() => fetchData()),
-        base44.entities.MallItem?.subscribe?.(() => fetchData()),
-        base44.entities.UserProfile?.subscribe?.(() => fetchData()),
-        base44.entities.Badge?.subscribe?.(() => fetchData()),
-        base44.entities.Achievement?.subscribe?.(() => fetchData()),
-      ].filter(Boolean);
-    } catch (e) {
-      // subscriptions may not be available
-    }
-
-    return () => {
-      unsubscribes.forEach((unsub) => {
-        try { unsub?.(); } catch (e) { /* ignore */ }
-      });
-    };
+    // Realtime invalidation is handled centrally by GlobalRealtimeProvider
+    // (single global Supabase channel → React Query cache invalidation).
+    // No per-page entity subscriptions are created here.
   }, [fetchData]);
 
   const markAsRead = useCallback(async (notificationId) => {
